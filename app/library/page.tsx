@@ -98,7 +98,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
                   <ResourceCard key={resource.id} resource={resource} />
                 ))}
               </div>
-              {data.total_pages > 1 && params.page < data.total_pages && (
+              {data.total_pages > 1 && (params.page ?? 1) < data.total_pages && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <a
                     href={`/library?${new URLSearchParams({

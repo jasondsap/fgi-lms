@@ -225,7 +225,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                     justifyContent: 'center',
                     marginTop: '1.5rem',
                   }}>
-                    {params.page < data.total_pages && (
+                    {(params.page ?? 1) < data.total_pages && (
                       <a
                         href={`/?${new URLSearchParams({
                           ...Object.fromEntries(
