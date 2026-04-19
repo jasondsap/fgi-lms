@@ -6,6 +6,7 @@ import {
   RESOURCE_TYPE_COLORS,
   AUDIENCE_TAG_LABELS,
   TOPIC_TAG_LABELS,
+  type ResourceType,
 } from '@/types';
 
 async function getResource(slug: string) {
@@ -32,10 +33,11 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
   const resource = await getResource(params.slug);
   if (!resource) notFound();
 
-  const badgeColor  = RESOURCE_TYPE_COLORS[resource.type];
-  const typeLabel   = RESOURCE_TYPE_LABELS[resource.type];
-  const cardImage   = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
-  const isVideo     = resource.type === 'video' || resource.type === 'webinar';
+  const type        = resource.type as ResourceType;
+  const badgeColor  = RESOURCE_TYPE_COLORS[type];
+  const typeLabel   = RESOURCE_TYPE_LABELS[type];
+  const cardImage   = resource.thumbnail_url || CATEGORY_CARD_IMAGE[type] || null;
+  const isVideo     = type === 'video' || type === 'webinar';
   const isPDF       = !!resource.download_url;
   const isExternal  = !!resource.external_url;
 
