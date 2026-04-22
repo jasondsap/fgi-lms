@@ -71,99 +71,106 @@ export default async function HomePage({ searchParams }: PageProps) {
         borderBottom: '1px solid #e8e8e8',
         padding: '2.5rem 2rem 2rem',
       }}>
-        <div style={{
-          maxWidth: 'var(--max-width)',
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1fr 360px',
-          gap: '3rem',
-          alignItems: 'start',
-        }}>
-          {/* Left: copy */}
-          <div>
-            <h1 style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              color: 'var(--fgi-blue)',
-              marginBottom: '1.25rem',
-              lineHeight: 1.3,
-            }}>
-              Welcome to the Fletcher Group Educational Resource Center
-            </h1>
+        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
 
-            <p style={{ marginBottom: '0.9rem', fontSize: '15px', lineHeight: 1.7 }}>
-              The Fletcher Group's Educational Resource Center is a no-cost, national platform created to
-              support and strengthen the Substance Use Disorder Recovery Ecosystem in rural, urban, and
-              metropolitan areas. It brings together a thoughtfully curated collection of resources designed
-              to expand capacity, enhance quality, and improve access to recovery supports.
-            </p>
+          {/* Centered title */}
+          <h1 style={{
+            fontSize: '26px',
+            fontWeight: 700,
+            color: 'var(--fgi-blue)',
+            marginBottom: '1.75rem',
+            lineHeight: 1.3,
+            textAlign: 'center',
+          }}>
+            Welcome to the Fletcher Group Learning Resource Center
+          </h1>
 
-            <p style={{ marginBottom: '0.6rem', fontSize: '15px' }}>
-              Within the Center, you'll find a wide range of materials, including:
-            </p>
-            <ul style={{ paddingLeft: '1.5rem', marginBottom: '0.9rem', fontSize: '15px', lineHeight: 1.85 }}>
-              <li>Courses (including NAADAC CE-approved offerings)</li>
-              <li>How-to toolkits</li>
-              <li>Webinars</li>
-              <li>Newsletters</li>
-              <li>Podcasts</li>
-              <li>Publications</li>
-              <li>And more</li>
-            </ul>
+          {/* Two-column: copy left, video right */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 360px',
+            gap: '3rem',
+            alignItems: 'start',
+          }}>
+            {/* Left: body copy */}
+            <div>
+              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
+                The Fletcher Group&#x2019;s Learning Resource Center is a no-cost, national platform
+                dedicated to supporting and strengthening the Substance Use Disorder Recovery Ecosystem
+                across rural, urban, and metropolitan communities. It offers a curated collection of
+                resources designed to expand capacity, enhance quality, and improve access to recovery
+                supports.
+              </p>
 
-            <p style={{ marginBottom: '0.9rem', fontSize: '15px', lineHeight: 1.7 }}>
-              This resource center is for everyone invested in recovery—recovery housing owners and
-              operators, staff, residents, peer support specialists, clinicians, workforce professionals,
-              allies, and community partners.
-            </p>
+              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
+                Within the Center, you&#x2019;ll find a wide range of materials, including courses (some
+                NAADAC CE-approved), how-to toolkits, recovery housing (RH) guidebooks and handbooks,
+                webinars, podcasts, publications, newsletters, success stories, and more.
+              </p>
 
-            <p style={{ marginBottom: '1.25rem', fontSize: '15px', lineHeight: 1.7 }}>
-              We invite you to explore, learn, and grow with us.
-            </p>
+              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
+                The learning resource center is for everyone invested in recovery&#x2014;recovery housing
+                owners and operators, staff, residents, peer supports, clinicians, workforce and criminal
+                justice professionals, allies, and community partners.
+              </p>
 
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-              For assistance contact{' '}
-              <a href="mailto:LC@fletchergroup.org">LC@fletchergroup.org</a>.
-            </p>
-          </div>
-
-          {/* Right: Vimeo embed */}
-          <div>
-            <div style={{
-              position: 'relative',
-              paddingTop: '56.25%',
-              borderRadius: 'var(--radius-md)',
-              overflow: 'hidden',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-              background: '#111',
-            }}>
-              <iframe
-                src="https://player.vimeo.com/video/1181685318?h=3d4673b6ea&badge=0&autopause=0&player_id=0&app_id=58479"
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                title="FGI Who We Are"
-              />
+              <p style={{ fontSize: '15px', lineHeight: 1.75 }}>
+                We invite you to explore, learn, and grow with us.
+              </p>
             </div>
-            <a
-              href="https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'block',
-                marginTop: '10px',
-                background: 'var(--fgi-blue)',
-                color: '#fff',
-                textAlign: 'center',
-                padding: '10px 0',
+
+            {/* Right: Vimeo embed + email below */}
+            <div>
+              <div style={{
+                position: 'relative',
+                paddingTop: '56.25%',
                 borderRadius: 'var(--radius-md)',
-                fontWeight: 600,
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              Who We Are
-            </a>
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                background: '#111',
+              }}>
+                <iframe
+                  src="https://player.vimeo.com/video/1181685318?h=3d4673b6ea&badge=0&autopause=0&player_id=0&app_id=58479"
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  title="FGI Who We Are"
+                />
+              </div>
+
+              <a
+                href="https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  marginTop: '10px',
+                  background: 'var(--fgi-blue)',
+                  color: '#fff',
+                  textAlign: 'center',
+                  padding: '10px 0',
+                  borderRadius: 'var(--radius-md)',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                }}
+              >
+                Who We Are
+              </a>
+
+              {/* Email — balanced under video */}
+              <p style={{
+                marginTop: '12px',
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                textAlign: 'center',
+              }}>
+                For support contact{' '}
+                <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
+                  LC@fletchergroup.org
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -181,18 +188,15 @@ export default async function HomePage({ searchParams }: PageProps) {
           alignItems: 'flex-start',
         }}>
 
-          {/* ── Sidebar ── */}
+          {/* Sidebar */}
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
             <FilterSidebar total={data.total} targetPath="/" />
           </Suspense>
 
-          {/* ── Main content area ── */}
+          {/* Main content area */}
           <div style={{ flex: 1, minWidth: 0 }}>
-
-            {/* Search bar */}
             <SearchBar defaultValue={params.search} targetPath="/" />
 
-            {/* Grid */}
             {data.resources.length === 0 ? (
               <div style={{
                 textAlign: 'center',
@@ -218,13 +222,8 @@ export default async function HomePage({ searchParams }: PageProps) {
                   ))}
                 </div>
 
-                {/* Load more / pagination */}
                 {data.total_pages > 1 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginTop: '1.5rem',
-                  }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
                     {(params.page ?? 1) < data.total_pages && (
                       <a
                         href={`/?${new URLSearchParams({

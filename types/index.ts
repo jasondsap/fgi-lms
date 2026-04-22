@@ -4,7 +4,9 @@
 
 export type ResourceType =
   | 'course'
+  | 'naadac_ce'
   | 'toolkit'
+  | 'handbook'
   | 'webinar'
   | 'newsletter'
   | 'video'
@@ -12,7 +14,6 @@ export type ResourceType =
   | 'paper'
   | 'infographic'
   | 'success_story'
-  | 'calculator'
   | 'non_fgi';
 
 export type AudienceTag =
@@ -35,7 +36,12 @@ export type TopicTag =
   | 'funding'
   | 'research'
   | 'mental_health'
-  | 'self_care';
+  | 'self_care'
+  | 'hud'
+  | 'recovery_ky_model'
+  | 'rhoar_model'
+  | 'recovery_ecosystems'
+  | 'rh_policies';
 
 // ---------------------------------------------------------------------------
 // Resource
@@ -111,20 +117,21 @@ export interface ResourceListResponse {
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   course:        'Course / Training',
-  toolkit:       'Toolkit / How-To Guide',
+  naadac_ce:     'NAADAC CE Course',
+  toolkit:       'Toolkit',
+  handbook:      'Handbook / Guidebook',
   webinar:       'Webinar',
   newsletter:    'Newsletter',
   video:         'Video',
   podcast:       'Podcast',
-  paper:         'Whitepaper / Article',
+  paper:         'Publication / Whitepaper',
   infographic:   'Infographic',
   success_story: 'Success Story',
-  calculator:    'Recovery Economic Calculator',
   non_fgi:       'Non-FGI Recommended',
 };
 
 export const AUDIENCE_TAG_LABELS: Record<AudienceTag, string> = {
-  house_owner:      'House Owner / Operator / Staff',
+  house_owner:      'RH Owner / Operator / Staff',
   peer_support:     'Peer Support Professional',
   community:        'Community Member / Ally',
   criminal_justice: 'Criminal Justice Professional',
@@ -134,17 +141,22 @@ export const AUDIENCE_TAG_LABELS: Record<AudienceTag, string> = {
 };
 
 export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
-  establishing_rh:  'Establishing a Recovery House',
-  rh_management:    'Recovery House Management',
-  operations:       'Recovery House Operations',
-  recovery_support: 'Recovery Support Services',
-  social_model:     'Social Model of Recovery',
-  reentry:          'Re-entry / Criminal Justice',
-  workforce:        'Workforce',
-  funding:          'Funding',
-  research:         'Research / Data',
-  mental_health:    'Co-Occurring Mental Health',
-  self_care:        'Self-care',
+  establishing_rh:    'Establishing an RH',
+  rh_management:      'RH Management',
+  operations:         'RH Operations',
+  recovery_support:   'Recovery Support Services',
+  social_model:       'Social Model of Recovery',
+  reentry:            'Re-entry / Criminal Justice',
+  workforce:          'Workforce',
+  funding:            'Funding',
+  research:           'Research / Data / Recovery Economic Calculator',
+  mental_health:      'Co-Occurring Mental Health',
+  self_care:          'Self-care',
+  hud:                'HUD',
+  recovery_ky_model:  'Recovery KY Model',
+  rhoar_model:        'RHOAR Model',
+  recovery_ecosystems:'Recovery Ecosystems',
+  rh_policies:        'RH Policies & Procedures',
 };
 
 export const DURATION_LABELS = {
@@ -159,7 +171,9 @@ export const DURATION_LABELS = {
 // Badge colors matching FGI mockup
 export const RESOURCE_TYPE_COLORS: Record<ResourceType, string> = {
   course:        '#0e72a2',
+  naadac_ce:     '#1a5f7a',
   toolkit:       '#2d6a4f',
+  handbook:      '#3a7d44',
   webinar:       '#f4a261',
   newsletter:    '#c9a227',
   video:         '#e76f51',
@@ -167,6 +181,5 @@ export const RESOURCE_TYPE_COLORS: Record<ResourceType, string> = {
   paper:         '#795548',
   infographic:   '#0097a7',
   success_story: '#388e3c',
-  calculator:    '#546e7a',
   non_fgi:       '#8d6e63',
 };

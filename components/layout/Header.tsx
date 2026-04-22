@@ -81,8 +81,8 @@ export default function Header() {
           <Image
             src="/images/logos/rcorp-badge.png"
             alt="RCORP"
-            width={62}
-            height={62}
+            width={78}
+            height={78}
             style={{ objectFit: 'contain', opacity: 0.9 }}
             priority
           />
