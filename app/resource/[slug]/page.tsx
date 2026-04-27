@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   RESOURCE_TYPE_LABELS,
   RESOURCE_TYPE_COLORS,
@@ -16,7 +15,6 @@ async function getResource(slug: string) {
   return res.json();
 }
 
-// Map resource type to the category card image in /public/images/category-cards/
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
   newsletter:    '/images/category-cards/newsletter.png',
   toolkit:       '/images/category-cards/toolkit.png',
@@ -27,27 +25,26 @@ const CATEGORY_CARD_IMAGE: Record<string, string> = {
   infographic:   '/images/category-cards/infographic.png',
   success_story: '/images/category-cards/success-story.png',
   handbook:      '/images/category-cards/handbook.png',
+  course:        '/images/category-cards/toolkit.png',
+  naadac_ce:     '/images/category-cards/toolkit.png',
 };
 
 export default async function ResourceDetailPage({ params }: { params: { slug: string } }) {
   const resource = await getResource(params.slug);
   if (!resource) notFound();
 
-  const type        = resource.type as ResourceType;
-  const badgeColor  = RESOURCE_TYPE_COLORS[type];
-  const typeLabel   = RESOURCE_TYPE_LABELS[type];
-  const cardImage   = resource.thumbnail_url || CATEGORY_CARD_IMAGE[type] || null;
-  const isVideo     = type === 'video' || type === 'webinar';
-  const isPDF       = !!resource.download_url;
-  const isExternal  = !!resource.external_url;
+  const type       = resource.type as ResourceType;
+  const badgeColor = RESOURCE_TYPE_COLORS[type];
+  const typeLabel  = RESOURCE_TYPE_LABELS[type];
+  const cardImage  = resource.thumbnail_url || CATEGORY_CARD_IMAGE[type] || null;
+  const isVideo    = type === 'video' || type === 'webinar';
+  const isPDF      = !!resource.download_url;
+  const isExternal = !!resource.external_url;
+  const shortLabel = typeLabel?.split(' / ')[0] ?? typeLabel;
 
   return (
     <div style={{ background: 'var(--body-bg)', minHeight: '60vh' }}>
-      <div style={{
-        maxWidth: 'var(--max-width)',
-        margin: '0 auto',
-        padding: '2rem 2rem 4rem',
-      }}>
+      <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', padding: '2rem 2rem 4rem' }}>
 
         {/* Breadcrumb */}
         <nav style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '1.75rem' }}>
@@ -58,7 +55,7 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
           <span>{resource.title}</span>
         </nav>
 
-        {/* ── Two-column layout ── */}
+        {/* Two-column layout */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 320px',
@@ -66,30 +63,21 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
           alignItems: 'start',
         }}>
 
-          {/* ── LEFT: main content ── */}
+          {/* LEFT: main content */}
           <div>
-
-            {/* Title */}
             <h1 style={{
-              fontSize: '26px',
-              fontWeight: 700,
-              lineHeight: 1.25,
-              marginBottom: '1.5rem',
-              color: 'var(--text-primary)',
+              fontSize: '26px', fontWeight: 700,
+              lineHeight: 1.25, marginBottom: '1.5rem',
             }}>
               {resource.title}
             </h1>
 
-            {/* Vimeo embed (video/webinar) */}
+            {/* Vimeo embed */}
             {isVideo && resource.vimeo_id && (
               <div style={{
-                position: 'relative',
-                paddingTop: '56.25%',
-                marginBottom: '1.75rem',
-                borderRadius: 'var(--radius-md)',
-                overflow: 'hidden',
-                background: '#111',
-                boxShadow: 'var(--shadow-card)',
+                position: 'relative', paddingTop: '56.25%',
+                marginBottom: '1.75rem', borderRadius: 'var(--radius-md)',
+                overflow: 'hidden', background: '#111',
               }}>
                 <iframe
                   src={`https://player.vimeo.com/video/${resource.vimeo_id}?badge=0&autopause=0`}
@@ -101,57 +89,39 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
               </div>
             )}
 
-            {/* Description section */}
+            {/* Description */}
             <div style={{
-              background: 'var(--card-bg)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1.5rem',
-              marginBottom: '1.5rem',
+              background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '1.5rem',
             }}>
               <div style={{
-                fontSize: '12px',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.07em',
-                color: 'var(--text-muted)',
-                marginBottom: '10px',
+                fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
+                letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '10px',
               }}>
                 Description
               </div>
-              <p style={{
-                fontSize: '15px',
-                lineHeight: 1.75,
-                color: 'var(--text-secondary)',
-              }}>
+              <p style={{ fontSize: '15px', lineHeight: 1.75, color: 'var(--text-secondary)' }}>
                 {resource.description}
               </p>
             </div>
 
-            {/* Audience + Topic tags */}
+            {/* Tags */}
             {(resource.audience_tags?.length > 0 || resource.topic_tags?.length > 0) && (
               <div style={{
-                background: 'var(--card-bg)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1.25rem 1.5rem',
+                background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)', padding: '1.25rem 1.5rem',
               }}>
                 {resource.audience_tags?.length > 0 && (
                   <div style={{ marginBottom: resource.topic_tags?.length > 0 ? '1rem' : 0 }}>
                     <div style={{
                       fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
                       letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '8px',
-                    }}>
-                      Audience
-                    </div>
+                    }}>Audience</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                       {resource.audience_tags.map((tag: string) => (
                         <span key={tag} style={{
-                          background: 'var(--fgi-blue-light)',
-                          color: 'var(--fgi-blue-dark)',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '13px',
+                          background: 'var(--fgi-blue-light)', color: 'var(--fgi-blue-dark)',
+                          padding: '4px 12px', borderRadius: '20px', fontSize: '13px',
                         }}>
                           {AUDIENCE_TAG_LABELS[tag as keyof typeof AUDIENCE_TAG_LABELS] || tag}
                         </span>
@@ -164,17 +134,12 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
                     <div style={{
                       fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
                       letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '8px',
-                    }}>
-                      Topics
-                    </div>
+                    }}>Topics</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                       {resource.topic_tags.map((tag: string) => (
                         <span key={tag} style={{
-                          background: '#f0f7ef',
-                          color: '#2d6a4f',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '13px',
+                          background: '#f0f7ef', color: '#2d6a4f',
+                          padding: '4px 12px', borderRadius: '20px', fontSize: '13px',
                         }}>
                           {TOPIC_TAG_LABELS[tag as keyof typeof TOPIC_TAG_LABELS] || tag}
                         </span>
@@ -186,107 +151,67 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
             )}
           </div>
 
-          {/* ── RIGHT: sidebar actions ── */}
+          {/* RIGHT: sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-            {/* Category card / thumbnail image */}
+            {/* Category card image — plain img tag, no crash if file missing */}
             {cardImage && !isVideo && (
               <div style={{
-                borderRadius: 'var(--radius-md)',
-                overflow: 'hidden',
-                boxShadow: 'var(--shadow-card)',
-                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                boxShadow: 'var(--shadow-card)', border: '1px solid var(--border-color)',
+                background: `${badgeColor}18`,
               }}>
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={cardImage}
                   alt={resource.title}
-                  width={320}
-                  height={200}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
               </div>
             )}
 
             {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {/* Open (view in browser) */}
               {isPDF && (
-                <a
-                  href={resource.download_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a href={resource.download_url} target="_blank" rel="noopener noreferrer"
                   style={{
-                    display: 'block',
-                    background: 'var(--fgi-blue)',
-                    color: '#fff',
-                    textAlign: 'center',
-                    padding: '13px 0',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 600,
-                    fontSize: '15px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Open {typeLabel.split(' / ')[0]}
+                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
+                    fontWeight: 600, fontSize: '15px', textDecoration: 'none',
+                  }}>
+                  Open {shortLabel}
                 </a>
               )}
-
-              {/* Download */}
               {isPDF && (
-                <a
-                  href={resource.download_url}
-                  download
+                <a href={resource.download_url} download
                   style={{
-                    display: 'block',
-                    background: 'var(--fgi-blue)',
-                    color: '#fff',
-                    textAlign: 'center',
-                    padding: '13px 0',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 600,
-                    fontSize: '15px',
-                    textDecoration: 'none',
-                    opacity: 0.88,
-                  }}
-                >
-                  Download {typeLabel.split(' / ')[0]}
+                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
+                    fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
+                  }}>
+                  Download {shortLabel}
                 </a>
               )}
-
-              {/* External link (podcasts, non-FGI) */}
               {isExternal && (
-                <a
-                  href={resource.external_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <a href={resource.external_url} target="_blank" rel="noopener noreferrer"
                   style={{
-                    display: 'block',
-                    background: 'var(--fgi-blue)',
-                    color: '#fff',
-                    textAlign: 'center',
-                    padding: '13px 0',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 600,
-                    fontSize: '15px',
-                    textDecoration: 'none',
-                  }}
-                >
+                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
+                    fontWeight: 600, fontSize: '15px', textDecoration: 'none',
+                  }}>
                   Open Resource
                 </a>
               )}
             </div>
 
-            {/* Type badge + duration meta */}
+            {/* Meta */}
             <div style={{
-              background: 'var(--card-bg)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              padding: '1rem 1.125rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '8px',
+              background: 'var(--card-bg)', border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)', padding: '1rem 1.125rem',
+              display: 'flex', flexDirection: 'column', gap: '8px',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{
                   background: badgeColor, color: '#fff',
                   fontSize: '12px', fontWeight: 600,
@@ -304,13 +229,11 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
                   </span>
                 )}
               </div>
-
               {resource.duration_minutes && (
                 <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                   ⏱ Approx. {resource.duration_minutes} min.
                 </div>
               )}
-
               {resource.published_at && (
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                   {new Date(resource.published_at).toLocaleDateString('en-US', {
@@ -320,14 +243,11 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
               )}
             </div>
 
-            {/* Support link */}
+            {/* Support */}
             <div style={{
-              background: 'var(--fgi-blue-light)',
-              border: '1px solid #cce3f0',
-              borderRadius: 'var(--radius-md)',
-              padding: '1rem 1.125rem',
-              fontSize: '13px',
-              color: 'var(--text-secondary)',
+              background: 'var(--fgi-blue-light)', border: '1px solid #cce3f0',
+              borderRadius: 'var(--radius-md)', padding: '1rem 1.125rem',
+              fontSize: '13px', color: 'var(--text-secondary)',
             }}>
               For support email{' '}
               <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
@@ -335,21 +255,14 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
               </a>
             </div>
 
-            {/* Back to library */}
+            {/* Back */}
             <Link href="/" style={{
-              display: 'block',
-              textAlign: 'center',
-              padding: '10px 0',
-              borderRadius: 'var(--radius-md)',
-              border: '1.5px solid var(--fgi-blue)',
-              color: 'var(--fgi-blue)',
-              fontWeight: 600,
-              fontSize: '14px',
-              textDecoration: 'none',
+              display: 'block', textAlign: 'center', padding: '10px 0',
+              borderRadius: 'var(--radius-md)', border: '1.5px solid var(--fgi-blue)',
+              color: 'var(--fgi-blue)', fontWeight: 600, fontSize: '14px', textDecoration: 'none',
             }}>
               ← Back to Library
             </Link>
-
           </div>
         </div>
       </div>
