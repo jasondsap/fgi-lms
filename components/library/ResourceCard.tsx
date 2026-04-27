@@ -5,20 +5,21 @@ import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
 
 interface Props { resource: Resource; }
 
-// Shell card images used as thumbnails in the grid
-const SHELL_CARD_IMAGE: Record<string, string> = {
-  newsletter:    '/images/shell-cards/newletter-shell-card.png',
-  toolkit:       '/images/shell-cards/toolkit-shell-card.png',
-  handbook:      '/images/shell-cards/handbook-shell-card.png',
-  webinar:       '/images/shell-cards/webinar-shell-card.png',
-  podcast:       '/images/shell-cards/podcasts-shell-card.png',
-  paper:         '/images/shell-cards/paper-shell-card.png',
-  infographic:   '/images/shell-cards/infographic-shell-card.png',
-  success_story: '/images/shell-cards/success-stories-shell-card.png',
-  course:        '/images/shell-cards/toolkit-shell-card.png',
-  naadac_ce:     '/images/shell-cards/toolkit-shell-card.png',
-  non_fgi:       '/images/shell-cards/paper-shell-card.png',
-  video:         '/images/shell-cards/webinar-shell-card.png',
+// Category card images — used as thumbnails in the library grid
+// Filenames matched exactly to what's in /public/images/category-cards/
+const CATEGORY_CARD_IMAGE: Record<string, string> = {
+  newsletter:    '/images/category-cards/newsletters.png',
+  toolkit:       '/images/category-cards/toolkit.png',
+  handbook:      '/images/category-cards/handbook.png',
+  webinar:       '/images/category-cards/webinar.png',
+  podcast:       '/images/category-cards/podcast.png',
+  paper:         '/images/category-cards/paper.png',
+  infographic:   '/images/category-cards/infographic.png',
+  success_story: '/images/category-cards/success-story.png',
+  course:        '/images/category-cards/toolkit.png',
+  naadac_ce:     '/images/category-cards/toolkit.png',
+  non_fgi:       '/images/category-cards/paper.png',
+  video:         '/images/category-cards/video.png',
 };
 
 function formatDuration(mins: number | null): string {
@@ -32,7 +33,7 @@ function formatDuration(mins: number | null): string {
 export default function ResourceCard({ resource }: Props) {
   const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
-  const thumbnailSrc = resource.thumbnail_url || SHELL_CARD_IMAGE[resource.type] || null;
+  const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
   const shortLabel   = typeLabel.split(' / ')[0];
 
   return (
