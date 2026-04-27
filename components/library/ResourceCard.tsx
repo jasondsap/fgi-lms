@@ -5,20 +5,20 @@ import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
 
 interface Props { resource: Resource; }
 
-// Matches exact filenames in /public/images/category-cards/
-const CATEGORY_CARD_IMAGE: Record<string, string> = {
-  newsletter:    '/images/category-cards/newsletters.png',
-  toolkit:       '/images/category-cards/toolkit.png',
-  webinar:       '/images/category-cards/webinar.png',
-  podcast:       '/images/category-cards/podcast.png',
-  video:         '/images/category-cards/video.png',
-  paper:         '/images/category-cards/paper.png',
-  infographic:   '/images/category-cards/infographic.png',
-  success_story: '/images/category-cards/success-story.png',
-  handbook:      '/images/category-cards/handbook.png',
-  course:        '/images/category-cards/toolkit.png',
-  naadac_ce:     '/images/category-cards/toolkit.png',
-  non_fgi:       '/images/category-cards/paper.png',
+// Shell card images used as thumbnails in the grid
+const SHELL_CARD_IMAGE: Record<string, string> = {
+  newsletter:    '/images/shell-cards/newletter-shell-card.png',
+  toolkit:       '/images/shell-cards/toolkit-shell-card.png',
+  handbook:      '/images/shell-cards/handbook-shell-card.png',
+  webinar:       '/images/shell-cards/webinar-shell-card.png',
+  podcast:       '/images/shell-cards/podcasts-shell-card.png',
+  paper:         '/images/shell-cards/paper-shell-card.png',
+  infographic:   '/images/shell-cards/infographic-shell-card.png',
+  success_story: '/images/shell-cards/success-stories-shell-card.png',
+  course:        '/images/shell-cards/toolkit-shell-card.png',
+  naadac_ce:     '/images/shell-cards/toolkit-shell-card.png',
+  non_fgi:       '/images/shell-cards/paper-shell-card.png',
+  video:         '/images/shell-cards/webinar-shell-card.png',
 };
 
 function formatDuration(mins: number | null): string {
@@ -30,19 +30,20 @@ function formatDuration(mins: number | null): string {
 }
 
 export default function ResourceCard({ resource }: Props) {
-  const badgeColor   = RESOURCE_TYPE_COLORS[resource.type];
-  const typeLabel    = RESOURCE_TYPE_LABELS[resource.type];
-  const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
-  const shortLabel   = typeLabel?.split(' / ')[0] ?? typeLabel;
+  const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
+  const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
+  const thumbnailSrc = resource.thumbnail_url || SHELL_CARD_IMAGE[resource.type] || null;
+  const shortLabel   = typeLabel.split(' / ')[0];
 
   return (
     <Link href={`/resource/${resource.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-      <article style={{
-        background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
-        boxShadow: 'var(--shadow-card)', overflow: 'hidden',
-        height: '100%', display: 'flex', flexDirection: 'column',
-        transition: 'box-shadow 0.18s, transform 0.18s',
-      }}
+      <article
+        style={{
+          background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
+          boxShadow: 'var(--shadow-card)', overflow: 'hidden',
+          height: '100%', display: 'flex', flexDirection: 'column',
+          transition: 'box-shadow 0.18s, transform 0.18s',
+        }}
         onMouseEnter={e => {
           (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 14px rgba(0,0,0,0.13)';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
@@ -63,21 +64,17 @@ export default function ResourceCard({ resource }: Props) {
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           )}
-
           {/* Type badge bar */}
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
             background: badgeColor, padding: '5px 10px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <span style={{ color: '#fff', fontSize: '13px', fontWeight: 700 }}>
-              {shortLabel}
-            </span>
+            <span style={{ color: '#fff', fontSize: '13px', fontWeight: 700 }}>{shortLabel}</span>
             {resource.is_naadac_ce && (
               <span style={{
                 background: 'rgba(255,255,255,0.25)', color: '#fff',
-                fontSize: '10px', fontWeight: 700,
-                padding: '1px 6px', borderRadius: '3px',
+                fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '3px',
               }}>CE</span>
             )}
           </div>
@@ -90,16 +87,12 @@ export default function ResourceCard({ resource }: Props) {
             marginBottom: '6px', color: 'var(--text-primary)',
             display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          }}>
-            {resource.title}
-          </h3>
+          }}>{resource.title}</h3>
           <p style={{
             fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5,
             flex: 1, display: '-webkit-box', WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '8px',
-          }}>
-            {resource.description}
-          </p>
+          }}>{resource.description}</p>
           {resource.duration_minutes && (
             <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', marginTop: 'auto' }}>
               {formatDuration(resource.duration_minutes)}
