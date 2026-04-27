@@ -5,8 +5,6 @@ import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
 
 interface Props { resource: Resource; }
 
-// Category card images — used as thumbnails in the library grid
-// Filenames matched exactly to what's in /public/images/category-cards/
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
   newsletter:    '/images/category-cards/newsletters.png',
   toolkit:       '/images/category-cards/toolkit.png',
@@ -37,65 +35,134 @@ export default function ResourceCard({ resource }: Props) {
   const shortLabel   = typeLabel.split(' / ')[0];
 
   return (
-    <Link href={`/resource/${resource.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
+    <Link
+      href={`/resource/${resource.slug}`}
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
+    >
       <article
         style={{
-          background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-card)', overflow: 'hidden',
-          height: '100%', display: 'flex', flexDirection: 'column',
+          background: 'var(--card-bg)',
+          borderRadius: '16px',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
           transition: 'box-shadow 0.18s, transform 0.18s',
+          border: '1px solid #ebebeb',
         }}
         onMouseEnter={e => {
-          (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 14px rgba(0,0,0,0.13)';
-          (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+          (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.11)';
+          (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
         }}
         onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card)';
+          (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
-        {/* Thumbnail */}
-        <div style={{ position: 'relative', height: '160px', flexShrink: 0, background: `${badgeColor}18` }}>
-          {thumbnailSrc && (
+        {/* Thumbnail — fully rounded top corners, contain so full image shows */}
+        <div style={{
+          height: '180px',
+          flexShrink: 0,
+          background: '#f5f5f5',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}>
+          {thumbnailSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={thumbnailSrc}
               alt={resource.title}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
+              }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
+          ) : (
+            <div style={{
+              width: '100%', height: '100%',
+              background: `${badgeColor}18`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '36px', opacity: 0.3,
+            }}>📄</div>
           )}
-          {/* Type badge bar */}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            background: badgeColor, padding: '5px 10px',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}>
-            <span style={{ color: '#fff', fontSize: '13px', fontWeight: 700 }}>{shortLabel}</span>
-            {resource.is_naadac_ce && (
-              <span style={{
-                background: 'rgba(255,255,255,0.25)', color: '#fff',
-                fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '3px',
-              }}>CE</span>
-            )}
-          </div>
         </div>
 
         {/* Card body */}
-        <div style={{ padding: '12px 14px 14px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+          {/* Type badge pill + CE badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+            <span style={{
+              background: badgeColor,
+              color: '#fff',
+              fontSize: '11px',
+              fontWeight: 700,
+              padding: '3px 10px',
+              borderRadius: '20px',
+              letterSpacing: '0.02em',
+              display: 'inline-block',
+            }}>
+              {shortLabel}
+            </span>
+            {resource.is_naadac_ce && (
+              <span style={{
+                background: '#0e72a2',
+                color: '#fff',
+                fontSize: '10px',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '20px',
+                letterSpacing: '0.03em',
+              }}>
+                NAADAC CE
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
           <h3 style={{
-            fontSize: '14px', fontWeight: 700, lineHeight: 1.35,
-            marginBottom: '6px', color: 'var(--text-primary)',
-            display: '-webkit-box', WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical', overflow: 'hidden',
-          }}>{resource.title}</h3>
+            fontSize: '14px',
+            fontWeight: 700,
+            lineHeight: 1.35,
+            marginBottom: '6px',
+            color: 'var(--text-primary)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>
+            {resource.title}
+          </h3>
+
+          {/* Description */}
           <p style={{
-            fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5,
-            flex: 1, display: '-webkit-box', WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '8px',
-          }}>{resource.description}</p>
+            fontSize: '13px',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.55,
+            flex: 1,
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            marginBottom: '8px',
+          }}>
+            {resource.description}
+          </p>
+
+          {/* Duration */}
           {resource.duration_minutes && (
-            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', marginTop: 'auto' }}>
+            <p style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              color: 'var(--text-muted)',
+              marginTop: 'auto',
+            }}>
               {formatDuration(resource.duration_minutes)}
             </p>
           )}
