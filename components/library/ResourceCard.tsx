@@ -1,3 +1,4 @@
+'use client';
 import Link from 'next/link';
 import type { Resource } from '@/types';
 import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
