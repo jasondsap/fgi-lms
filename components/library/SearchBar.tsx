@@ -2,22 +2,18 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
 
-interface Props {
-  defaultValue?: string;
-  targetPath?: string; // '/' for homepage, '/library' if keeping separate page
-}
+interface Props { defaultValue?: string; targetPath?: string; }
 
 export default function SearchBar({ defaultValue, targetPath = '/' }: Props) {
-  const router       = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const inputRef     = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const val = inputRef.current?.value.trim() || '';
     const params = new URLSearchParams(searchParams.toString());
-    if (val) { params.set('search', val); }
-    else      { params.delete('search'); }
+    if (val) { params.set('search', val); } else { params.delete('search'); }
     params.set('page', '1');
     router.push(`${targetPath}?${params.toString()}`);
   }
@@ -40,48 +36,23 @@ export default function SearchBar({ defaultValue, targetPath = '/' }: Props) {
             defaultValue={defaultValue}
             placeholder="Search..."
             style={{
-              width: '100%',
-              padding: '9px 36px 9px 14px',
-              fontSize: '14px',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              outline: 'none',
-              fontFamily: 'var(--font-sans)',
-              background: 'var(--card-bg)',
+              width: '100%', padding: '9px 36px 9px 14px', fontSize: '14px',
+              border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+              outline: 'none', fontFamily: 'var(--font-sans)', background: 'var(--card-bg)',
             }}
           />
-          {/* Search icon */}
-          <button
-            type="submit"
-            style={{
-              position: 'absolute', right: '10px', top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--text-muted)', padding: '0', lineHeight: 1,
-              fontSize: '16px',
-            }}
-            aria-label="Search"
-          >
-            🔍
-          </button>
+          <button type="submit" aria-label="Search" style={{
+            position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--text-muted)', padding: 0, fontSize: '16px',
+          }}>🔍</button>
         </div>
         {defaultValue && (
-          <button
-            type="button"
-            onClick={handleClear}
-            style={{
-              background: 'none',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              padding: '9px 14px',
-              fontSize: '13px',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Clear
-          </button>
+          <button type="button" onClick={handleClear} style={{
+            background: 'none', border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)', padding: '9px 14px',
+            fontSize: '13px', color: 'var(--text-secondary)', cursor: 'pointer',
+          }}>Clear</button>
         )}
       </div>
     </form>

@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import CategoryImage from '@/components/library/CategoryImage';
 import {
-  RESOURCE_TYPE_LABELS,
-  RESOURCE_TYPE_COLORS,
-  AUDIENCE_TAG_LABELS,
-  TOPIC_TAG_LABELS,
+  RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS,
+  AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS,
   type ResourceType,
 } from '@/types';
 
@@ -16,7 +15,7 @@ async function getResource(slug: string) {
 }
 
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
-  newsletter:    '/images/category-cards/newsletter.png',
+  newsletter:    '/images/category-cards/newsletters.png',
   toolkit:       '/images/category-cards/toolkit.png',
   webinar:       '/images/category-cards/webinar.png',
   podcast:       '/images/category-cards/podcast.png',
@@ -27,6 +26,7 @@ const CATEGORY_CARD_IMAGE: Record<string, string> = {
   handbook:      '/images/category-cards/handbook.png',
   course:        '/images/category-cards/toolkit.png',
   naadac_ce:     '/images/category-cards/toolkit.png',
+  non_fgi:       '/images/category-cards/paper.png',
 };
 
 export default async function ResourceDetailPage({ params }: { params: { slug: string } }) {
@@ -34,13 +34,13 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
   if (!resource) notFound();
 
   const type       = resource.type as ResourceType;
-  const badgeColor = RESOURCE_TYPE_COLORS[type];
-  const typeLabel  = RESOURCE_TYPE_LABELS[type];
+  const badgeColor = RESOURCE_TYPE_COLORS[type] ?? '#0e72a2';
+  const typeLabel  = RESOURCE_TYPE_LABELS[type] ?? type;
   const cardImage  = resource.thumbnail_url || CATEGORY_CARD_IMAGE[type] || null;
   const isVideo    = type === 'video' || type === 'webinar';
   const isPDF      = !!resource.download_url;
   const isExternal = !!resource.external_url;
-  const shortLabel = typeLabel?.split(' / ')[0] ?? typeLabel;
+  const shortLabel = typeLabel.split(' / ')[0];
 
   return (
     <div style={{ background: 'var(--body-bg)', minHeight: '60vh' }}>
@@ -55,61 +55,45 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
           <span>{resource.title}</span>
         </nav>
 
-        {/* Two-column layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 320px',
-          gap: '2.5rem',
-          alignItems: 'start',
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}>
 
-          {/* LEFT: main content */}
+          {/* LEFT */}
           <div>
-            <h1 style={{
-              fontSize: '26px', fontWeight: 700,
-              lineHeight: 1.25, marginBottom: '1.5rem',
-            }}>
+            <h1 style={{ fontSize: '26px', fontWeight: 700, lineHeight: 1.25, marginBottom: '1.5rem' }}>
               {resource.title}
             </h1>
 
-            {/* Vimeo embed */}
             {isVideo && resource.vimeo_id && (
               <div style={{
-                position: 'relative', paddingTop: '56.25%',
-                marginBottom: '1.75rem', borderRadius: 'var(--radius-md)',
-                overflow: 'hidden', background: '#111',
+                position: 'relative', paddingTop: '56.25%', marginBottom: '1.75rem',
+                borderRadius: '8px', overflow: 'hidden', background: '#111',
               }}>
                 <iframe
                   src={`https://player.vimeo.com/video/${resource.vimeo_id}?badge=0&autopause=0`}
-                  frameBorder="0"
-                  allow="autoplay; fullscreen; picture-in-picture"
+                  frameBorder="0" allow="autoplay; fullscreen; picture-in-picture"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                   title={resource.title}
                 />
               </div>
             )}
 
-            {/* Description */}
             <div style={{
               background: 'var(--card-bg)', border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '1.5rem',
+              borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem',
             }}>
               <div style={{
                 fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
                 letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '10px',
-              }}>
-                Description
-              </div>
+              }}>Description</div>
               <p style={{ fontSize: '15px', lineHeight: 1.75, color: 'var(--text-secondary)' }}>
                 {resource.description}
               </p>
             </div>
 
-            {/* Tags */}
             {(resource.audience_tags?.length > 0 || resource.topic_tags?.length > 0) && (
               <div style={{
                 background: 'var(--card-bg)', border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)', padding: '1.25rem 1.5rem',
+                borderRadius: '8px', padding: '1.25rem 1.5rem',
               }}>
                 {resource.audience_tags?.length > 0 && (
                   <div style={{ marginBottom: resource.topic_tags?.length > 0 ? '1rem' : 0 }}>
@@ -151,82 +135,52 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
             )}
           </div>
 
-          {/* RIGHT: sidebar */}
+          {/* RIGHT */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-            {/* Category card image — plain img tag, no crash if file missing */}
             {cardImage && !isVideo && (
-              <div style={{
-                borderRadius: 'var(--radius-md)', overflow: 'hidden',
-                boxShadow: 'var(--shadow-card)', border: '1px solid var(--border-color)',
-                background: `${badgeColor}18`,
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cardImage}
-                  alt={resource.title}
-                  style={{ width: '100%', height: 'auto', display: 'block' }}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              </div>
+              <CategoryImage src={cardImage} alt={resource.title} badgeColor={badgeColor} />
             )}
 
-            {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {isPDF && (
-                <a href={resource.download_url} target="_blank" rel="noopener noreferrer"
-                  style={{
-                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
-                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
-                    fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-                  }}>
-                  Open {shortLabel}
-                </a>
+                <a href={resource.download_url} target="_blank" rel="noopener noreferrer" style={{
+                  display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                  textAlign: 'center', padding: '13px 0', borderRadius: '8px',
+                  fontWeight: 600, fontSize: '15px', textDecoration: 'none',
+                }}>Open {shortLabel}</a>
               )}
               {isPDF && (
-                <a href={resource.download_url} download
-                  style={{
-                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
-                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
-                    fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
-                  }}>
-                  Download {shortLabel}
-                </a>
+                <a href={resource.download_url} download style={{
+                  display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                  textAlign: 'center', padding: '13px 0', borderRadius: '8px',
+                  fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
+                }}>Download {shortLabel}</a>
               )}
               {isExternal && (
-                <a href={resource.external_url} target="_blank" rel="noopener noreferrer"
-                  style={{
-                    display: 'block', background: 'var(--fgi-blue)', color: '#fff',
-                    textAlign: 'center', padding: '13px 0', borderRadius: 'var(--radius-md)',
-                    fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-                  }}>
-                  Open Resource
-                </a>
+                <a href={resource.external_url} target="_blank" rel="noopener noreferrer" style={{
+                  display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                  textAlign: 'center', padding: '13px 0', borderRadius: '8px',
+                  fontWeight: 600, fontSize: '15px', textDecoration: 'none',
+                }}>Open Resource</a>
               )}
             </div>
 
-            {/* Meta */}
             <div style={{
               background: 'var(--card-bg)', border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)', padding: '1rem 1.125rem',
+              borderRadius: '8px', padding: '1rem 1.125rem',
               display: 'flex', flexDirection: 'column', gap: '8px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span style={{
                   background: badgeColor, color: '#fff',
-                  fontSize: '12px', fontWeight: 600,
-                  padding: '3px 10px', borderRadius: '4px',
-                }}>
-                  {typeLabel}
-                </span>
+                  fontSize: '12px', fontWeight: 600, padding: '3px 10px', borderRadius: '4px',
+                }}>{typeLabel}</span>
                 {resource.is_naadac_ce && (
                   <span style={{
                     background: '#0e72a2', color: '#fff',
-                    fontSize: '11px', fontWeight: 700,
-                    padding: '3px 8px', borderRadius: '4px',
-                  }}>
-                    NAADAC CE
-                  </span>
+                    fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px',
+                  }}>NAADAC CE</span>
                 )}
               </div>
               {resource.duration_minutes && (
@@ -236,17 +190,14 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
               )}
               {resource.published_at && (
                 <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                  {new Date(resource.published_at).toLocaleDateString('en-US', {
-                    year: 'numeric', month: 'long',
-                  })}
+                  {new Date(resource.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
                 </div>
               )}
             </div>
 
-            {/* Support */}
             <div style={{
               background: 'var(--fgi-blue-light)', border: '1px solid #cce3f0',
-              borderRadius: 'var(--radius-md)', padding: '1rem 1.125rem',
+              borderRadius: '8px', padding: '1rem 1.125rem',
               fontSize: '13px', color: 'var(--text-secondary)',
             }}>
               For support email{' '}
@@ -255,14 +206,11 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
               </a>
             </div>
 
-            {/* Back */}
             <Link href="/" style={{
-              display: 'block', textAlign: 'center', padding: '10px 0',
-              borderRadius: 'var(--radius-md)', border: '1.5px solid var(--fgi-blue)',
-              color: 'var(--fgi-blue)', fontWeight: 600, fontSize: '14px', textDecoration: 'none',
-            }}>
-              ← Back to Library
-            </Link>
+              display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '8px',
+              border: '1.5px solid var(--fgi-blue)', color: 'var(--fgi-blue)',
+              fontWeight: 600, fontSize: '14px', textDecoration: 'none',
+            }}>← Back to Library</Link>
           </div>
         </div>
       </div>
