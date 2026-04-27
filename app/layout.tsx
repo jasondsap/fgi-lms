@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header   from '@/components/layout/Header';
-import Partners from '@/components/layout/Partners';
-import Footer   from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
 
 export const metadata: Metadata = {
   title: 'FGI Learning Resource Center',
@@ -16,10 +14,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Header />
         <main>{children}</main>
-        {/* Partners + Footer render on all pages EXCEPT resource detail pages,
-            which include their own slim footer inside the page component */}
-        <Partners />
-        <Footer />
       </body>
     </html>
   );
