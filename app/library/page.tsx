@@ -2,39 +2,11 @@ import { Suspense } from 'react';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceCard from '@/components/library/ResourceCard';
 import SearchBar from '@/components/library/SearchBar';
+import { getPublicResources } from '@/lib/resources';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
-}
-
-async function getResources(params: ResourceListParams) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const qs   = new URLSearchParams();
-
-  if (params.type)     qs.set('type',     params.type);
-  if (params.duration) qs.set('duration', params.duration);
-  if (params.search)   qs.set('search',   params.search);
-  if (params.match)    qs.set('match',    params.match);
-  if (params.page)     qs.set('page',     String(params.page));
-  if (params.per_page) qs.set('per_page', String(params.per_page));
-
-  if (params.audience) {
-    const arr = Array.isArray(params.audience) ? params.audience : [params.audience];
-    arr.forEach(a => qs.append('audience', a));
-  }
-  if (params.topic) {
-    const arr = Array.isArray(params.topic) ? params.topic : [params.topic];
-    arr.forEach(t => qs.append('topic', t));
-  }
-
-  try {
-    const res = await fetch(`${base}/api/resources?${qs.toString()}`, { next: { revalidate: 60 } });
-    if (!res.ok) return { resources: [], total: 0, page: 1, per_page: 12, total_pages: 0 };
-    return res.json();
-  } catch {
-    return { resources: [], total: 0, page: 1, per_page: 12, total_pages: 0 };
-  }
 }
 
 export default async function LibraryPage({ searchParams }: PageProps) {
@@ -58,16 +30,13 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     ) as TopicTag[];
   }
 
-  const data = await getResources(params);
+  const data = await getPublicResources(params);
 
   return (
     <div style={{ background: 'var(--body-bg)', padding: '2rem 2rem 4rem' }}>
       <div style={{
-        maxWidth: 'var(--max-width)',
-        margin: '0 auto',
-        display: 'flex',
-        gap: '2rem',
-        alignItems: 'flex-start',
+        maxWidth: 'var(--max-width)', margin: '0 auto',
+        display: 'flex', gap: '2rem', alignItems: 'flex-start',
       }}>
         <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
           <FilterSidebar total={data.total} targetPath="/library" />
@@ -80,8 +49,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
             <div style={{
               textAlign: 'center', padding: '4rem 2rem',
               color: 'var(--text-muted)', fontSize: '15px',
-              background: 'var(--card-bg)',
-              borderRadius: 'var(--radius-md)',
+              background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-color)',
             }}>
               No resources found matching your filters.
@@ -91,8 +59,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1.25rem',
-                marginBottom: '2rem',
+                gap: '1.25rem', marginBottom: '2rem',
               }}>
                 {data.resources.map((resource: any) => (
                   <ResourceCard key={resource.id} resource={resource} />

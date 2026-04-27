@@ -2,41 +2,11 @@ import { Suspense } from 'react';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceCard from '@/components/library/ResourceCard';
 import SearchBar from '@/components/library/SearchBar';
+import { getPublicResources } from '@/lib/resources';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
-}
-
-async function getResources(params: ResourceListParams) {
-  const base = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const qs   = new URLSearchParams();
-
-  if (params.type)     qs.set('type',     params.type);
-  if (params.duration) qs.set('duration', params.duration);
-  if (params.search)   qs.set('search',   params.search);
-  if (params.match)    qs.set('match',    params.match);
-  if (params.page)     qs.set('page',     String(params.page));
-  if (params.per_page) qs.set('per_page', String(params.per_page));
-
-  if (params.audience) {
-    const arr = Array.isArray(params.audience) ? params.audience : [params.audience];
-    arr.forEach(a => qs.append('audience', a));
-  }
-  if (params.topic) {
-    const arr = Array.isArray(params.topic) ? params.topic : [params.topic];
-    arr.forEach(t => qs.append('topic', t));
-  }
-
-  try {
-    const res = await fetch(`${base}/api/resources?${qs.toString()}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return { resources: [], total: 0, page: 1, per_page: 12, total_pages: 0 };
-    return res.json();
-  } catch {
-    return { resources: [], total: 0, page: 1, per_page: 12, total_pages: 0 };
-  }
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
@@ -60,32 +30,25 @@ export default async function HomePage({ searchParams }: PageProps) {
     ) as TopicTag[];
   }
 
-  const data = await getResources(params);
+  // Call DB directly — no internal HTTP fetch
+  const data = await getPublicResources(params);
 
   return (
     <div>
-
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      {/* ── Hero ── */}
       <section style={{
         background: '#ffffff',
         borderBottom: '1px solid #e8e8e8',
         padding: '2.5rem 2rem 2rem',
       }}>
         <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
-
-          {/* Centered title */}
           <h1 style={{
-            fontSize: '26px',
-            fontWeight: 700,
-            color: 'var(--fgi-blue)',
-            marginBottom: '1.75rem',
-            lineHeight: 1.3,
-            textAlign: 'center',
+            fontSize: '26px', fontWeight: 700, color: 'var(--fgi-blue)',
+            marginBottom: '1.75rem', lineHeight: 1.3, textAlign: 'center',
           }}>
             Welcome to the Fletcher Group Learning Resource Center
           </h1>
 
-          {/* Two-column: copy left, video right */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr 360px',
@@ -101,33 +64,27 @@ export default async function HomePage({ searchParams }: PageProps) {
                 resources designed to expand capacity, enhance quality, and improve access to recovery
                 supports.
               </p>
-
               <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
                 Within the Center, you&#x2019;ll find a wide range of materials, including courses (some
                 NAADAC CE-approved), how-to toolkits, recovery housing (RH) guidebooks and handbooks,
                 webinars, podcasts, publications, newsletters, success stories, and more.
               </p>
-
               <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
                 The learning resource center is for everyone invested in recovery&#x2014;recovery housing
                 owners and operators, staff, residents, peer supports, clinicians, workforce and criminal
                 justice professionals, allies, and community partners.
               </p>
-
               <p style={{ fontSize: '15px', lineHeight: 1.75 }}>
                 We invite you to explore, learn, and grow with us.
               </p>
             </div>
 
-            {/* Right: Vimeo embed + email below */}
+            {/* Right: video + button + email */}
             <div>
               <div style={{
-                position: 'relative',
-                paddingTop: '56.25%',
-                borderRadius: 'var(--radius-md)',
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-                background: '#111',
+                position: 'relative', paddingTop: '56.25%',
+                borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)', background: '#111',
               }}>
                 <iframe
                   src="https://player.vimeo.com/video/1181685318?h=3d4673b6ea&badge=0&autopause=0&player_id=0&app_id=58479"
@@ -137,33 +94,21 @@ export default async function HomePage({ searchParams }: PageProps) {
                   title="FGI Who We Are"
                 />
               </div>
-
               <a
                 href="https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form"
-                target="_blank"
-                rel="noopener noreferrer"
+                target="_blank" rel="noopener noreferrer"
                 style={{
-                  display: 'block',
-                  marginTop: '10px',
-                  background: 'var(--fgi-blue)',
-                  color: '#fff',
-                  textAlign: 'center',
-                  padding: '10px 0',
-                  borderRadius: 'var(--radius-md)',
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  textDecoration: 'none',
+                  display: 'block', marginTop: '10px', background: 'var(--fgi-blue)',
+                  color: '#fff', textAlign: 'center', padding: '10px 0',
+                  borderRadius: 'var(--radius-md)', fontWeight: 600,
+                  fontSize: '14px', textDecoration: 'none',
                 }}
               >
                 Who We Are
               </a>
-
-              {/* Email — balanced under video */}
               <p style={{
-                marginTop: '12px',
-                fontSize: '13px',
-                color: 'var(--text-secondary)',
-                textAlign: 'center',
+                marginTop: '12px', fontSize: '13px',
+                color: 'var(--text-secondary)', textAlign: 'center',
               }}>
                 For support contact{' '}
                 <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
@@ -175,36 +120,24 @@ export default async function HomePage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* ── Library (search + sidebar + grid) ────────────────────────── */}
-      <section style={{
-        background: 'var(--body-bg)',
-        padding: '2rem 2rem 4rem',
-      }}>
+      {/* ── Library ── */}
+      <section style={{ background: 'var(--body-bg)', padding: '2rem 2rem 4rem' }}>
         <div style={{
-          maxWidth: 'var(--max-width)',
-          margin: '0 auto',
-          display: 'flex',
-          gap: '2rem',
-          alignItems: 'flex-start',
+          maxWidth: 'var(--max-width)', margin: '0 auto',
+          display: 'flex', gap: '2rem', alignItems: 'flex-start',
         }}>
-
-          {/* Sidebar */}
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
             <FilterSidebar total={data.total} targetPath="/" />
           </Suspense>
 
-          {/* Main content area */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath="/" />
 
             {data.resources.length === 0 ? (
               <div style={{
-                textAlign: 'center',
-                padding: '4rem 2rem',
-                color: 'var(--text-muted)',
-                fontSize: '15px',
-                background: 'var(--card-bg)',
-                borderRadius: 'var(--radius-md)',
+                textAlign: 'center', padding: '4rem 2rem',
+                color: 'var(--text-muted)', fontSize: '15px',
+                background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)',
               }}>
                 No resources found matching your filters.
@@ -235,13 +168,9 @@ export default async function HomePage({ searchParams }: PageProps) {
                           page: String((params.page || 1) + 1),
                         }).toString()}`}
                         style={{
-                          background: 'var(--fgi-blue)',
-                          color: '#fff',
-                          padding: '11px 36px',
-                          borderRadius: 'var(--radius-md)',
-                          fontWeight: 600,
-                          fontSize: '15px',
-                          textDecoration: 'none',
+                          background: 'var(--fgi-blue)', color: '#fff',
+                          padding: '11px 36px', borderRadius: 'var(--radius-md)',
+                          fontWeight: 600, fontSize: '15px', textDecoration: 'none',
                           display: 'inline-block',
                         }}
                       >
