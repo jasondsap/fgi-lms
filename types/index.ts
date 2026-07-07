@@ -5,15 +5,18 @@
 export type ResourceType =
   | 'course'
   | 'naadac_ce'
-  | 'toolkit'
-  | 'handbook'
+  | 'toolkit'      // displayed as "Learning Brief" (6-2-2026 update)
+  | 'guidebook'
+  | 'handbook'     // displayed as "Handbook / RH Templates"
   | 'webinar'
   | 'newsletter'
   | 'video'
   | 'podcast'
-  | 'paper'
+  | 'paper'        // displayed as "Publications"
+  | 'whitepaper'
   | 'infographic'
   | 'success_story'
+  | 'fgi_service'
   | 'non_fgi';
 
 export type AudienceTag =
@@ -41,7 +44,8 @@ export type TopicTag =
   | 'recovery_ky_model'
   | 'rhoar_model'
   | 'recovery_ecosystems'
-  | 'rh_policies';
+  | 'rh_policies'
+  | 'fgi_services';
 
 // ---------------------------------------------------------------------------
 // Resource
@@ -118,15 +122,18 @@ export interface ResourceListResponse {
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   course:        'Course / Training',
   naadac_ce:     'NAADAC CE Course',
-  toolkit:       'Toolkit',
-  handbook:      'Handbook / Guidebook',
+  toolkit:       'Learning Brief',
+  guidebook:     'Guidebook',
+  handbook:      'Handbook / RH Templates',
   webinar:       'Webinar',
   newsletter:    'Newsletter',
   video:         'Video',
   podcast:       'Podcast',
-  paper:         'Publication / Whitepaper',
+  paper:         'Publications',
+  whitepaper:    'Whitepaper / Brief',
   infographic:   'Infographic',
   success_story: 'Success Story',
+  fgi_service:   'FGI Services',
   non_fgi:       'Non-FGI Recommended',
 };
 
@@ -157,6 +164,7 @@ export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
   rhoar_model:        'RHOAR Model',
   recovery_ecosystems:'Recovery Ecosystems',
   rh_policies:        'RH Policies & Procedures',
+  fgi_services:       'FGI Services',
 };
 
 export const DURATION_LABELS = {
@@ -173,13 +181,16 @@ export const RESOURCE_TYPE_COLORS: Record<ResourceType, string> = {
   course:        '#0e72a2',
   naadac_ce:     '#1a5f7a',
   toolkit:       '#2d6a4f',
+  guidebook:     '#00695c',
   handbook:      '#3a7d44',
   webinar:       '#f4a261',
   newsletter:    '#c9a227',
   video:         '#e76f51',
   podcast:       '#7b4fa6',
   paper:         '#795548',
+  whitepaper:    '#5d4037',
   infographic:   '#0097a7',
   success_story: '#388e3c',
+  fgi_service:   '#0e72a2',
   non_fgi:       '#8d6e63',
 };

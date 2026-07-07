@@ -16,6 +16,9 @@ const CATEGORY_CARD_IMAGE: Record<string, string> = {
   success_story: '/images/category-cards/success-story-photo.png',
   course:        '/images/category-cards/toolkit.png',
   naadac_ce:     '/images/category-cards/toolkit.png',
+  guidebook:     '/images/category-cards/handbook.png',
+  whitepaper:    '/images/category-cards/paper.png',
+  fgi_service:   '/images/category-cards/toolkit.png',
   non_fgi:       '/images/category-cards/paper.png',
   video:         '/images/category-cards/video.png',
 };

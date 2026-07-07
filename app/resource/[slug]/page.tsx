@@ -28,6 +28,9 @@ const SHELL_CARD_IMAGE: Record<string, string> = {
   success_story: '/images/shell-cards/success-stories-shell-card.png',
   course:        '/images/shell-cards/toolkit-shell-card.png',
   naadac_ce:     '/images/shell-cards/toolkit-shell-card.png',
+  guidebook:     '/images/shell-cards/handbook-shell-card.png',
+  whitepaper:    '/images/shell-cards/paper-shell-card.png',
+  fgi_service:   '/images/shell-cards/toolkit-shell-card.png',
   non_fgi:       '/images/shell-cards/paper-shell-card.png',
   video:         '/images/shell-cards/webinar-shell-card.png',
 };
