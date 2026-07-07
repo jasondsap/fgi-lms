@@ -13,7 +13,7 @@ const CATEGORY_CARD_IMAGE: Record<string, string> = {
   podcast:       '/images/category-cards/podcast.png',
   paper:         '/images/category-cards/paper.png',
   infographic:   '/images/category-cards/infographic.png',
-  success_story: '/images/category-cards/success-story.png',
+  success_story: '/images/category-cards/success-story-photo.png',
   course:        '/images/category-cards/toolkit.png',
   naadac_ce:     '/images/category-cards/toolkit.png',
   non_fgi:       '/images/category-cards/paper.png',
@@ -29,7 +29,11 @@ function formatDuration(mins: number | null): string {
 }
 
 export default function ResourceCard({ resource }: Props) {
-  const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
+  // Jennifer's proposed card restyle — previewing on Success Story cards only
+  const isSuccessStory = resource.type === 'success_story';
+  const badgeColor   = isSuccessStory
+    ? '#2a56ac' /* var(--card-success-story) — literal needed for `${badgeColor}18` alpha fallback */
+    : RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
   const shortLabel   = typeLabel.split(' / ')[0];
@@ -62,7 +66,9 @@ export default function ResourceCard({ resource }: Props) {
       >
         {/* Thumbnail — fully rounded top corners, contain so full image shows */}
         <div style={{
-          height: '180px',
+          // Success story photo (banner cropped off) is 640×300 — size the frame
+          // to its aspect so it fills edge-to-edge with nothing cut off
+          ...(isSuccessStory ? { aspectRatio: '640 / 300' } : { height: '180px' }),
           flexShrink: 0,
           background: '#f5f5f5',
           display: 'flex',
@@ -78,7 +84,7 @@ export default function ResourceCard({ resource }: Props) {
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'contain',
+                objectFit: isSuccessStory ? 'cover' : 'contain',
                 display: 'block',
               }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -127,7 +133,7 @@ export default function ResourceCard({ resource }: Props) {
 
           {/* Title */}
           <h3 style={{
-            fontSize: '14px',
+            fontSize: isSuccessStory ? '17px' : '14px',
             fontWeight: 700,
             lineHeight: 1.35,
             marginBottom: '6px',
@@ -143,7 +149,7 @@ export default function ResourceCard({ resource }: Props) {
           {/* Description */}
           <p style={{
             fontSize: '13px',
-            color: 'var(--text-secondary)',
+            color: isSuccessStory ? 'var(--text-body-dark)' : 'var(--text-secondary)',
             lineHeight: 1.55,
             flex: 1,
             display: '-webkit-box',
