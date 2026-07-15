@@ -109,3 +109,12 @@ When Moodle is deployed on AWS:
 | `S3_PRESIGNED_URL_EXPIRY` | Seconds (default 3600) |
 | `JWT_SECRET` | Admin JWT signing secret |
 | `NEXT_PUBLIC_APP_URL` | Deployed app URL |
+| `AUTH_SECRET` | Auth.js session-cookie encryption secret |
+| `COGNITO_CLIENT_ID` | Cognito app client ID (site login) |
+| `COGNITO_CLIENT_SECRET` | Cognito app client secret |
+| `COGNITO_ISSUER` | `https://cognito-idp.<region>.amazonaws.com/<user-pool-id>` |
+| `COGNITO_DOMAIN` | Hosted-UI domain (used for logout URL) |
+
+Site login (Cognito) is feature-flagged: if the `COGNITO_*` client/issuer
+variables are absent, the login button and course gating are disabled and the
+site behaves as if auth was never built.

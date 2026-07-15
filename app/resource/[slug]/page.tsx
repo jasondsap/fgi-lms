@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { authEnabled, getSession, signIn } from '@/auth';
 import CategoryImage from '@/components/library/CategoryImage';
 import {
   RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS,
@@ -47,6 +48,10 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
   const isPDF      = !!resource.download_url;
   const isExternal = !!resource.external_url;
   const shortLabel = typeLabel.split(' / ')[0];
+
+  // Courses require a signed-in user (no-op until Cognito env vars exist)
+  const isCourse    = type === 'course' || type === 'naadac_ce';
+  const courseGated = isCourse && authEnabled && !(await getSession());
 
   return (
     <div style={{ background: '#ffffff', minHeight: '60vh' }}>
@@ -170,12 +175,30 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
                 fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
               }}>Download {shortLabel}</a>
             )}
-            {isExternal && (
+            {isExternal && !courseGated && (
               <a href={resource.external_url} target="_blank" rel="noopener noreferrer" style={{
                 display: 'block', background: 'var(--fgi-blue)', color: '#fff',
                 textAlign: 'center', padding: '13px 0', borderRadius: '8px',
                 fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-              }}>Open Resource</a>
+              }}>{isCourse ? 'Start Course' : 'Open Resource'}</a>
+            )}
+            {courseGated && (
+              <form
+                action={async () => {
+                  'use server';
+                  await signIn('cognito', { redirectTo: `/resource/${params.slug}` });
+                }}
+              >
+                <button type="submit" style={{
+                  display: 'block', width: '100%', background: 'var(--fgi-blue)', color: '#fff',
+                  textAlign: 'center', padding: '13px 0', borderRadius: '8px', border: 'none',
+                  fontWeight: 600, fontSize: '15px', fontFamily: 'inherit', cursor: 'pointer',
+                }}>Sign In to Start Course</button>
+                <p style={{
+                  fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
+                  marginTop: '8px', lineHeight: 1.5,
+                }}>Courses require a free account so your progress and CE credit can be tracked.</p>
+              </form>
             )}
 
             {/* Meta card */}

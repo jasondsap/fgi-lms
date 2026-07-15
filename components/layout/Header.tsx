@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import AuthNav from './AuthNav';
 
 export default function Header() {
   return (
@@ -69,6 +70,11 @@ export default function Header() {
             ))}
           </ul>
         </nav>
+
+        {/* Account area — hidden until Cognito is configured */}
+        <div style={{ flexShrink: 0, marginLeft: '1.5rem' }}>
+          <AuthNav />
+        </div>
 
         {/* RCORP Badge */}
         <Link
