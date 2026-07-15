@@ -176,21 +176,23 @@ export const DURATION_LABELS = {
   '121_plus':'121+ mins',
 } as const;
 
-// Badge colors matching FGI mockup
+// Card colors from the FGI Resource Center Brand palette (4-9-26 doc).
+// Types the palette doesn't define borrow the closest palette color
+// (matched to the tint of Jennifer's 7-7-26 card images).
 export const RESOURCE_TYPE_COLORS: Record<ResourceType, string> = {
-  course:        '#0e72a2',
-  naadac_ce:     '#1a5f7a',
-  toolkit:       '#2d6a4f',
-  guidebook:     '#00695c',
-  handbook:      '#3a7d44',
-  webinar:       '#f4a261',
-  newsletter:    '#c9a227',
-  video:         '#e76f51',
-  podcast:       '#7b4fa6',
-  paper:         '#795548',
-  whitepaper:    '#5d4037',
-  infographic:   '#0097a7',
-  success_story: '#388e3c',
-  fgi_service:   '#0e72a2',
-  non_fgi:       '#8d6e63',
+  course:        '#0e72a2', // Courses — FGI Original Blue
+  naadac_ce:     '#0e72a2', // not in palette — uses Courses blue
+  toolkit:       '#047b3f', // Toolkits (displayed "Learning Brief")
+  guidebook:     '#4e6205', // not in palette — uses Handbooks olive
+  handbook:      '#4e6205', // Handbooks
+  webinar:       '#a2307c', // Webinars
+  newsletter:    '#8b6d00', // Newsletters
+  video:         '#a20e3e', // Video
+  podcast:       '#3d135f', // Podcasts
+  paper:         '#b13f08', // Paper (displayed "Publications")
+  whitepaper:    '#b13f08', // not in palette — uses Paper
+  infographic:   '#557a92', // Infographics
+  success_story: '#2a56ac', // Success Story
+  fgi_service:   '#0e72a2', // not in palette — FGI Original Blue
+  non_fgi:       '#557a92', // not in palette — uses Infographics steel blue
 };

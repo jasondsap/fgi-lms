@@ -5,21 +5,22 @@ import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
 
 interface Props { resource: Resource; }
 
+// Jennifer's 7-7-26 card set — banner-free 640×360 photos, one per type
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
-  newsletter:    '/images/category-cards/newsletters.png',
-  toolkit:       '/images/category-cards/toolkit.png',
+  newsletter:    '/images/category-cards/newsletter.png',
+  toolkit:       '/images/category-cards/learning-brief.png',
   handbook:      '/images/category-cards/handbook.png',
   webinar:       '/images/category-cards/webinar.png',
   podcast:       '/images/category-cards/podcast.png',
-  paper:         '/images/category-cards/paper.png',
+  paper:         '/images/category-cards/publication.png',
   infographic:   '/images/category-cards/infographic.png',
-  success_story: '/images/category-cards/success-story-photo.png',
-  course:        '/images/category-cards/toolkit.png',
-  naadac_ce:     '/images/category-cards/toolkit.png',
-  guidebook:     '/images/category-cards/handbook.png',
-  whitepaper:    '/images/category-cards/paper.png',
-  fgi_service:   '/images/category-cards/toolkit.png',
-  non_fgi:       '/images/category-cards/paper.png',
+  success_story: '/images/category-cards/success-story.png',
+  course:        '/images/category-cards/course.png',
+  naadac_ce:     '/images/category-cards/course.png',
+  guidebook:     '/images/category-cards/guidebook.png',
+  whitepaper:    '/images/category-cards/whitepaper.png',
+  fgi_service:   '/images/category-cards/fgi-services.png',
+  non_fgi:       '/images/category-cards/non-fgi.png',
   video:         '/images/category-cards/video.png',
 };
 
@@ -32,11 +33,7 @@ function formatDuration(mins: number | null): string {
 }
 
 export default function ResourceCard({ resource }: Props) {
-  // Jennifer's proposed card restyle — previewing on Success Story cards only
-  const isSuccessStory = resource.type === 'success_story';
-  const badgeColor   = isSuccessStory
-    ? '#2a56ac' /* var(--card-success-story) — literal needed for `${badgeColor}18` alpha fallback */
-    : RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
+  const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
   const shortLabel   = typeLabel.split(' / ')[0];
@@ -67,11 +64,9 @@ export default function ResourceCard({ resource }: Props) {
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
-        {/* Thumbnail — fully rounded top corners, contain so full image shows */}
+        {/* Thumbnail — category photos are 640×360, shown edge-to-edge */}
         <div style={{
-          // Success story photo (banner cropped off) is 640×300 — size the frame
-          // to its aspect so it fills edge-to-edge with nothing cut off
-          ...(isSuccessStory ? { aspectRatio: '640 / 300' } : { height: '180px' }),
+          aspectRatio: '16 / 9',
           flexShrink: 0,
           background: '#f5f5f5',
           display: 'flex',
@@ -87,7 +82,7 @@ export default function ResourceCard({ resource }: Props) {
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: isSuccessStory ? 'cover' : 'contain',
+                objectFit: 'cover',
                 display: 'block',
               }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -95,7 +90,7 @@ export default function ResourceCard({ resource }: Props) {
           ) : (
             <div style={{
               width: '100%', height: '100%',
-              background: `${badgeColor}18`,
+              background: `${badgeColor}33`, // 20% tint per brand palette
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '36px', opacity: 0.3,
             }}>📄</div>
@@ -136,7 +131,7 @@ export default function ResourceCard({ resource }: Props) {
 
           {/* Title */}
           <h3 style={{
-            fontSize: isSuccessStory ? '17px' : '14px',
+            fontSize: '17px',
             fontWeight: 700,
             lineHeight: 1.35,
             marginBottom: '6px',
@@ -152,7 +147,7 @@ export default function ResourceCard({ resource }: Props) {
           {/* Description */}
           <p style={{
             fontSize: '13px',
-            color: isSuccessStory ? 'var(--text-body-dark)' : 'var(--text-secondary)',
+            color: 'var(--text-body-dark)',
             lineHeight: 1.55,
             flex: 1,
             display: '-webkit-box',
