@@ -15,6 +15,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     duration: (searchParams.duration as any)           || undefined,
     search:   (searchParams.search   as string)        || undefined,
     match:    (searchParams.match    as 'any' | 'all') || 'any',
+    tenant:   (searchParams.tenant   as string)        || undefined,
     page:     parseInt((searchParams.page as string)   || '1', 10),
     per_page: 12,
   };
