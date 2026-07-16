@@ -175,18 +175,25 @@ export default async function ResourceDetailPage({ params }: { params: { slug: s
                 fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
               }}>Download {shortLabel}</a>
             )}
-            {isExternal && !courseGated && (
+            {isCourse && !courseGated && (
+              <Link href={`/course/${params.slug}`} style={{
+                display: 'block', background: 'var(--fgi-blue)', color: '#fff',
+                textAlign: 'center', padding: '13px 0', borderRadius: '8px',
+                fontWeight: 600, fontSize: '15px', textDecoration: 'none',
+              }}>Start Course</Link>
+            )}
+            {isExternal && !isCourse && (
               <a href={resource.external_url} target="_blank" rel="noopener noreferrer" style={{
                 display: 'block', background: 'var(--fgi-blue)', color: '#fff',
                 textAlign: 'center', padding: '13px 0', borderRadius: '8px',
                 fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-              }}>{isCourse ? 'Start Course' : 'Open Resource'}</a>
+              }}>Open Resource</a>
             )}
             {courseGated && (
               <form
                 action={async () => {
                   'use server';
-                  await signIn('cognito', { redirectTo: `/resource/${params.slug}` });
+                  await signIn('cognito', { redirectTo: `/course/${params.slug}` });
                 }}
               >
                 <button type="submit" style={{

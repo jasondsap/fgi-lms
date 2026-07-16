@@ -96,6 +96,7 @@ export interface MoodleModule {
   id: number;          // course-module id (cmid)
   name: string;
   modname: string;     // 'scorm' | 'quiz' | 'page' | 'videotime' | ...
+  instance: number;    // module-type-specific instance id (e.g. scorm.id)
   url?: string;        // view URL, e.g. .../mod/scorm/view.php?id=1
   visible: number;
   completion: number;  // 0 none, 1 manual, 2 automatic
@@ -121,6 +122,18 @@ export async function getCourses(): Promise<MoodleCourse[]> {
 /** Full section/module outline of one course — drives the player sidebar. */
 export async function getCourseContents(courseId: number): Promise<MoodleSection[]> {
   return moodleCall<MoodleSection[]>('core_course_get_contents', { courseid: courseId });
+}
+
+/**
+ * Best in-iframe URL for an activity. SCORM packages open through the
+ * chrome-free popup player (no Moodle navbar inside our course player);
+ * other module types fall back to their regular view URL.
+ */
+export function getActivityEmbedUrl(module: Pick<MoodleModule, 'modname' | 'instance' | 'url'>): string | null {
+  if (module.modname === 'scorm') {
+    return `${BASE_URL}/mod/scorm/player.php?a=${module.instance}&display=popup&mode=normal&scoid=0`;
+  }
+  return module.url ?? null;
 }
 
 // ---------------------------------------------------------------------------
