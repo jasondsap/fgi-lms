@@ -23,16 +23,27 @@ export default function Header() {
         height: '80px',
       }}>
 
-        {/* FGI Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        {/* FGI Logo + tagline (tagline is text, matching the teaser email header) */}
+        <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flexShrink: 0 }}>
           <Image
             src="/images/logos/fgi-logo-white.png"
-            alt="Fletcher Group — Building Recovery Ecosystems"
+            alt="Fletcher Group"
             width={210}
             height={55}
             style={{ objectFit: 'contain', objectPosition: 'left center' }}
             priority
           />
+          <span style={{
+            color: '#ffffff',
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '2.5px',
+            textTransform: 'uppercase',
+            marginTop: '2px',
+            whiteSpace: 'nowrap',
+          }}>
+            Building Recovery Ecosystems
+          </span>
         </Link>
 
         {/* Nav links */}

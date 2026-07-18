@@ -21,8 +21,19 @@ export default function Footer() {
             alt="Fletcher Group"
             width={180}
             height={47}
-            style={{ objectFit: 'contain', objectPosition: 'left', marginBottom: '8px' }}
+            style={{ objectFit: 'contain', objectPosition: 'left', marginBottom: '2px' }}
           />
+          <div style={{
+            color: '#ffffff',
+            fontSize: '9px',
+            fontWeight: 700,
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            marginBottom: '10px',
+            whiteSpace: 'nowrap',
+          }}>
+            Building Recovery Ecosystems
+          </div>
           <Link
             href="https://www.fletchergroup.org"
             target="_blank"
