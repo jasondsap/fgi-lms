@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: 'var(--fgi-blue)', color: '#ffffff' }}>
+    <footer style={{ backgroundColor: 'var(--fgi-navy)', color: '#ffffff' }}>
       <div style={{
         maxWidth: 'var(--max-width)',
         margin: '0 auto',
@@ -17,10 +17,10 @@ export default function Footer() {
         {/* Col 1 — FGI logo + URL + social icons */}
         <div>
           <Image
-            src="/images/logos/fgi-logo.png"
+            src="/images/logos/fgi-logo-white.png"
             alt="Fletcher Group"
-            width={160}
-            height={56}
+            width={180}
+            height={47}
             style={{ objectFit: 'contain', objectPosition: 'left', marginBottom: '8px' }}
           />
           <Link

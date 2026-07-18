@@ -5,13 +5,14 @@ import AuthNav from './AuthNav';
 export default function Header() {
   return (
     <header style={{
-      backgroundColor: 'var(--fgi-blue)',
+      backgroundColor: 'var(--fgi-navy)',
       color: '#ffffff',
       padding: '0 2rem',
       position: 'sticky',
       top: 0,
       zIndex: 100,
       boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+      borderBottom: '8px solid var(--fgi-teal)',
     }}>
       <div style={{
         maxWidth: 'var(--max-width)',
@@ -25,10 +26,10 @@ export default function Header() {
         {/* FGI Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <Image
-            src="/images/logos/fgi-logo.png"
+            src="/images/logos/fgi-logo-white.png"
             alt="Fletcher Group — Building Recovery Ecosystems"
-            width={170}
-            height={64}
+            width={210}
+            height={55}
             style={{ objectFit: 'contain', objectPosition: 'left center' }}
             priority
           />
