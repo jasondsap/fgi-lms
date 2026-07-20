@@ -12,7 +12,7 @@ export default function Header() {
       top: 0,
       zIndex: 100,
       boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
-      borderBottom: '8px solid var(--fgi-teal)',
+      borderBottom: '6px solid var(--fgi-teal)',
     }}>
       <div style={{
         maxWidth: 'var(--max-width)',
@@ -20,34 +20,23 @@ export default function Header() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '80px',
+        height: '92px',
       }}>
 
-        {/* FGI Logo + tagline (tagline is text, matching the teaser email header) */}
-        <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flexShrink: 0 }}>
+        {/* FGI logo — 7-18-26 brand mark (cyan flag + white wordmark) */}
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <Image
-            src="/images/logos/fgi-logo-white.png"
+            src="/images/logos/fgi-logo-transparent.png"
             alt="Fletcher Group"
-            width={210}
-            height={55}
+            width={244}
+            height={64}
             style={{ objectFit: 'contain', objectPosition: 'left center' }}
             priority
           />
-          <span style={{
-            color: '#ffffff',
-            fontSize: '10px',
-            fontWeight: 700,
-            letterSpacing: '2.5px',
-            textTransform: 'uppercase',
-            marginTop: '2px',
-            whiteSpace: 'nowrap',
-          }}>
-            Building Recovery Ecosystems
-          </span>
         </Link>
 
         {/* Nav links */}
-        <nav aria-label="Main navigation">
+        <nav aria-label="Main navigation" style={{ marginLeft: 'auto' }}>
           <ul style={{
             display: 'flex',
             gap: '2.25rem',
@@ -84,27 +73,9 @@ export default function Header() {
         </nav>
 
         {/* Account area — hidden until Cognito is configured */}
-        <div style={{ flexShrink: 0, marginLeft: '1.5rem' }}>
+        <div style={{ flexShrink: 0, marginLeft: '2.25rem' }}>
           <AuthNav />
         </div>
-
-        {/* RCORP Badge */}
-        <Link
-          href="https://www.hrsa.gov"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ flexShrink: 0, marginLeft: '1.5rem' }}
-          aria-label="RCORP — visit HRSA"
-        >
-          <Image
-            src="/images/logos/rcorp-badge.png"
-            alt="RCORP"
-            width={78}
-            height={78}
-            style={{ objectFit: 'contain', opacity: 0.9 }}
-            priority
-          />
-        </Link>
 
       </div>
     </header>

@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   RESOURCE_TYPE_LABELS, AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, DURATION_LABELS,
   type ResourceType, type AudienceTag, type TopicTag,
@@ -8,13 +8,41 @@ import {
 
 interface Props { total: number; targetPath?: string; }
 
-function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
+/**
+ * Accordion filter group. Collapsed by default (per Jennifer's 7-18-26 mockup);
+ * a group that already has an active filter opens itself so the selection stays
+ * visible after the filter navigation re-renders the sidebar.
+ */
+function FilterGroup({
+  title, defaultOpen = false, children,
+}: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
-    <div style={{ marginBottom: '1.25rem' }}>
-      <div style={{ fontSize: '12px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-primary)' }}>
+    <div style={{ borderBottom: '1px solid var(--border-color)' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          width: '100%', gap: '8px', background: 'none', border: 'none',
+          padding: '13px 0', textAlign: 'left', fontFamily: 'inherit',
+          fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)',
+        }}
+      >
         {title}
-      </div>
-      {children}
+        <svg
+          width="18" height="11" viewBox="0 0 18 11" aria-hidden="true"
+          style={{
+            flexShrink: 0, transition: 'transform 0.15s ease',
+            transform: open ? 'rotate(180deg)' : 'none',
+          }}
+        >
+          <path d="M1 1l8 8 8-8" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
+      </button>
+      {open && <div style={{ paddingBottom: '12px' }}>{children}</div>}
     </div>
   );
 }
@@ -69,31 +97,57 @@ export default function FilterSidebar({ total, targetPath }: Props) {
 
   return (
     <aside style={{
-      width: '220px', flexShrink: 0, background: 'var(--card-bg)',
+      width: '252px', flexShrink: 0, background: 'var(--card-bg)',
       border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-      padding: '1rem', position: 'sticky', top: '90px',
-      maxHeight: 'calc(100vh - 110px)', overflowY: 'auto',
+      padding: '1.15rem 1.25rem', position: 'sticky', top: '110px',
+      maxHeight: 'calc(100vh - 130px)', overflowY: 'auto',
     }}>
-      <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '10px' }}>
-        Showing <strong style={{ color: 'var(--text-primary)' }}>{total}</strong> results
-      </div>
-
       <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid var(--border-color)',
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+        gap: '8px', marginBottom: '6px',
       }}>
-        <span style={{ fontSize: '13px', fontWeight: 700 }}>Filters</span>
+        <span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>
+          Showing <strong style={{ color: 'var(--text-primary)' }}>{total}</strong> results
+        </span>
         {hasFilters ? (
           <button onClick={clearAll} style={{
             fontSize: '11px', color: 'var(--fgi-blue)', background: 'none',
             border: 'none', padding: 0, cursor: 'pointer', textDecoration: 'underline',
+            flexShrink: 0,
           }}>Clear all</button>
-        ) : (
-          <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>⊟</span>
-        )}
+        ) : null}
       </div>
 
-      <div style={{ marginBottom: '1.1rem' }}>
+      <FilterGroup title="Resource Type" defaultOpen={activeTypes.length > 0}>
+        {(Object.keys(RESOURCE_TYPE_LABELS) as ResourceType[]).map(type => (
+          <CheckItem key={type} label={RESOURCE_TYPE_LABELS[type]}
+            checked={activeTypes.includes(type)} onChange={() => toggle('type', type)} />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="I Am A…" defaultOpen={activeAudience.length > 0}>
+        {(Object.keys(AUDIENCE_TAG_LABELS) as AudienceTag[]).map(tag => (
+          <CheckItem key={tag} label={AUDIENCE_TAG_LABELS[tag]}
+            checked={activeAudience.includes(tag)} onChange={() => toggle('audience', tag)} />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="I Want To Learn About…" defaultOpen={activeTopics.length > 0}>
+        {(Object.keys(TOPIC_TAG_LABELS) as TopicTag[]).map(tag => (
+          <CheckItem key={tag} label={TOPIC_TAG_LABELS[tag]}
+            checked={activeTopics.includes(tag)} onChange={() => toggle('topic', tag)} />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="Length" defaultOpen={Boolean(activeDuration)}>
+        {(Object.keys(DURATION_LABELS) as Array<keyof typeof DURATION_LABELS>).map(key => (
+          <CheckItem key={key} label={DURATION_LABELS[key]}
+            checked={activeDuration === key}
+            onChange={() => setParam('duration', activeDuration === key ? null : key)} />
+        ))}
+      </FilterGroup>
+
+      <FilterGroup title="Match Categories" defaultOpen={activeMatch === 'all'}>
         {['any', 'all'].map(val => (
           <label key={val} style={{
             display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
@@ -104,35 +158,6 @@ export default function FilterSidebar({ total, targetPath }: Props) {
               style={{ accentColor: 'var(--fgi-blue)' }} />
             {val === 'any' ? 'Match Any Category' : 'Match All Categories'}
           </label>
-        ))}
-      </div>
-
-      <FilterGroup title="Type">
-        {(Object.keys(RESOURCE_TYPE_LABELS) as ResourceType[]).map(type => (
-          <CheckItem key={type} label={RESOURCE_TYPE_LABELS[type]}
-            checked={activeTypes.includes(type)} onChange={() => toggle('type', type)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="Length">
-        {(Object.keys(DURATION_LABELS) as Array<keyof typeof DURATION_LABELS>).map(key => (
-          <CheckItem key={key} label={DURATION_LABELS[key]}
-            checked={activeDuration === key}
-            onChange={() => setParam('duration', activeDuration === key ? null : key)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="I am a…">
-        {(Object.keys(AUDIENCE_TAG_LABELS) as AudienceTag[]).map(tag => (
-          <CheckItem key={tag} label={AUDIENCE_TAG_LABELS[tag]}
-            checked={activeAudience.includes(tag)} onChange={() => toggle('audience', tag)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="I want to learn about…">
-        {(Object.keys(TOPIC_TAG_LABELS) as TopicTag[]).map(tag => (
-          <CheckItem key={tag} label={TOPIC_TAG_LABELS[tag]}
-            checked={activeTopics.includes(tag)} onChange={() => toggle('topic', tag)} />
         ))}
       </FilterGroup>
     </aside>

@@ -40,7 +40,7 @@ export default async function AuthNav() {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', whiteSpace: 'nowrap' }}>
-      <span style={{ color: 'rgba(255,255,255,0.92)', fontSize: '14px' }}>
+      <span style={{ color: '#ffffff', fontSize: '15px', fontWeight: 700 }}>
         Hi, {displayName}
       </span>
       <form
@@ -53,14 +53,14 @@ export default async function AuthNav() {
           type="submit"
           style={{
             background: 'transparent',
-            color: 'rgba(255,255,255,0.85)',
+            color: '#ffffff',
             border: 'none',
             padding: 0,
-            fontSize: '13px',
-            fontWeight: 600,
+            fontSize: '15px',
+            fontWeight: 700,
             fontFamily: 'inherit',
             cursor: 'pointer',
-            textDecoration: 'underline',
+            textDecoration: 'none',
           }}
         >
           Sign Out

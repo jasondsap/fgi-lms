@@ -14,34 +14,25 @@ export default function Partners() {
   return (
     <section style={{
       background: '#ffffff',
-      borderTop: '1px solid #e8e8e8',
-      padding: '2.5rem 2rem',
+      padding: '2.5rem 2rem 3rem',
     }}>
-      <div style={{
-        maxWidth: 'var(--max-width)',
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0',
-      }}>
+      <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+        <h2 style={{
+          fontSize: '30px',
+          fontWeight: 700,
+          color: 'var(--fgi-navy)',
+          marginBottom: '2rem',
+        }}>
+          In Partnership With
+        </h2>
 
-        {/* Left: heading + logos */}
-        <div style={{ flex: 1 }}>
-          <h2 style={{
-            fontSize: '20px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginBottom: '1.5rem',
-          }}>
-            Working Together With
-          </h2>
-
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2.5rem',
-            flexWrap: 'wrap',
-          }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2rem',
+          flexWrap: 'wrap',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
             {PARTNERS.map(({ file, alt, width, height }) => (
               <div key={file} style={{ flexShrink: 0 }}>
                 <Image
@@ -54,33 +45,20 @@ export default function Partners() {
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Right: Collaborate CTA button */}
-        <div style={{ flexShrink: 0, marginLeft: '2rem' }}>
           <Link
             href="mailto:LC@fletchergroup.org"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'var(--fgi-blue)',
-              color: '#ffffff',
-              borderRadius: 'var(--radius-lg)',
-              width: '130px',
-              height: '130px',
-              fontSize: '14px',
-              fontWeight: 600,
-              textAlign: 'center',
-              lineHeight: 1.4,
-              textDecoration: 'none',
-              padding: '1rem',
+              color: 'var(--fgi-navy)',
+              fontSize: '19px',
+              fontWeight: 700,
+              textDecoration: 'underline',
+              marginLeft: 'auto',
             }}
           >
-            Collaborate With Us? Click here to send us an email
+            Interested in Partnering with us?
           </Link>
         </div>
-
       </div>
     </section>
   );

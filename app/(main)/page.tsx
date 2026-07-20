@@ -1,4 +1,6 @@
 import { Suspense } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceCard from '@/components/library/ResourceCard';
 import SearchBar from '@/components/library/SearchBar';
@@ -7,6 +9,33 @@ import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
+}
+
+// Small "New This Month" promo tile: square thumbnail + label + item title.
+function NewThisMonthTile({ href, image, label, title }: {
+  href: string; image: string; label: string; title: string;
+}) {
+  return (
+    <Link href={href} style={{
+      display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none',
+    }}>
+      <Image
+        src={image}
+        alt=""
+        width={96}
+        height={96}
+        style={{ objectFit: 'cover', borderRadius: '2px', flexShrink: 0, width: '96px', height: '96px' }}
+      />
+      <div>
+        <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--fgi-navy)', marginBottom: '4px' }}>
+          {label}
+        </div>
+        <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-body-dark)' }}>
+          {title}
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
@@ -39,52 +68,48 @@ export default async function HomePage({ searchParams }: PageProps) {
       <section style={{
         background: '#ffffff',
         borderBottom: '1px solid #e8e8e8',
-        padding: '2.5rem 2rem 2rem',
+        padding: '3rem 2rem 2.5rem',
       }}>
         <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           <h1 style={{
-            fontSize: '26px', fontWeight: 700, color: 'var(--fgi-blue)',
-            marginBottom: '1.75rem', lineHeight: 1.3, textAlign: 'center',
+            fontSize: '42px', fontWeight: 800, color: 'var(--fgi-navy)',
+            marginBottom: '2.5rem', lineHeight: 1.2,
           }}>
-            Welcome to the Fletcher Group Learning Resource Center
+            Welcome to the Learning Resource Center
           </h1>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 360px',
-            gap: '3rem',
+            gridTemplateColumns: '1fr 420px',
+            gap: '3.5rem',
             alignItems: 'start',
           }}>
             {/* Left: body copy */}
             <div>
-              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
-                The Fletcher Group&#x2019;s Learning Resource Center is a no-cost, national platform
-                dedicated to supporting and strengthening the Substance Use Disorder Recovery Ecosystem
-                across rural, urban, and metropolitan communities. It offers a curated collection of
-                resources designed to expand capacity, enhance quality, and improve access to recovery
-                supports.
+              <p style={{ marginBottom: '1.35rem', fontSize: '17px', lineHeight: 1.7, textAlign: 'justify' }}>
+                Your one-stop, no-cost library for building stronger recovery housing and support
+                programs &mdash; courses, guides, webinars, podcasts, NAADAC CE opportunities,
+                research, and more.
               </p>
-              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
-                Within the Center, you&#x2019;ll find a wide range of materials, including courses (some
-                NAADAC CE-approved), how-to toolkits, recovery housing (RH) guidebooks and handbooks,
-                webinars, podcasts, publications, newsletters, success stories, and more.
+              <p style={{ marginBottom: '1.35rem', fontSize: '17px', lineHeight: 1.7, textAlign: 'justify' }}>
+                Whether you&#x2019;re opening your first recovery home, leading an established program,
+                working as a peer or recovery support provider, or a community partner, there&#x2019;s
+                something here for you.
               </p>
-              <p style={{ marginBottom: '1rem', fontSize: '15px', lineHeight: 1.75 }}>
-                The learning resource center is for everyone invested in recovery&#x2014;recovery housing
-                owners and operators, staff, residents, peer supports, clinicians, workforce and criminal
-                justice professionals, allies, and community partners.
-              </p>
-              <p style={{ fontSize: '15px', lineHeight: 1.75 }}>
-                We invite you to explore, learn, and grow with us.
+              <p style={{ fontSize: '17px', lineHeight: 1.7 }}>
+                Explore, learn, and grow with us.
               </p>
             </div>
 
-            {/* Right: video + button + email */}
-            <div>
+            {/* Right: Who We Are video */}
+            <div style={{
+              border: '10px solid var(--fgi-navy)',
+              background: 'var(--fgi-navy)',
+              borderRadius: '2px',
+            }}>
               <div style={{
                 position: 'relative', paddingTop: '56.25%',
-                borderRadius: 'var(--radius-md)', overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.12)', background: '#111',
+                overflow: 'hidden', background: '#111',
               }}>
                 <iframe
                   src="https://player.vimeo.com/video/1181685318?h=3d4673b6ea&badge=0&autopause=0&player_id=0&app_id=58479"
@@ -94,22 +119,40 @@ export default async function HomePage({ searchParams }: PageProps) {
                   title="FGI Who We Are"
                 />
               </div>
-              <a
-                href="https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form"
-                target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: 'block', marginTop: '10px', background: 'var(--fgi-blue)',
-                  color: '#fff', textAlign: 'center', padding: '10px 0',
-                  borderRadius: 'var(--radius-md)', fontWeight: 600,
-                  fontSize: '14px', textDecoration: 'none',
-                }}
-              >
-                Who We Are
-              </a>
-              <p style={{
-                marginTop: '12px', fontSize: '13px',
-                color: 'var(--text-secondary)', textAlign: 'center',
-              }}>
+            </div>
+          </div>
+
+          {/* ── New This Month ── */}
+          <div style={{ marginTop: '3rem' }}>
+            <h2 style={{
+              fontSize: '26px', fontWeight: 700, fontStyle: 'italic',
+              color: 'var(--fgi-navy)', marginBottom: '1.25rem',
+            }}>
+              New This Month
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '2rem',
+              alignItems: 'center',
+            }}>
+              {/* TODO: swap these two tiles to the newest published podcast/webinar
+                  from Neon once podcast resources are loaded. */}
+              <NewThisMonthTile
+                href="/library?type=podcast"
+                image="/images/category-cards/podcast.png"
+                label="Latest Podcast"
+                title="Launch episode"
+              />
+              <NewThisMonthTile
+                href="/library?type=webinar"
+                image="/images/category-cards/webinar.png"
+                label="Latest Webinar"
+                title="Building Recovery Ecosystems"
+              />
+
+              <p style={{ fontSize: '16px', color: 'var(--text-secondary)', textAlign: 'right' }}>
                 For support contact{' '}
                 <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
                   LC@fletchergroup.org
