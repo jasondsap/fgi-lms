@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/layout/Header';
+import RegistrationGate from '@/components/account/RegistrationGate';
 
 export const metadata: Metadata = {
   title: 'FGI Learning Resource Center',
@@ -14,6 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Header />
         <main>{children}</main>
+        {/* Blocks the site until a signed-in user completes registration */}
+        <RegistrationGate />
       </body>
     </html>
   );

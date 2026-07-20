@@ -4,6 +4,7 @@
 // (course-player integration), tenant_id when tenant binding is built.
 // =============================================================================
 import { sql } from '@/lib/db';
+import type { UserRole } from '@/types';
 
 export interface AppUser {
   id: string;
@@ -13,6 +14,12 @@ export interface AppUser {
   family_name: string | null;
   moodle_user_id: number | null;
   tenant_id: string | null;
+  organization: string | null;
+  state: string | null;
+  zip: string | null;
+  county: string | null;
+  role_other: string | null;
+  registration_completed_at: string | null;
 }
 
 export async function upsertUser(input: {
@@ -41,4 +48,71 @@ export async function getUserById(id: string): Promise<AppUser | null> {
 
 export async function setMoodleUserId(id: string, moodleUserId: number): Promise<void> {
   await sql`UPDATE users SET moodle_user_id = ${moodleUserId}, updated_at = now() WHERE id = ${id}`;
+}
+
+// -----------------------------------------------------------------------------
+// Registration — the one-time profile captured by the blocking modal.
+// -----------------------------------------------------------------------------
+
+export interface RegistrationInput {
+  givenName: string;
+  familyName: string;
+  organization: string;
+  state: string;
+  zip: string;
+  county: string;
+  roles: UserRole[];
+  roleOther: string | null;
+}
+
+/**
+ * Has this user completed registration? Called on every page load for a
+ * signed-in user, so it stays a single indexed lookup by primary key.
+ */
+export async function isRegistered(userId: string): Promise<boolean> {
+  const rows = await sql`
+    SELECT registration_completed_at FROM users WHERE id = ${userId}
+  `;
+  return Boolean(rows[0]?.registration_completed_at);
+}
+
+/** Profile fields the modal prefills from the Cognito-sourced user record. */
+export async function getRegistrationDefaults(userId: string) {
+  const rows = await sql`
+    SELECT given_name, family_name, email FROM users WHERE id = ${userId}
+  `;
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    name: [row.given_name, row.family_name].filter(Boolean).join(' '),
+    email: row.email as string,
+  };
+}
+
+/**
+ * Persist a completed registration. Idempotent — re-submitting replaces the
+ * role set rather than appending to it.
+ */
+export async function saveRegistration(userId: string, input: RegistrationInput): Promise<void> {
+  await sql`
+    UPDATE users SET
+      given_name                = ${input.givenName},
+      family_name               = ${input.familyName},
+      organization              = ${input.organization},
+      state                     = ${input.state},
+      zip                       = ${input.zip},
+      county                    = ${input.county},
+      role_other                = ${input.roleOther},
+      registration_completed_at = now(),
+      updated_at                = now()
+    WHERE id = ${userId}
+  `;
+
+  await sql`DELETE FROM user_roles WHERE user_id = ${userId}`;
+  for (const role of input.roles) {
+    await sql`
+      INSERT INTO user_roles (user_id, role) VALUES (${userId}, ${role})
+      ON CONFLICT DO NOTHING
+    `;
+  }
 }
