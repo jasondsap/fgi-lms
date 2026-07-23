@@ -45,8 +45,8 @@ export default function Footer() {
         }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: '2.5rem',
+            gridTemplateColumns: '0.8fr 1.7fr 1.1fr',
+            gap: '2rem',
             alignItems: 'start',
           }}>
 
@@ -55,8 +55,8 @@ export default function Footer() {
               <Image
                 src="/images/logos/fgi-logo-transparent.png"
                 alt="Fletcher Group"
-                width={220}
-                height={58}
+                width={190}
+                height={50}
                 style={{ objectFit: 'contain', objectPosition: 'left', marginBottom: '6px' }}
               />
               <div style={{
@@ -92,12 +92,12 @@ export default function Footer() {
               </div>
 
               <div style={{
-                display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '1.5rem',
+                display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '1.75rem',
                 alignItems: 'start', justifyItems: 'center',
               }}>
                 {/* Follow Us */}
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
                     Follow Us
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -117,8 +117,8 @@ export default function Footer() {
 
                 {/* Recovery Ecosystem Radio */}
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px', lineHeight: 1.35 }}>
-                    Recovery Ecosystem<br />Radio Podcast
+                  <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
+                    Recovery Ecosystem Radio Podcast
                   </div>
                   <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                     <IconCircle href={PODCAST_URL} label="Listen — audio">
