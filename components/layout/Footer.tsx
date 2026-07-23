@@ -15,7 +15,7 @@ function IconCircle({ href, label, children }: {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         width: '38px', height: '38px', borderRadius: '50%',
-        background: 'var(--fgi-blue)', color: 'var(--fgi-navy)', flexShrink: 0,
+        background: 'var(--fgi-gold)', color: 'var(--fgi-navy)', flexShrink: 0,
       }}
     >
       {children}

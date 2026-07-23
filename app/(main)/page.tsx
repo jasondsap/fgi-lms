@@ -11,20 +11,23 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-// Small "New This Month" promo tile: square thumbnail + label + item title.
+// Small "New This Month" promo tile: bordered pill with a square thumbnail +
+// label + item title (7-22-26 mockup).
 function NewThisMonthTile({ href, image, label, title }: {
   href: string; image: string; label: string; title: string;
 }) {
   return (
     <Link href={href} style={{
       display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none',
+      border: '1px solid #cfe0ec', borderRadius: '12px', padding: '12px 20px 12px 12px',
+      background: '#ffffff',
     }}>
       <Image
         src={image}
         alt=""
-        width={96}
-        height={96}
-        style={{ objectFit: 'cover', borderRadius: '2px', flexShrink: 0, width: '96px', height: '96px' }}
+        width={72}
+        height={72}
+        style={{ objectFit: 'cover', borderRadius: '6px', flexShrink: 0, width: '72px', height: '72px' }}
       />
       <div>
         <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--fgi-navy)', marginBottom: '4px' }}>
@@ -68,35 +71,58 @@ export default async function HomePage({ searchParams }: PageProps) {
       <section style={{
         background: '#ffffff',
         borderBottom: '1px solid #e8e8e8',
-        padding: '3rem 2rem 2.5rem',
+        padding: '2.75rem 2rem 2.5rem',
       }}>
         <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+          {/* Eyebrow: flag + Learning Resource Center */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
+            <Image
+              src="/images/logos/fgi-flag.png"
+              alt=""
+              width={38}
+              height={35}
+              style={{ objectFit: 'contain', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '30px', fontWeight: 400, color: 'var(--fgi-navy)', lineHeight: 1.1 }}>
+              Learning Resource Center
+            </span>
+          </div>
+
+          {/* Welcome heading + gold underline */}
           <h1 style={{
-            fontSize: '42px', fontWeight: 800, color: 'var(--fgi-navy)',
-            marginBottom: '2.5rem', lineHeight: 1.2,
+            fontSize: '62px', fontWeight: 800, color: '#111111',
+            margin: '0 0 12px', lineHeight: 1.05,
           }}>
-            Welcome to the Learning Resource Center
+            Welcome
           </h1>
+          <div style={{
+            width: '148px', height: '5px', background: 'var(--fgi-gold)',
+            borderRadius: '2px', marginBottom: '2.5rem',
+          }} />
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 420px',
-            gap: '3.5rem',
+            gridTemplateColumns: '1fr 380px',
+            gap: '3rem',
             alignItems: 'start',
           }}>
             {/* Left: body copy */}
             <div>
-              <p style={{ marginBottom: '1.35rem', fontSize: '17px', lineHeight: 1.7, textAlign: 'justify' }}>
+              <p style={{ marginBottom: '1.35rem', fontSize: '17px', lineHeight: 1.7 }}>
                 Your one-stop, no-cost library for building stronger recovery housing and support
-                programs &mdash; courses, guides, webinars, podcasts, NAADAC CE opportunities,
-                research, and more.
+                programs &mdash;{' '}
+                <strong>courses, guides, webinars, podcasts, NAADAC CE opportunities, research,
+                and more.</strong>
               </p>
-              <p style={{ marginBottom: '1.35rem', fontSize: '17px', lineHeight: 1.7, textAlign: 'justify' }}>
+              <p style={{ marginBottom: '1.5rem', fontSize: '17px', lineHeight: 1.7 }}>
                 Whether you&#x2019;re opening your first recovery home, leading an established program,
                 working as a peer or recovery support provider, or a community partner, there&#x2019;s
                 something here for you.
               </p>
-              <p style={{ fontSize: '17px', lineHeight: 1.7 }}>
+              <p style={{
+                fontSize: '17px', lineHeight: 1.7, fontWeight: 700,
+                borderLeft: '4px solid var(--fgi-gold)', paddingLeft: '14px',
+              }}>
                 Explore, learn, and grow with us.
               </p>
             </div>
@@ -105,11 +131,11 @@ export default async function HomePage({ searchParams }: PageProps) {
             <div style={{
               border: '10px solid var(--fgi-navy)',
               background: 'var(--fgi-navy)',
-              borderRadius: '2px',
+              borderRadius: '16px',
             }}>
               <div style={{
                 position: 'relative', paddingTop: '56.25%',
-                overflow: 'hidden', background: '#111',
+                overflow: 'hidden', background: '#111', borderRadius: '6px',
               }}>
                 <iframe
                   src="https://player.vimeo.com/video/1181685318?h=3d4673b6ea&badge=0&autopause=0&player_id=0&app_id=58479"
@@ -124,18 +150,20 @@ export default async function HomePage({ searchParams }: PageProps) {
 
           {/* ── New This Month ── */}
           <div style={{ marginTop: '3rem' }}>
-            <h2 style={{
-              fontSize: '26px', fontWeight: 700, fontStyle: 'italic',
-              color: 'var(--fgi-navy)', marginBottom: '1.25rem',
-            }}>
-              New This Month
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.5rem' }}>
+              <h2 style={{
+                fontSize: '26px', fontWeight: 700, fontStyle: 'italic',
+                color: 'var(--fgi-navy)', whiteSpace: 'nowrap',
+              }}>
+                New This Month
+              </h2>
+              <div style={{ flex: 1, height: '2px', background: 'var(--fgi-gold)' }} />
+            </div>
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(2, 1fr)',
               gap: '2rem',
-              alignItems: 'center',
             }}>
               {/* TODO: swap these two tiles to the newest published podcast/webinar
                   from Neon once podcast resources are loaded. */}
@@ -143,24 +171,30 @@ export default async function HomePage({ searchParams }: PageProps) {
                 href="/library?type=podcast"
                 image="/images/category-cards/podcast.png"
                 label="Latest Podcast"
-                title="Launch episode"
+                title="Building Recovery Ecosystems"
               />
               <NewThisMonthTile
                 href="/library?type=webinar"
                 image="/images/category-cards/webinar.png"
                 label="Latest Webinar"
-                title="Building Recovery Ecosystems"
+                title="The Brain in Early Recovery"
               />
-
-              <p style={{ fontSize: '16px', color: 'var(--text-secondary)', textAlign: 'right' }}>
-                For support contact{' '}
-                <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
-                  LC@fletchergroup.org
-                </a>
-              </p>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ── Need help? support bar — full-bleed tan (7-22-26) ── */}
+      <section style={{
+        background: 'var(--fgi-tan)',
+        padding: '1.15rem 2rem',
+        textAlign: 'center',
+      }}>
+        <a href="mailto:LC@fletchergroup.org" style={{
+          fontSize: '16px', color: 'var(--fgi-navy)', textDecoration: 'underline',
+        }}>
+          Need help? Contact us at <strong>LC@fletchergroup.org</strong>
+        </a>
       </section>
 
       {/* ── Library ── */}

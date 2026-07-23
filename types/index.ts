@@ -179,22 +179,24 @@ export const DURATION_LABELS = {
 // Card colors from the FGI Resource Center Brand palette (4-9-26 doc).
 // Types the palette doesn't define borrow the closest palette color
 // (matched to the tint of Jennifer's 7-7-26 card images).
+// Card color-bar palette — from Jennifer's 7-22-26 mockup "Color Codes.txt"
+// (the hex encoded in each card-image filename). This revised several types.
 export const RESOURCE_TYPE_COLORS: Record<ResourceType, string> = {
-  course:        '#0e72a2', // Courses — FGI Original Blue
-  naadac_ce:     '#0e72a2', // not in palette — uses Courses blue
-  toolkit:       '#047b3f', // Toolkits (displayed "Learning Brief")
-  guidebook:     '#4e6205', // not in palette — uses Handbooks olive
-  handbook:      '#4e6205', // Handbooks
-  webinar:       '#a2307c', // Webinars
-  newsletter:    '#8b6d00', // Newsletters
+  course:        '#0e72a2', // Course / Training
+  naadac_ce:     '#0e72a2', // not in palette — uses Course blue
+  toolkit:       '#047b3f', // Learning Brief
+  guidebook:     '#3a4904', // Guidebook
+  handbook:      '#4e6205', // Handbook & RH Template
+  webinar:       '#2a56ac', // Webinar
+  newsletter:    '#8b6f00', // Newsletter
   video:         '#a20e3e', // Video
-  podcast:       '#3d135f', // Podcasts
-  paper:         '#b13f08', // Paper (displayed "Publications")
-  whitepaper:    '#b13f08', // not in palette — uses Paper
-  infographic:   '#557a92', // Infographics
-  success_story: '#2a56ac', // Success Story
-  fgi_service:   '#0e72a2', // not in palette — FGI Original Blue
-  non_fgi:       '#557a92', // not in palette — uses Infographics steel blue
+  podcast:       '#204f64', // Podcast
+  paper:         '#b13f08', // Publication
+  whitepaper:    '#862f04', // Whitepaper & Topic Brief
+  infographic:   '#557a92', // Infographic
+  success_story: '#3d135f', // Success Story
+  fgi_service:   '#03587c', // FGI Services
+  non_fgi:       '#384f61', // Non-FGI Recommended
 };
 
 // =============================================================================

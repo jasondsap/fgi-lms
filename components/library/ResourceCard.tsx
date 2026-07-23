@@ -36,7 +36,6 @@ export default function ResourceCard({ resource }: Props) {
   const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
-  const shortLabel   = typeLabel.split(' / ')[0];
 
   return (
     <Link
@@ -46,7 +45,7 @@ export default function ResourceCard({ resource }: Props) {
       <article
         style={{
           background: 'var(--card-bg)',
-          borderRadius: '24px',
+          borderRadius: '10px',
           boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           overflow: 'hidden',
           height: '100%',
@@ -64,8 +63,10 @@ export default function ResourceCard({ resource }: Props) {
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
-        {/* Thumbnail — category photos are 640×360, shown edge-to-edge */}
+        {/* Thumbnail — category photos are 640×360, shown edge-to-edge, with a
+            full-width brand-color type bar across the bottom (7-22-26 mockup) */}
         <div style={{
+          position: 'relative',
           aspectRatio: '16 / 9',
           flexShrink: 0,
           background: '#f5f5f5',
@@ -95,39 +96,35 @@ export default function ResourceCard({ resource }: Props) {
               fontSize: '36px', opacity: 0.3,
             }}>📄</div>
           )}
+
+          {/* NAADAC CE overlay — top-right of the image */}
+          {resource.is_naadac_ce && (
+            <span style={{
+              position: 'absolute', top: '10px', right: '10px',
+              background: '#0e72a2', color: '#fff',
+              fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
+              padding: '3px 8px', borderRadius: '20px',
+            }}>
+              NAADAC CE
+            </span>
+          )}
+
+          {/* Type color bar — full width across the bottom of the image */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            background: badgeColor,
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 700,
+            letterSpacing: '0.01em',
+            padding: '7px 16px',
+          }}>
+            {typeLabel}
+          </div>
         </div>
 
         {/* Card body */}
         <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-
-          {/* Type badge pill + CE badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-            <span style={{
-              background: badgeColor,
-              color: '#fff',
-              fontSize: '11px',
-              fontWeight: 700,
-              padding: '3px 10px',
-              borderRadius: '20px',
-              letterSpacing: '0.02em',
-              display: 'inline-block',
-            }}>
-              {shortLabel}
-            </span>
-            {resource.is_naadac_ce && (
-              <span style={{
-                background: '#0e72a2',
-                color: '#fff',
-                fontSize: '10px',
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: '20px',
-                letterSpacing: '0.03em',
-              }}>
-                NAADAC CE
-              </span>
-            )}
-          </div>
 
           {/* Title */}
           <h3 style={{
