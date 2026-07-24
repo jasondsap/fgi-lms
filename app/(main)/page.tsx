@@ -102,7 +102,7 @@ export default async function HomePage({ searchParams }: PageProps) {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 380px',
+            gridTemplateColumns: '1fr 540px',
             gap: '3rem',
             alignItems: 'start',
           }}>
