@@ -36,7 +36,7 @@
   --radius-lg:       12px;
   --shadow-card:     0 1px 3px rgba(0,0,0,0.08);
   --font-sans:       'Open Sans', sans-serif;
-  --max-width:       960px;   /* boxed width matched to Jennifer's 7-22-26 mockup (1024pt artboard) */
+  --max-width:       1320px;  /* boxed width matched to PsychArmor's .container (learn.psycharmor.org) */
   --sidebar-width:   220px;
 }
 
