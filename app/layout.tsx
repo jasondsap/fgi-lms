@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header from '@/components/layout/Header';
 import RegistrationGate from '@/components/account/RegistrationGate';
 
 export const metadata: Metadata = {
@@ -13,8 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main>{children}</main>
+        {/* Header/Footer are provided per route group (FGI surfaces vs tenant
+            pages) so tenant landing pages can supply their own chrome. */}
+        {children}
         {/* Blocks the site until a signed-in user completes registration */}
         <RegistrationGate />
       </body>

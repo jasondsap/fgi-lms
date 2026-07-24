@@ -75,20 +75,19 @@ export async function getPublicResources(
       : `topic_tags && ${ph}::text[]`);
   }
 
-  if (tenant) {
-    const ph = bind(tenant);
-    conditions.push(`(
-      NOT EXISTS (SELECT 1 FROM resource_visibility WHERE resource_id = resources.id)
-      OR EXISTS (
-        SELECT 1 FROM resource_visibility rv
-        JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = resources.id AND t.slug = ${ph}
-      )
+  // Allow-list visibility model. Every surface — the FGI main site and each
+  // tenant portal — is an explicit membership: a resource appears on a surface
+  // only if it has a resource_visibility row for that surface's tenant. The
+  // main site is the 'fgi' surface; tenant pages use their own slug. A resource
+  // shared across surfaces simply has a row per surface.
+  const surface = tenant || 'fgi';
+  {
+    const ph = bind(surface);
+    conditions.push(`EXISTS (
+      SELECT 1 FROM resource_visibility rv
+      JOIN tenants t ON t.id = rv.tenant_id
+      WHERE rv.resource_id = resources.id AND t.slug = ${ph}
     )`);
-  } else {
-    conditions.push(
-      `NOT EXISTS (SELECT 1 FROM resource_visibility WHERE resource_id = resources.id)`
-    );
   }
 
   const limitPh  = bind(per_page);
