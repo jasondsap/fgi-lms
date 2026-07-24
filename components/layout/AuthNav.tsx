@@ -2,7 +2,12 @@ import { authEnabled, getSession, signIn, signOut } from '@/auth';
 
 // Header account area. Renders nothing until the Cognito env vars are
 // configured, so the header is unchanged while auth is being set up.
-export default async function AuthNav() {
+// `color` lets tenant headers (light background) reuse it with dark text;
+// `signOutRedirect` keeps tenant users on their portal after sign-out.
+export default async function AuthNav({
+  color = '#ffffff',
+  signOutRedirect = '/',
+}: { color?: string; signOutRedirect?: string } = {}) {
   if (!authEnabled) return null;
   const session = await getSession();
 
@@ -18,8 +23,8 @@ export default async function AuthNav() {
           type="submit"
           style={{
             background: 'transparent',
-            color: '#ffffff',
-            border: '1.5px solid rgba(255,255,255,0.85)',
+            color,
+            border: `1.5px solid ${color}`,
             borderRadius: '20px',
             padding: '7px 20px',
             fontSize: '14px',
@@ -40,20 +45,20 @@ export default async function AuthNav() {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', whiteSpace: 'nowrap' }}>
-      <span style={{ color: '#ffffff', fontSize: '15px', fontWeight: 700 }}>
+      <span style={{ color, fontSize: '15px', fontWeight: 700 }}>
         Hi, {displayName}
       </span>
       <form
         action={async () => {
           'use server';
-          await signOut({ redirectTo: '/' });
+          await signOut({ redirectTo: signOutRedirect });
         }}
       >
         <button
           type="submit"
           style={{
             background: 'transparent',
-            color: '#ffffff',
+            color,
             border: 'none',
             padding: 0,
             fontSize: '15px',

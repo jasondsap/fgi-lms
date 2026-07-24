@@ -59,6 +59,13 @@ button {
 
 img { max-width: 100%; height: auto; display: block; }
 
+/* Tenant portal rich-text blocks (dangerouslySetInnerHTML content) */
+.tenant-contact p { margin: 0 0 2px; }
+.tenant-contact a { color: #ffffff; text-decoration: underline; }
+.tenant-prose p { margin: 0 0 0.9rem; }
+.tenant-prose p:last-child { margin-bottom: 0; }
+.tenant-prose a { color: inherit; text-decoration: underline; font-weight: 700; }
+
 /* Utility */
 .sr-only {
   position: absolute; width: 1px; height: 1px;
