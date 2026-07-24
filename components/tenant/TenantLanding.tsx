@@ -33,9 +33,8 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
   }
 
   const data = await getPublicResources(params);
-  const fgiLogo = tenant.hostedBar.fg === '#000000'
-    ? '/images/logos/fgi-logo.png'
-    : '/images/logos/fgi-logo-transparent.png';
+  // Same Fletcher Group mark on every tenant's hosted bar (per Jason).
+  const fgiLogo = '/images/logos/fgi-logo-transparent.png';
 
   return (
     <div>
