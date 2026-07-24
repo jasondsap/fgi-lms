@@ -45,7 +45,7 @@ export default function ResourceCard({ resource }: Props) {
       <article
         style={{
           background: 'var(--card-bg)',
-          borderRadius: '10px',
+          borderRadius: '25px',        // match PsychArmor's rounded collection cards
           boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           overflow: 'hidden',
           height: '100%',
