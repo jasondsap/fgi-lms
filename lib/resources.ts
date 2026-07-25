@@ -102,7 +102,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY published_at DESC NULLS LAST
+    ORDER BY published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 

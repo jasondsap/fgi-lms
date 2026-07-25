@@ -2,9 +2,10 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/library/FilterSidebar';
-import ResourceCard from '@/components/library/ResourceCard';
+import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getPublicResources } from '@/lib/resources';
+import { filterQuery } from '@/lib/query';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
@@ -33,6 +34,10 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
   }
 
   const data = await getPublicResources(params);
+  // The surface comes from the route here, not the URL, so the API query needs
+  // `tenant` added explicitly; the visible href keeps the clean tenant path.
+  const linkQuery = filterQuery(searchParams);
+  const apiQuery = filterQuery(searchParams, { tenant: tenant.slug });
   // Same Fletcher Group mark on every tenant's hosted bar (per Jason).
   const fgiLogo = '/images/logos/fgi-logo-transparent.png';
 
@@ -154,39 +159,18 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath={home} />
-            {data.resources.length === 0 ? (
-              <div style={{
-                textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-muted)', fontSize: '15px',
-                background: 'var(--card-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
-              }}>
-                No resources found matching your filters.
-              </div>
-            ) : (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem', marginBottom: '2rem' }}>
-                  {data.resources.map((r: any) => <ResourceCard key={r.id} resource={r} />)}
-                </div>
-                {data.total_pages > 1 && (params.page ?? 1) < data.total_pages && (
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <a
-                      href={`${home}?${new URLSearchParams({
-                        ...Object.fromEntries(
-                          Object.entries(searchParams).filter(([k]) => k !== 'page')
-                            .flatMap(([k, v]) => Array.isArray(v) ? v.map(val => [k, val]) : [[k, v as string]])
-                        ),
-                        page: String((params.page || 1) + 1),
-                      }).toString()}`}
-                      style={{
-                        background: tenant.primary, color: '#fff', padding: '11px 36px',
-                        borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-                      }}
-                    >
-                      Load More
-                    </a>
-                  </div>
-                )}
-              </>
-            )}
+            {/* key resets the accumulated list whenever a filter changes */}
+            <ResourceGrid
+              key={linkQuery}
+              initial={data.resources}
+            startPage={params.page ?? 1}
+              totalPages={data.total_pages}
+              perPage={params.per_page!}
+              apiQuery={apiQuery}
+              fallbackBase={home}
+              fallbackQuery={linkQuery}
+              buttonColor={tenant.primary}
+            />
           </div>
         </div>
       </section>

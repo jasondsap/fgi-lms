@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import FilterSidebar from '@/components/library/FilterSidebar';
-import ResourceCard from '@/components/library/ResourceCard';
+import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getPublicResources } from '@/lib/resources';
+import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 interface PageProps {
@@ -32,6 +33,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   }
 
   const data = await getPublicResources(params);
+  const query = filterQuery(searchParams);
 
   return (
     <div style={{ background: 'var(--body-bg)', padding: '2rem 2rem 4rem' }}>
@@ -46,49 +48,18 @@ export default async function LibraryPage({ searchParams }: PageProps) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <SearchBar defaultValue={params.search} targetPath="/library" />
 
-          {data.resources.length === 0 ? (
-            <div style={{
-              textAlign: 'center', padding: '4rem 2rem',
-              color: 'var(--text-muted)', fontSize: '15px',
-              background: 'var(--card-bg)', borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-            }}>
-              No resources found matching your filters.
-            </div>
-          ) : (
-            <>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '1.25rem', marginBottom: '2rem',
-              }}>
-                {data.resources.map((resource: any) => (
-                  <ResourceCard key={resource.id} resource={resource} />
-                ))}
-              </div>
-              {data.total_pages > 1 && (params.page ?? 1) < data.total_pages && (
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <a
-                    href={`/library?${new URLSearchParams({
-                      ...Object.fromEntries(
-                        Object.entries(searchParams)
-                          .filter(([k]) => k !== 'page')
-                          .flatMap(([k, v]) => Array.isArray(v) ? v.map(val => [k, val]) : [[k, v as string]])
-                      ),
-                      page: String((params.page || 1) + 1),
-                    }).toString()}`}
-                    style={{
-                      background: 'var(--fgi-blue)', color: '#fff',
-                      padding: '11px 36px', borderRadius: 'var(--radius-md)',
-                      fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-                    }}
-                  >
-                    Load More
-                  </a>
-                </div>
-              )}
-            </>
-          )}
+          {/* key resets the accumulated list whenever a filter changes */}
+          <ResourceGrid
+            key={query}
+            initial={data.resources}
+            startPage={params.page ?? 1}
+            totalPages={data.total_pages}
+            perPage={params.per_page!}
+            apiQuery={query}
+            fallbackBase="/library"
+            fallbackQuery={query}
+            buttonColor="var(--fgi-blue)"
+          />
         </div>
       </div>
     </div>
