@@ -20,6 +20,8 @@ export interface PlayerSection {
 interface Props {
   title: string;
   slug: string;
+  /** '' on FGI, '/colorado' or '/scarr' on a tenant portal. */
+  basePath: string;
   sections: PlayerSection[];
   initialSrc: string; // one-time SSO login URL → first activity
   initialCmid: number;
@@ -34,7 +36,7 @@ const MODNAME_LABELS: Record<string, string> = {
   resource: 'Resource',
 };
 
-export default function CoursePlayer({ title, slug, sections, initialSrc, initialCmid }: Props) {
+export default function CoursePlayer({ title, slug, basePath, sections, initialSrc, initialCmid }: Props) {
   const router = useRouter();
   // iframe src lives in state so server refreshes (which mint a new one-time
   // login URL) never reload the running activity
@@ -77,7 +79,7 @@ export default function CoursePlayer({ title, slug, sections, initialSrc, initia
         flexDirection: 'column',
       }}>
         <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid var(--border-color)' }}>
-          <Link href={`/resource/${slug}`} style={{
+          <Link href={`${basePath}/resource/${slug}`} style={{
             fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'none', fontWeight: 600,
           }}>
             ‹ Back to course page

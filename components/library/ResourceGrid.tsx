@@ -21,6 +21,8 @@ interface Props {
   fallbackBase: string;
   fallbackQuery: string;
   buttonColor: string;
+  /** Link prefix for cards — '' on FGI, '/colorado' or '/scarr'. */
+  basePath?: string;
 }
 
 /**
@@ -35,6 +37,7 @@ interface Props {
  */
 export default function ResourceGrid({
   initial, startPage, totalPages, perPage, apiQuery, fallbackBase, fallbackQuery, buttonColor,
+  basePath = '',
 }: Props) {
   const [items, setItems] = useState<Resource[]>(initial);
   const [page, setPage] = useState(startPage);
@@ -95,7 +98,7 @@ export default function ResourceGrid({
         gap: '1.25rem', marginBottom: '2rem',
       }}>
         {items.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} />
+          <ResourceCard key={resource.id} resource={resource} basePath={basePath} />
         ))}
       </div>
 

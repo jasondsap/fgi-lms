@@ -3,7 +3,11 @@ import Link from 'next/link';
 import type { Resource } from '@/types';
 import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
 
-interface Props { resource: Resource; }
+interface Props {
+  resource: Resource;
+  /** '' on FGI, '/colorado' or '/scarr' — keeps the visitor on their surface. */
+  basePath?: string;
+}
 
 // Jennifer's 7-7-26 card set — banner-free 640×360 photos, one per type
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
@@ -32,14 +36,14 @@ function formatDuration(mins: number | null): string {
   return m ? `Approx. ${h}h ${m}m.` : `Approx. ${h}h.`;
 }
 
-export default function ResourceCard({ resource }: Props) {
+export default function ResourceCard({ resource, basePath = '' }: Props) {
   const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
 
   return (
     <Link
-      href={`/resource/${resource.slug}`}
+      href={`${basePath}/resource/${resource.slug}`}
       style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
     >
       <article

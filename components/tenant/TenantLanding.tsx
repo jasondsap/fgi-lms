@@ -170,6 +170,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
               fallbackBase={home}
               fallbackQuery={linkQuery}
               buttonColor={tenant.primary}
+              basePath={home}
             />
           </div>
         </div>
