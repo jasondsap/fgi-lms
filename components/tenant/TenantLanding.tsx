@@ -9,6 +9,13 @@ import { filterQuery } from '@/lib/query';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
+// Resource Type is a multi-select in the sidebar, so this arrives as a string
+// when one box is ticked and an array when several are.
+function normalizeType(v: string | string[] | undefined) {
+  if (!v) return undefined;
+  return (Array.isArray(v) ? v : [v]) as ResourceType[];
+}
+
 interface Props {
   tenant: TenantConfig;
   searchParams: { [key: string]: string | string[] | undefined };
@@ -18,7 +25,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
   const home = `/${tenant.slug}`;
 
   const params: ResourceListParams = {
-    type:     (searchParams.type     as ResourceType)  || undefined,
+    type:     normalizeType(searchParams.type),
     duration: (searchParams.duration as any)           || undefined,
     search:   (searchParams.search   as string)        || undefined,
     match:    (searchParams.match    as 'any' | 'all') || 'any',

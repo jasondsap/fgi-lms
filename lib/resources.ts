@@ -27,11 +27,15 @@ export async function getPublicResources(
   params: ResourceListParams
 ): Promise<ResourceListResponse> {
   const {
-    type, duration, search, tenant,
+    duration, search, tenant,
     page = 1, per_page = 12, match = 'any',
   } = params;
 
   const offset = (page - 1) * per_page;
+  // The sidebar's Resource Type group is multi-select, so `type` arrives as an
+  // array whenever more than one box is ticked.
+  const typeArr = params.type
+    ? (Array.isArray(params.type) ? params.type : [params.type]) : [];
   const audienceArr = params.audience
     ? (Array.isArray(params.audience) ? params.audience : [params.audience]) : [];
   const topicArr = params.topic
@@ -47,8 +51,11 @@ export async function getPublicResources(
     return `$${values.length}`;
   };
 
-  if (type) {
-    conditions.push(`type = ${bind(type)}`);
+  if (typeArr.length > 0) {
+    // A resource has exactly one type, so multiple selections are always OR —
+    // the any/all "Match Categories" toggle applies to audience and topic only.
+    // Cast to text because the column is the resource_type enum.
+    conditions.push(`type::text = ANY(${bind(typeArr)}::text[])`);
   }
 
   if (search) {

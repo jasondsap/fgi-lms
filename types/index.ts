@@ -96,7 +96,7 @@ export interface Tenant {
 // ---------------------------------------------------------------------------
 
 export interface ResourceListParams {
-  type?: ResourceType;
+  type?: ResourceType | ResourceType[];
   audience?: AudienceTag | AudienceTag[];
   topic?: TopicTag | TopicTag[];
   duration?: 'under_15' | '16_30' | '31_60' | '61_90' | '91_120' | '121_plus';

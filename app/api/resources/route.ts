@@ -8,7 +8,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
 
     const params: ResourceListParams = {
-      type:     (searchParams.get('type')     as any) || undefined,
       duration: (searchParams.get('duration') as any) || undefined,
       search:   searchParams.get('search')            || undefined,
       tenant:   searchParams.get('tenant')            || undefined,
@@ -17,9 +16,13 @@ export async function GET(request: NextRequest) {
       per_page: parseInt(searchParams.get('per_page') || '12', 10),
     };
 
-    // audience and topic can be multi-value: ?audience=house_owner&audience=clinical
+    // type, audience and topic can be multi-value:
+    //   ?type=toolkit&type=webinar&audience=house_owner&audience=clinical
+    // getAll is required — get() silently returns only the first value.
+    const type     = searchParams.getAll('type');
     const audience = searchParams.getAll('audience');
     const topic    = searchParams.getAll('topic');
+    if (type.length)     params.type     = type     as any;
     if (audience.length) params.audience = audience as any;
     if (topic.length)    params.topic    = topic    as any;
 

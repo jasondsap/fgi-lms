@@ -8,6 +8,13 @@ import { getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
+// Resource Type is a multi-select in the sidebar, so this arrives as a string
+// when one box is ticked and an array when several are.
+function normalizeType(v: string | string[] | undefined) {
+  if (!v) return undefined;
+  return (Array.isArray(v) ? v : [v]) as ResourceType[];
+}
+
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
@@ -44,7 +51,7 @@ function NewThisMonthTile({ href, image, label, title }: {
 
 export default async function HomePage({ searchParams }: PageProps) {
   const params: ResourceListParams = {
-    type:     (searchParams.type     as ResourceType)  || undefined,
+    type:     normalizeType(searchParams.type),
     duration: (searchParams.duration as any)           || undefined,
     search:   (searchParams.search   as string)        || undefined,
     match:    (searchParams.match    as 'any' | 'all') || 'any',
