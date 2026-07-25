@@ -61,7 +61,10 @@ export default async function CourseView(
         id: s.id,
         name: /^\d*$/.test(name) ? '' : name,
         modules: s.modules
-          .filter((m) => m.visible && m.url)
+          // Moodle auto-creates an Announcements forum in every course. It is
+          // site scaffolding, not coursework — without this the player opens on
+          // an empty forum instead of the first lesson.
+          .filter((m) => m.visible && m.url && m.modname !== 'forum')
           .map(
             (m): PlayerModule => ({
               cmid: m.id,
