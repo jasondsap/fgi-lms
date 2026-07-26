@@ -5,7 +5,7 @@ import AskLibrary from '@/components/library/AskLibrary';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
-import { getPublicResources } from '@/lib/resources';
+import { getLatestWebinar, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import { HERO_ASPECT_PADDING, HERO_COLUMN_WIDTH, TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -42,6 +42,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
   }
 
   const data = await getPublicResources(params);
+  const latestWebinar = await getLatestWebinar();
   // The surface comes from the route here, not the URL, so the API query needs
   // `tenant` added explicitly; the visible href keeps the clean tenant path.
   const linkQuery = filterQuery(searchParams);
@@ -129,12 +130,16 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
                 label="FGI's Latest Podcast" title="Building Recovery Ecosystems"
                 color={tenant.primary}
               />
-              <NewThisMonthTile
-                href={`${tenant.fgiSiteUrl}/library?type=webinar`}
-                image="/images/category-cards/webinar.png"
-                label="FGI's Latest Webinar" title="Building Recovery Ecosystems"
-                color={tenant.primary}
-              />
+              {/* Points at the FGI site, not the tenant path: these webinars are
+                  FGI-only, so they aren't in the tenant's own library. */}
+              {latestWebinar && (
+                <NewThisMonthTile
+                  href={`${tenant.fgiSiteUrl}/resource/${latestWebinar.slug}`}
+                  image="/images/category-cards/webinar.png"
+                  label="FGI's Latest Webinar" title={latestWebinar.title}
+                  color={tenant.primary}
+                />
+              )}
             </div>
           </div>
         </div>

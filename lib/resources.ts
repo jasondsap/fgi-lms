@@ -155,6 +155,32 @@ export async function getRelatedWebinars(
   return rows as unknown as Resource[];
 }
 
+/**
+ * The newest published webinar on the FGI surface — what the "FGI's Latest
+ * Webinar" tile points at on the homepage and on both tenant landing pages.
+ *
+ * Derived rather than hardcoded so the tile keeps matching its own label as new
+ * webinars land. Note this makes the tile sensitive to `published_at`: a wrong
+ * date in a source info sheet would promote the wrong webinar here (one such
+ * typo was found and fixed during the July 2026 webinar load).
+ */
+export async function getLatestWebinar(): Promise<{ slug: string; title: string } | null> {
+  const rows = await sql`
+    SELECT r.slug, r.title
+    FROM resources r
+    WHERE r.type = 'webinar'
+      AND r.published = TRUE
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = 'fgi'
+      )
+    ORDER BY r.published_at DESC NULLS LAST, r.id DESC
+    LIMIT 1
+  `;
+  return (rows[0] as { slug: string; title: string }) ?? null;
+}
+
 // Course-player lookup — includes moodle_course_id, which the public
 // resource shape deliberately omits. Server-side use only.
 export interface CourseResource {

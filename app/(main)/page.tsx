@@ -5,7 +5,7 @@ import FilterSidebar from '@/components/library/FilterSidebar';
 import AskLibrary from '@/components/library/AskLibrary';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
-import { getPublicResources } from '@/lib/resources';
+import { getLatestWebinar, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
@@ -74,6 +74,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   // Call DB directly — no internal HTTP fetch
   const data = await getPublicResources(params);
   const query = filterQuery(searchParams);
+  const latestWebinar = await getLatestWebinar();
 
   return (
     <div>
@@ -175,20 +176,23 @@ export default async function HomePage({ searchParams }: PageProps) {
               gridTemplateColumns: 'repeat(2, 1fr)',
               gap: '2rem',
             }}>
-              {/* TODO: swap these two tiles to the newest published podcast/webinar
-                  from Neon once podcast resources are loaded. */}
+              {/* TODO: the podcast tile is still hardcoded — swap it to the
+                  newest published podcast from Neon once podcasts are loaded.
+                  The webinar tile is already live via getLatestWebinar(). */}
               <NewThisMonthTile
                 href="/library?type=podcast"
                 image="/images/category-cards/podcast.png"
                 label="Latest Podcast"
                 title="Building Recovery Ecosystems"
               />
-              <NewThisMonthTile
-                href="/library?type=webinar"
-                image="/images/category-cards/webinar.png"
-                label="Latest Webinar"
-                title="The Brain in Early Recovery"
-              />
+              {latestWebinar && (
+                <NewThisMonthTile
+                  href={`/resource/${latestWebinar.slug}`}
+                  image="/images/category-cards/webinar.png"
+                  label="Latest Webinar"
+                  title={latestWebinar.title}
+                />
+              )}
             </div>
           </div>
         </div>
