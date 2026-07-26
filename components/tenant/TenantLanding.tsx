@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import AskLibrary from '@/components/library/AskLibrary';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
@@ -182,6 +183,9 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Scoped to this tenant's catalog and chrome. */}
+      <AskLibrary basePath={home} surface={tenant.slug} accent={tenant.primary} />
     </div>
   );
 }

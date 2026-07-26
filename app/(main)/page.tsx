@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FilterSidebar from '@/components/library/FilterSidebar';
+import AskLibrary from '@/components/library/AskLibrary';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getPublicResources } from '@/lib/resources';
@@ -234,6 +235,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           </div>
         </div>
       </section>
+      <AskLibrary />
     </div>
   );
 }

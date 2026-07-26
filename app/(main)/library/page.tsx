@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import FilterSidebar from '@/components/library/FilterSidebar';
+import AskLibrary from '@/components/library/AskLibrary';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getPublicResources } from '@/lib/resources';
@@ -69,6 +70,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
           />
         </div>
       </div>
+      <AskLibrary />
     </div>
   );
 }
