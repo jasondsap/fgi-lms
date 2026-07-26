@@ -19,7 +19,34 @@ export interface TenantSocial {
 
 export type TenantHeroRight =
   | { kind: 'logo'; src: string; alt: string }
-  | { kind: 'video'; embedUrl: string; title: string };
+  | {
+      kind: 'video';
+      embedUrl: string;
+      title: string;
+      /**
+       * Source aspect ratio, so the frame fits the video instead of
+       * letterboxing it. Defaults to 16:9. SCARR's hero is a 1080×1080
+       * square — framing it 16:9 pillarboxes it with black bars.
+       */
+      aspect?: '16:9' | '1:1';
+    };
+
+/** padding-top percentage that produces each aspect ratio. */
+export const HERO_ASPECT_PADDING: Record<'16:9' | '1:1', string> = {
+  '16:9': '56.25%',
+  '1:1': '100%',
+};
+
+/**
+ * Hero column width per aspect. Chosen so the *video* has comparable visual
+ * area across surfaces: FGI's 16:9 renders 520×293 (~152k px²), and a square
+ * at 400 renders 380×380 (~144k px²). Matching frame widths instead would
+ * make the square video 44% smaller than FGI's.
+ */
+export const HERO_COLUMN_WIDTH: Record<'16:9' | '1:1', string> = {
+  '16:9': '540px',
+  '1:1': '400px',
+};
 
 export interface TenantConfig {
   slug: string;
@@ -137,6 +164,8 @@ const TENANTS: Record<string, TenantConfig> = {
       kind: 'video',
       embedUrl: 'https://player.vimeo.com/video/1211785746?badge=0&autopause=0&player_id=0&app_id=58479',
       title: 'SCARR',
+      // Source is 1080×1080 (scarronline.org "Why become certified?").
+      aspect: '1:1',
     },
     hostedBar: { bg: '#f5d300', fg: '#000000' },   // SCARR: yellow bar
     instruction: {

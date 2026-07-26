@@ -7,7 +7,7 @@ import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
-import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
+import { HERO_ASPECT_PADDING, HERO_COLUMN_WIDTH, TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 // Resource Type is a multi-select in the sidebar, so this arrives as a string
@@ -62,7 +62,18 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
           </h1>
           <div style={{ width: '148px', height: '5px', background: tenant.accent, borderRadius: '2px', marginBottom: '2.25rem' }} />
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '3rem', alignItems: 'center' }}>
+          {/* Column width follows the hero content: a video gets the width that
+              gives it comparable visual area to the FGI homepage video for its
+              aspect ratio (see HERO_COLUMN_WIDTH); a logo stays at 380px, which
+              is sized for the mark rather than a video frame. */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: tenant.heroRight.kind === 'video'
+              ? `1fr ${HERO_COLUMN_WIDTH[tenant.heroRight.aspect ?? '16:9']}`
+              : '1fr 380px',
+            gap: '3rem',
+            alignItems: 'center',
+          }}>
             <div>
               {tenant.heroParagraphs.map((html, i) => (
                 <p
@@ -75,7 +86,11 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
 
             {tenant.heroRight.kind === 'video' ? (
               <div style={{ border: `10px solid ${tenant.primary}`, background: tenant.primary, borderRadius: '16px' }}>
-                <div style={{ position: 'relative', paddingTop: '56.25%', overflow: 'hidden', background: '#111', borderRadius: '6px' }}>
+                <div style={{
+                  position: 'relative',
+                  paddingTop: HERO_ASPECT_PADDING[tenant.heroRight.aspect ?? '16:9'],
+                  overflow: 'hidden', background: '#111', borderRadius: '6px',
+                }}>
                   <iframe
                     src={tenant.heroRight.embedUrl}
                     frameBorder="0"
