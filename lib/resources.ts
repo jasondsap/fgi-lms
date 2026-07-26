@@ -25,6 +25,16 @@ const DURATION_CLAUSES: Record<string, string> = {
   '121_plus': 'duration_minutes > 120',
 };
 
+/**
+ * Shuffle seed for the stratified default view. Constant for a UTC day, so
+ * paging stays consistent within a visit but the mix rotates day to day.
+ * (A visit spanning UTC midnight could see one repeated card on Load More —
+ * acceptable versus threading a session seed through every caller.)
+ */
+function dailySeed(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export async function getPublicResources(
   params: ResourceListParams
 ): Promise<ResourceListResponse> {
@@ -99,15 +109,50 @@ export async function getPublicResources(
     )`);
   }
 
+  // A visitor who hasn't searched or ticked a filter gets the stratified view;
+  // anyone who has expressed intent gets newest-first, which is what they want.
+  // `tenant` is the surface, not a user filter, so it doesn't count here.
+  const isDefaultView = typeArr.length === 0 && !search && !duration
+    && audienceArr.length === 0 && topicArr.length === 0;
+
+  const seedPh   = isDefaultView ? bind(dailySeed()) : null;
   const limitPh  = bind(per_page);
   const offsetPh = bind(offset);
 
   const where = conditions.join(' AND ');
-  const query = `
-    SELECT
+  const COLUMNS = `
       id, title, slug, type, description, duration_minutes,
       thumbnail_url, vimeo_id, external_url,
-      is_naadac_ce, audience_tags, topic_tags, published_at,
+      is_naadac_ce, audience_tags, topic_tags, published_at`;
+
+  // Default view: round-robin across types so the first screen is a sample of
+  // the whole library rather than whatever was bulk-loaded most recently.
+  //
+  // ROW_NUMBER() partitioned by type gives each resource its position within its
+  // own type; ordering by that number first interleaves the types — every type's
+  // 1st item, then every type's 2nd, and so on. Types run out at different
+  // points and simply drop out of the rotation.
+  //
+  // Deliberately not `ORDER BY random()`: "Load More" appends, so a fresh
+  // shuffle per request would repeat and skip items across pages. The seed is
+  // stable for a day, which keeps paging consistent while still rotating what
+  // greets a returning visitor.
+  const query = isDefaultView
+    ? `
+    SELECT ${COLUMNS}, total_count
+    FROM (
+      SELECT ${COLUMNS},
+        COUNT(*) OVER() AS total_count,
+        ROW_NUMBER() OVER (PARTITION BY type ORDER BY md5(id::text || ${seedPh})) AS type_rank,
+        md5(id::text || ${seedPh}) AS shuffle
+      FROM resources
+      WHERE ${where}
+    ) ranked
+    ORDER BY type_rank, shuffle
+    LIMIT ${limitPh} OFFSET ${offsetPh}
+  `
+    : `
+    SELECT ${COLUMNS},
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
