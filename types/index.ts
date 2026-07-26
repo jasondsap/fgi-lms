@@ -51,6 +51,38 @@ export type TopicTag =
 // Resource
 // ---------------------------------------------------------------------------
 
+// A speaker attached to a webinar. Presenters are their own table because they
+// recur across the catalog (Tara Hyde fronts two webinars already).
+export interface Presenter {
+  id: string;
+  name: string;
+  credentials: string | null;  // "LCSW, LCADC, CCS"
+  title: string | null;        // role + organization, one line
+  bio: string | null;
+  photo_url: string | null;    // /images/presenters/*.jpg — public, not S3
+  org_name: string | null;
+  org_logo_url: string | null;
+  org_url: string | null;
+}
+
+export type MaterialKind = 'transcript' | 'slides' | 'handout' | 'other';
+
+// Supporting download attached to a resource (transcript, deck, handout).
+export interface ResourceMaterial {
+  id: string;
+  kind: MaterialKind;
+  label: string;
+  // Same invariant as Resource: the s3_key stays server-side.
+  download_url: string;
+}
+
+export const MATERIAL_KIND_LABELS: Record<MaterialKind, string> = {
+  transcript: 'Transcript',
+  slides:     'Presentation Slides',
+  handout:    'Handout',
+  other:      'Resource',
+};
+
 export interface Resource {
   id: string;
   title: string;
@@ -65,8 +97,13 @@ export interface Resource {
   audience_tags: AudienceTag[];
   topic_tags: TopicTag[];
   published_at: string | null;
+  event_date?: string | null;    // the date the webinar was actually delivered
+  ceu_credits?: number | null;
+  course_code?: string | null;
   // s3_key is never exposed to the client — middleware issues a presigned URL
   download_url?: string; // presigned URL, populated per-request for PDF resources
+  presenters?: Presenter[];
+  materials?: ResourceMaterial[];
 }
 
 // Resource as stored in DB (admin view — includes all fields)

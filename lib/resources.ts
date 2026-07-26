@@ -10,7 +10,9 @@
 
 import { sql } from './db';
 import { getPresignedUrl } from './s3';
-import type { Resource, ResourceListParams, ResourceListResponse } from '@/types';
+import type {
+  Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial,
+} from '@/types';
 
 // Whitelist of duration keys → SQL fragments. Lookup is by key only;
 // fragments are static and never derived from user input.
@@ -125,6 +127,34 @@ export async function getPublicResources(
   };
 }
 
+/**
+ * "You might also be interested in" — the most recent other webinars visible on
+ * the same surface. Deliberately not tag-based: topic_tags are populated on
+ * only a handful of rows, so a tag match would return noise rather than
+ * neighbours. Revisit once tagging is backfilled.
+ */
+export async function getRelatedWebinars(
+  excludeId: string, tenantSlug: string, limit = 3,
+): Promise<Resource[]> {
+  const rows = await sql`
+    SELECT r.id, r.title, r.slug, r.type, r.description, r.duration_minutes,
+           r.thumbnail_url, r.vimeo_id, r.external_url,
+           r.is_naadac_ce, r.audience_tags, r.topic_tags, r.published_at
+    FROM resources r
+    WHERE r.type = 'webinar'
+      AND r.published = TRUE
+      AND r.id <> ${excludeId}
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+      )
+    ORDER BY r.published_at DESC NULLS LAST, r.id DESC
+    LIMIT ${limit}
+  `;
+  return rows as unknown as Resource[];
+}
+
 // Course-player lookup — includes moodle_course_id, which the public
 // resource shape deliberately omits. Server-side use only.
 export interface CourseResource {
@@ -152,7 +182,8 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
   const rows = await sql`
     SELECT id, title, slug, type, description, duration_minutes,
            thumbnail_url, vimeo_id, external_url,
-           is_naadac_ce, audience_tags, topic_tags, published_at, s3_key
+           is_naadac_ce, audience_tags, topic_tags, published_at, s3_key,
+           event_date, ceu_credits, course_code
     FROM resources
     WHERE slug = ${slug} AND published = TRUE
     LIMIT 1
@@ -172,5 +203,50 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
     delete resource.s3_key;
   }
 
-  return { ...resource, download_url } as Resource;
+  const [presenters, materials] = await Promise.all([
+    getResourcePresenters(resource.id),
+    getResourceMaterials(resource.id),
+  ]);
+
+  return { ...resource, download_url, presenters, materials } as Resource;
+}
+
+/** Presenters attached to a resource, in the order Jennifer listed them. */
+async function getResourcePresenters(resourceId: string): Promise<Presenter[]> {
+  const rows = await sql`
+    SELECT p.id, p.name, p.credentials, p.title, p.bio,
+           p.photo_url, p.org_name, p.org_logo_url, p.org_url
+    FROM resource_presenters rp
+    JOIN presenters p ON p.id = rp.presenter_id
+    WHERE rp.resource_id = ${resourceId}
+    ORDER BY rp.sort_order, p.name
+  `;
+  return rows as Presenter[];
+}
+
+/**
+ * Transcripts, slide decks and handouts. Same S3 invariant as the resource
+ * itself: the key is swapped for a presigned URL and never reaches the client.
+ */
+async function getResourceMaterials(resourceId: string): Promise<ResourceMaterial[]> {
+  const rows = await sql`
+    SELECT id, kind, label, s3_key
+    FROM resource_materials
+    WHERE resource_id = ${resourceId}
+    ORDER BY sort_order, label
+  `;
+
+  const materials = await Promise.all(
+    rows.map(async (row: any) => {
+      const { s3_key, ...rest } = row;
+      try {
+        return { ...rest, download_url: await getPresignedUrl(s3_key) };
+      } catch (e) {
+        console.error('Presigned URL error:', e);
+        return null;
+      }
+    }),
+  );
+
+  return materials.filter(Boolean) as ResourceMaterial[];
 }
