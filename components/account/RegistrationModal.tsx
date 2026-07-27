@@ -135,11 +135,11 @@ export default function RegistrationModal({ defaultName, email }: Props) {
           padding: '1.25rem 1.75rem', borderBottom: '5px solid var(--fgi-teal)',
         }}>
           <h2 id="registration-title" style={{ fontSize: '22px', fontWeight: 700 }}>
-            Complete Your Registration
+            Tell Us a Little About Yourself
           </h2>
           <p style={{ fontSize: '14px', marginTop: '5px', color: 'rgba(255,255,255,0.88)' }}>
-            Tell us a little about yourself so we can tailor the Learning Resource Center
-            to you. All fields are required.
+            This helps us understand our community so we can keep improving the
+            Learning Resource Center. All fields are required.
           </p>
         </div>
 
@@ -234,6 +234,18 @@ export default function RegistrationModal({ defaultName, email }: Props) {
               {formError}
             </div>
           )}
+
+          <p style={{
+            fontSize: '12px', lineHeight: 1.5, color: 'var(--text-muted)',
+            background: 'var(--body-bg)', border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-sm)', padding: '10px 12px',
+            marginBottom: '1.25rem',
+          }}>
+            This Learning Resource Center is hosted by the Fletcher Group. Fletcher Group
+            does not share your data with third parties. If you are registering via a
+            partner organization&rsquo;s page, your information is also made available to
+            that partner only.
+          </p>
 
           <button type="submit" disabled={saving} style={{
             width: '100%', background: 'var(--fgi-blue)', color: '#ffffff',

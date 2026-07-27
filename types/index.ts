@@ -250,12 +250,13 @@ export type UserRole =
   | 'licensed_provider'
   | 'other';
 
+// Key order here is the order the checkboxes render in the registration modal.
 export const USER_ROLE_LABELS: Record<UserRole, string> = {
-  resident:                'Resident',
-  person_in_recovery:      'Person in substance use disorder recovery',
-  certified_peer:          'Certified Peer Role',
-  advocate:                'Advocate (Family, Friend, etc.)',
   rh_owner_operator_staff: 'Recovery House Owner/Operator/Staff',
+  certified_peer:          'Peer Support Professional',
+  person_in_recovery:      'Person in substance use disorder recovery',
+  resident:                'Resident',
+  advocate:                'Ally (Family, Friend, Advocate, etc.)',
   licensed_provider:       'Licensed Provider (Social Worker, Counselor, etc.)',
   other:                   'Other',
 };
