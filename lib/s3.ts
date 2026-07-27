@@ -24,3 +24,27 @@ export async function getPresignedUrl(s3Key: string): Promise<string> {
   const command = new GetObjectCommand({ Bucket: BUCKET, Key: s3Key });
   return getSignedUrl(s3, command, { expiresIn: EXPIRY });
 }
+
+/**
+ * Same, but forces a save-to-disk instead of rendering in the browser.
+ *
+ * The objects in the bucket carry `Content-Type: application/pdf` and no
+ * Content-Disposition, so a plain presigned URL opens the PDF inline — and an
+ * `<a download>` cannot change that, because the download attribute is ignored
+ * on cross-origin URLs. Overriding the response header at sign time is the only
+ * way to make a download button actually download.
+ */
+export async function getPresignedDownloadUrl(
+  s3Key: string,
+  filename: string,
+): Promise<string> {
+  // Quotes delimit the filename in the header, so a quote inside it would break
+  // the value; strip anything awkward rather than escaping.
+  const safe = filename.replace(/[^A-Za-z0-9._-]+/g, '-').slice(0, 120);
+  const command = new GetObjectCommand({
+    Bucket: BUCKET,
+    Key: s3Key,
+    ResponseContentDisposition: `attachment; filename="${safe}"`,
+  });
+  return getSignedUrl(s3, command, { expiresIn: EXPIRY });
+}

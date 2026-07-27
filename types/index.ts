@@ -101,7 +101,8 @@ export interface Resource {
   ceu_credits?: number | null;
   course_code?: string | null;
   // s3_key is never exposed to the client — middleware issues a presigned URL
-  download_url?: string; // presigned URL, populated per-request for PDF resources
+  download_url?: string;   // presigned URL, populated per-request for PDF resources
+  attachment_url?: string; // same object, signed to force a save rather than render
   presenters?: Presenter[];
   materials?: ResourceMaterial[];
 }

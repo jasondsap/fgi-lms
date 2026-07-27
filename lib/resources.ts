@@ -9,7 +9,7 @@
 // =============================================================================
 
 import { sql } from './db';
-import { getPresignedUrl } from './s3';
+import { getPresignedUrl, getPresignedDownloadUrl } from './s3';
 import type {
   Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial,
 } from '@/types';
@@ -264,10 +264,18 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
 
   const resource = { ...rows[0] } as any;
   let download_url: string | undefined;
+  let attachment_url: string | undefined;
 
   if (resource.s3_key) {
     try {
-      download_url = await getPresignedUrl(resource.s3_key);
+      // Two signings of the same object: one that renders inline (the embedded
+      // viewer) and one that forces a save (the Download button). Signing is
+      // local crypto, so the second costs nothing over the wire.
+      const ext = resource.s3_key.split('.').pop() || 'pdf';
+      [download_url, attachment_url] = await Promise.all([
+        getPresignedUrl(resource.s3_key),
+        getPresignedDownloadUrl(resource.s3_key, `${resource.slug}.${ext}`),
+      ]);
     } catch (e) {
       console.error('Presigned URL error:', e);
     }
@@ -279,7 +287,7 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
     getResourceMaterials(resource.id),
   ]);
 
-  return { ...resource, download_url, presenters, materials } as Resource;
+  return { ...resource, download_url, attachment_url, presenters, materials } as Resource;
 }
 
 /** Presenters attached to a resource, in the order Jennifer listed them. */

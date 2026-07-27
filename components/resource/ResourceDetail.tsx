@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { authEnabled, getSession, signIn } from '@/auth';
 import CategoryImage from '@/components/library/CategoryImage';
 import DetailFooter from '@/components/resource/DetailFooter';
+import PdfViewer from '@/components/resource/PdfViewer';
 import WebinarDetail from '@/components/resource/WebinarDetail';
 import { getResourceBySlug } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
@@ -91,12 +92,13 @@ export default async function ResourceDetail(
         {/* Two-column layout */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}>
 
-          {/* LEFT */}
-          <div>
+          {/* LEFT — a flex column so each card is separated by one gap, with no
+              trailing margin when the last optional card is absent. */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Vimeo embed for video/webinar */}
             {isVideo && resource.vimeo_id && (
               <div style={{
-                position: 'relative', paddingTop: '56.25%', marginBottom: '1.75rem',
+                position: 'relative', paddingTop: '56.25%',
                 borderRadius: '8px', overflow: 'hidden', background: '#111',
               }}>
                 <iframe
@@ -111,7 +113,7 @@ export default async function ResourceDetail(
             {/* Description */}
             <div style={{
               border: '1px solid var(--border-color)', borderRadius: '8px',
-              padding: '1.25rem 1.5rem', marginBottom: '1.25rem',
+              padding: '1.25rem 1.5rem',
             }}>
               <div style={{
                 fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
@@ -126,7 +128,7 @@ export default async function ResourceDetail(
             {resource.audience_tags?.length > 0 && (
               <div style={{
                 border: '1px solid var(--border-color)', borderRadius: '8px',
-                padding: '1.25rem 1.5rem', marginBottom: '1.25rem',
+                padding: '1.25rem 1.5rem',
               }}>
                 <div style={{
                   fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
@@ -167,6 +169,17 @@ export default async function ResourceDetail(
                 </div>
               </div>
             )}
+
+            {/* Inline PDF viewer. Renders on desktop widths only — see the
+                component for why phones are excluded. */}
+            {isPDF && (
+              <PdfViewer
+                url={resource.download_url}
+                title={resource.title}
+                label={shortLabel}
+                accent={surface.primary}
+              />
+            )}
           </div>
 
           {/* RIGHT sidebar */}
@@ -178,18 +191,15 @@ export default async function ResourceDetail(
             )}
 
             {/* Action buttons */}
+            {/* The document itself is read in the inline viewer, so the sidebar
+                only needs the download. `attachment_url` is signed with an
+                attachment disposition — a plain `download` attribute would be
+                ignored here, S3 being cross-origin. */}
             {isPDF && (
-              <a href={resource.download_url} target="_blank" rel="noopener noreferrer" style={{
+              <a href={resource.attachment_url ?? resource.download_url} style={{
                 display: 'block', background: surface.primary, color: '#fff',
                 textAlign: 'center', padding: '13px 0', borderRadius: '8px',
                 fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-              }}>Open {shortLabel}</a>
-            )}
-            {isPDF && (
-              <a href={resource.download_url} download style={{
-                display: 'block', background: surface.primary, color: '#fff',
-                textAlign: 'center', padding: '13px 0', borderRadius: '8px',
-                fontWeight: 600, fontSize: '15px', textDecoration: 'none', opacity: 0.85,
               }}>Download {shortLabel}</a>
             )}
             {isCourse && !courseGated && (
