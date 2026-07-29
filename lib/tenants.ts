@@ -25,8 +25,8 @@ export type TenantHeroRight =
       title: string;
       /**
        * Source aspect ratio, so the frame fits the video instead of
-       * letterboxing it. Defaults to 16:9. SCARR's hero is a 1080×1080
-       * square — framing it 16:9 pillarboxes it with black bars.
+       * letterboxing it. Defaults to 16:9; set '1:1' only for a genuinely
+       * square source, which 16:9 framing would pillarbox with black bars.
        */
       aspect?: '16:9' | '1:1';
     };
@@ -164,8 +164,9 @@ const TENANTS: Record<string, TenantConfig> = {
       kind: 'video',
       embedUrl: 'https://player.vimeo.com/video/1211785746?badge=0&autopause=0&player_id=0&app_id=58479',
       title: 'SCARR',
-      // Source is 1080×1080 (scarronline.org "Why become certified?").
-      aspect: '1:1',
+      // SCARR re-cut the source as widescreen (7-29-26), so it now matches the
+      // FGI homepage hero exactly — same 540px column, same 16:9 frame.
+      aspect: '16:9',
     },
     hostedBar: { bg: '#f5d300', fg: '#000000' },   // SCARR: yellow bar
     instruction: {
