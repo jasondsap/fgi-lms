@@ -146,13 +146,16 @@ export default function PdfViewer({ url, title, label, accent }: Props) {
       </div>
 
       {/*
-        The #view=FitH fragment asks the built-in viewer to fit the page width.
+        The fragment asks the built-in viewer to fit the page width and to drop
+        its own chrome (toolbar + side panel), since our header already carries
+        the controls we want. Chrome/Edge honour toolbar/navpanes; Firefox and
+        Safari ignore them and keep their toolbars, which is a harmless no-op.
         Fragments are never sent to S3, so this cannot invalidate the signature.
         Toggling fullscreen only changes style here — the iframe keeps its
         position in the tree, so the PDF is never re-fetched.
       */}
       <iframe
-        src={`${url}#view=FitH`}
+        src={`${url}#toolbar=0&navpanes=0&view=FitH`}
         title={title}
         style={{
           display: 'block', width: '100%', border: 'none',
