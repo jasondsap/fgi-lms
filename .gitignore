@@ -25,3 +25,6 @@ npm-debug.log*
 # Claude Code — personal, machine-local settings (shared config goes in
 # .claude/settings.json, which stays tracked)
 .claude/settings.local.json
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo
