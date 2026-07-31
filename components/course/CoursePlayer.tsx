@@ -11,10 +11,23 @@ export interface PlayerModule {
   state: number; // 0 incomplete, 1 complete, 2 complete-pass, 3 complete-fail
 }
 
+/**
+ * One collapsible block in the sidebar. Either headed by a lesson (`lead`, and
+ * clicking the header opens it) or by a static `label` — the Evaluation block
+ * and the loose-resources block have no lesson of their own.
+ */
+export interface PlayerGroup {
+  key: string;
+  kind: 'lesson' | 'evaluation' | 'resources';
+  lead: PlayerModule | null;
+  label: string | null;
+  items: PlayerModule[];
+}
+
 export interface PlayerSection {
   id: number;
   name: string;
-  modules: PlayerModule[];
+  groups: PlayerGroup[];
 }
 
 interface Props {
@@ -36,17 +49,31 @@ const MODNAME_LABELS: Record<string, string> = {
   resource: 'Resource',
 };
 
+const groupModules = (g: PlayerGroup): PlayerModule[] =>
+  g.lead ? [g.lead, ...g.items] : g.items;
+
 export default function CoursePlayer({ title, slug, basePath, sections, initialSrc, initialCmid }: Props) {
   const router = useRouter();
   // iframe src lives in state so server refreshes (which mint a new one-time
   // login URL) never reload the running activity
   const [iframeSrc, setIframeSrc] = useState(initialSrc);
   const [activeCmid, setActiveCmid] = useState(initialCmid);
+  // Collapsed groups only — everything starts expanded, so a group added by a
+  // later course edit is visible rather than silently folded away.
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const allModules = sections.flatMap((s) => s.modules);
+  const allGroups = sections.flatMap((s) => s.groups);
+  const allModules = allGroups.flatMap(groupModules);
   const completed = allModules.filter((m) => m.state === 1 || m.state === 2).length;
   const pct = allModules.length ? Math.round((completed / allModules.length) * 100) : 0;
+
+  // A single-activity course gets no headers — wrapping one item in a
+  // collapsible block is pure noise.
+  const flat = allModules.length <= 1;
+  // Moodle's default section name ("General") means nothing to a learner; only
+  // show section names when there is genuinely more than one section.
+  const showSectionNames = sections.length > 1;
 
   // Completion states change inside the iframe (Moodle-side); re-run the
   // server component periodically so the sidebar checkmarks catch up.
@@ -60,6 +87,127 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
     // The Moodle session cookie was established by the initial SSO load —
     // plain activity URLs work from here on.
     setIframeSrc(m.url);
+  };
+
+  const StatusCircle = ({ done, small }: { done: boolean; small?: boolean }) => (
+    <span style={{
+      width: small ? '16px' : '22px',
+      height: small ? '16px' : '22px',
+      borderRadius: '50%',
+      flexShrink: 0,
+      border: done ? 'none' : `2px solid ${small ? '#d4d4d4' : '#c4c4c4'}`,
+      background: done ? 'var(--fgi-blue)' : 'transparent',
+      color: '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: small ? '10px' : '13px',
+      fontWeight: 700,
+    }}>
+      {done ? '✓' : ''}
+    </span>
+  );
+
+  /** A lesson / evaluation row. `nested` rows are the indented attachments. */
+  const ModuleRow = ({ m, nested }: { m: PlayerModule; nested?: boolean }) => {
+    const isActive = m.cmid === activeCmid;
+    const isDone = m.state === 1 || m.state === 2;
+    return (
+      <button
+        onClick={() => openModule(m)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: nested ? '10px' : '12px',
+          width: '100%', textAlign: 'left',
+          padding: nested ? '8px 20px 8px 0' : '11px 20px',
+          background: isActive ? 'var(--fgi-blue-light)' : 'transparent',
+          border: 'none',
+          borderLeft: isActive && !nested ? '3px solid var(--fgi-blue)' : '3px solid transparent',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}
+      >
+        <StatusCircle done={isDone} small={nested} />
+        <span>
+          <span style={{
+            display: 'block',
+            fontSize: nested ? '13px' : '14px',
+            fontWeight: isActive ? 700 : nested ? 400 : 500,
+            color: nested ? 'var(--text-body-dark, #333)' : 'var(--text-primary)',
+            lineHeight: 1.35,
+          }}>
+            {m.name}
+          </span>
+          <span style={{
+            display: 'block', fontSize: '11px', color: 'var(--text-muted)',
+            textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '2px',
+          }}>
+            {MODNAME_LABELS[m.modname] ?? m.modname}
+            {m.state === 3 ? ' · not yet passed' : ''}
+          </span>
+        </span>
+      </button>
+    );
+  };
+
+  const Group = ({ g }: { g: PlayerGroup }) => {
+    const members = groupModules(g);
+    const done = members.filter((m) => m.state === 1 || m.state === 2).length;
+    const isCollapsed = !!collapsed[g.key];
+    const canCollapse = g.items.length > 0;
+    const toggle = () => setCollapsed((c) => ({ ...c, [g.key]: !c[g.key] }));
+
+    return (
+      <div style={{ marginBottom: '2px' }}>
+        {/* Header — the lesson itself when there is one, else a static label */}
+        <div style={{ display: 'flex', alignItems: 'stretch' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {g.lead ? (
+              <ModuleRow m={g.lead} />
+            ) : (
+              <div style={{
+                padding: '12px 20px 6px',
+                fontSize: '11px', fontWeight: 700, letterSpacing: '0.07em',
+                textTransform: 'uppercase', color: 'var(--text-muted)',
+              }}>
+                {g.label}
+              </div>
+            )}
+          </div>
+          {canCollapse && (
+            <button
+              onClick={toggle}
+              aria-expanded={!isCollapsed}
+              aria-label={`${isCollapsed ? 'Expand' : 'Collapse'} ${g.lead?.name ?? g.label ?? 'section'}`}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '0 16px 0 4px', background: 'transparent', border: 'none',
+                cursor: 'pointer', fontFamily: 'inherit',
+                fontSize: '12px', color: 'var(--text-muted)', flexShrink: 0,
+              }}
+            >
+              <span>{done}/{members.length}</span>
+              <span style={{
+                display: 'inline-block',
+                transform: isCollapsed ? 'rotate(-90deg)' : 'none',
+                transition: 'transform 0.15s',
+                fontSize: '10px',
+              }}>▾</span>
+            </button>
+          )}
+        </div>
+
+        {/* Indented attachments, hung off a connector line */}
+        {!isCollapsed && g.items.length > 0 && (
+          <div style={{
+            marginLeft: '31px',
+            paddingLeft: '14px',
+            borderLeft: '1px solid var(--border-color)',
+          }}>
+            {g.items.map((m) => <ModuleRow key={m.cmid} m={m} nested />)}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -102,11 +250,11 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
           </div>
         </div>
 
-        {/* Sections + lessons */}
+        {/* Lessons, their resources, and the evaluation */}
         <nav style={{ flex: 1, padding: '10px 0' }}>
           {sections.map((section) => (
             <div key={section.id} style={{ marginBottom: '6px' }}>
-              {section.name && (
+              {showSectionNames && section.name && (
                 <div style={{
                   padding: '10px 20px 6px',
                   fontSize: '11px', fontWeight: 700, letterSpacing: '0.07em',
@@ -115,52 +263,9 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
                   {section.name}
                 </div>
               )}
-              {section.modules.map((m) => {
-                const isActive = m.cmid === activeCmid;
-                const isDone = m.state === 1 || m.state === 2;
-                return (
-                  <button
-                    key={m.cmid}
-                    onClick={() => openModule(m)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '12px',
-                      width: '100%', textAlign: 'left',
-                      padding: '11px 20px',
-                      background: isActive ? 'var(--fgi-blue-light)' : 'transparent',
-                      border: 'none',
-                      borderLeft: isActive ? '3px solid var(--fgi-blue)' : '3px solid transparent',
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                    }}
-                  >
-                    {/* Status circle */}
-                    <span style={{
-                      width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-                      border: isDone ? 'none' : '2px solid #c4c4c4',
-                      background: isDone ? 'var(--fgi-blue)' : 'transparent',
-                      color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '13px', fontWeight: 700,
-                    }}>
-                      {isDone ? '✓' : ''}
-                    </span>
-                    <span>
-                      <span style={{
-                        display: 'block', fontSize: '14px', fontWeight: isActive ? 700 : 500,
-                        color: 'var(--text-primary)', lineHeight: 1.35,
-                      }}>
-                        {m.name}
-                      </span>
-                      <span style={{
-                        display: 'block', fontSize: '11px', color: 'var(--text-muted)',
-                        textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '2px',
-                      }}>
-                        {MODNAME_LABELS[m.modname] ?? m.modname}
-                        {m.state === 3 ? ' · not yet passed' : ''}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
+              {flat
+                ? section.groups.flatMap(groupModules).map((m) => <ModuleRow key={m.cmid} m={m} />)
+                : section.groups.map((g) => <Group key={g.key} g={g} />)}
             </div>
           ))}
         </nav>
