@@ -1,4 +1,5 @@
-import { authEnabled, getSession, signIn, signOut } from '@/auth';
+import { authEnabled, getSession, signIn } from '@/auth';
+import { signOutAction } from './auth-actions';
 
 // Header account area. Renders nothing until the Cognito env vars are
 // configured, so the header is unchanged while auth is being set up.
@@ -48,12 +49,8 @@ export default async function AuthNav({
       <span style={{ color, fontSize: '15px', fontWeight: 700 }}>
         Hi, {displayName}
       </span>
-      <form
-        action={async () => {
-          'use server';
-          await signOut({ redirectTo: signOutRedirect });
-        }}
-      >
+      {/* Bound arg, not a closure — see auth-actions.ts for why. */}
+      <form action={signOutAction.bind(null, signOutRedirect)}>
         <button
           type="submit"
           style={{
