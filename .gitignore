@@ -6,6 +6,7 @@ node_modules/
 # Next.js
 .next/
 out/
+docs/
 
 # Environment (never commit secrets)
 .env
@@ -20,3 +21,7 @@ build/
 .DS_Store
 *.pem
 npm-debug.log*
+
+# Claude Code — personal, machine-local settings (shared config goes in
+# .claude/settings.json, which stays tracked)
+.claude/settings.local.json
