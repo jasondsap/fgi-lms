@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import PdfViewer from '@/components/resource/PdfViewer';
+import FeedbackModal from '@/components/resource/FeedbackModal';
 import PresenterCard from '@/components/resource/PresenterCard';
 import { getRelatedResources } from '@/lib/resources';
-import { SURVEY_URL } from '@/lib/links';
 import type { Surface } from '@/lib/surface';
 import { RESOURCE_TYPE_LABELS, type Resource, type ResourceType } from '@/types';
 
@@ -245,19 +245,9 @@ export default async function PdfDetail(
               </div>
             )}
 
-            {/* Hidden until Jennifer supplies the survey URL (lib/links.ts). */}
-            {SURVEY_URL && (
-              <a
-                href={SURVEY_URL} target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: 'block', background: 'var(--fgi-amber)', color: '#fff',
-                  textAlign: 'center', padding: '15px 12px', borderRadius: '999px',
-                  fontWeight: 700, fontSize: '22px', textDecoration: 'none',
-                }}
-              >
-                Share Your Feedback
-              </a>
-            )}
+            {/* The Learning Center evaluation, in a modal. Same nine questions
+                Moodle asks on every course — see lib/evaluation.ts. */}
+            <FeedbackModal slug={resource.slug} surface={surface.key} accent={surface.primary} />
 
             <Link href={surface.libraryHref} style={{
               display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '999px',
