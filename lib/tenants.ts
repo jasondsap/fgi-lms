@@ -48,6 +48,45 @@ export const HERO_COLUMN_WIDTH: Record<'16:9' | '1:1', string> = {
   '1:1': '400px',
 };
 
+/*
+ * Second-generation tenant portal (Jennifer's 8-11-26 Colorado mockup), which
+ * follows the rebuilt FGI homepage rather than the 7-21-26 tenant layout:
+ * dark branded header with the logo in a white box, light hero with a framed
+ * photo and a halftone dot ring, Latest Highlights, a light "hosted on FGI"
+ * bar, a full-bleed certification band, and a dark footer.
+ *
+ * A tenant opts in by carrying a `v2` block. Colorado has one; SCARR does not,
+ * so /scarr keeps the original layout untouched until its own mockup lands
+ * (Jason, 8-11).
+ */
+export interface TenantV2 {
+  /** Tenant's own website, in the header nav — e.g. "ORH-CO Web". */
+  orgSiteLabel: string;
+  orgSiteUrl: string;
+  /**
+   * Label for the link across to the FGI library. The mockup renames the old
+   * "FGI Site" tab to "Fletcher Web"; the hosted-bar copy still says "FGI Site
+   * tab", which Jennifer should reconcile.
+   */
+  fgiNavLabel: string;
+  heroBg: string;
+  heroPhoto: { src: string; alt: string; width: number; height: number };
+  /** Halftone dot ring behind the hero photo. */
+  heroDots: string;
+  highlightTileBg: string;
+  hostedBar2: { bg: string; fg: string; buttonLabel: string };
+  certification: {
+    heading: string;
+    bodyHtml: string;
+    image: string;
+    imageAlt: string;
+    /** Fill behind the certification image. */
+    panelBg: string;
+  };
+  /** Footer support line — label plus a branded button. */
+  footerSupport: { label: string; href: string; buttonLabel: string };
+}
+
 export interface TenantConfig {
   slug: string;
   name: string;
@@ -75,6 +114,8 @@ export interface TenantConfig {
     websiteUrl: string;
     socials: TenantSocial[];
   };
+  /** Present only on tenants moved to the 8-11-26 portal design. */
+  v2?: TenantV2;
 }
 
 // Shared first hero paragraph (tenant pages drop "research," vs FGI).
@@ -108,13 +149,16 @@ const TENANTS: Record<string, TenantConfig> = {
     logoAlt: 'Ohio Recovery Housing – Colorado',
     primary: '#001970',   // CO blue
     accent: '#ffd100',    // CO yellow
+    // 8-11-26 mockup uses FGI's generic wording verbatim, including "research,"
+    // which HERO_P1 drops for tenants. Jason chose this over keeping the old
+    // Colorado-specific paragraphs; it loses the CARR provenance note.
     heroParagraphs: [
-      HERO_P1,
-      'Our Learning Center content, developed by subject matter experts in ' +
-      'substance use disorder recovery, has been <strong>curated to support ' +
-      'Colorado Recovery House owners, operators, and related supports.</strong>',
-      'Some of these resources were originally developed by the Colorado Agency ' +
-      'for Recovery Residences (CARR) and continue to reflect current best practices.',
+      'Your one-stop, no-cost library for building stronger recovery housing and ' +
+      'support programs — <strong>courses, guides, webinars, podcasts, NAADAC CE ' +
+      'opportunities, research, and more.</strong>',
+      'Whether you’re opening your first recovery home, leading an established ' +
+      'program, working as a peer or recovery support provider, or a community ' +
+      'partner, there’s something here for you.',
     ],
     heroRight: {
       kind: 'logo',
@@ -140,8 +184,44 @@ const TENANTS: Record<string, TenantConfig> = {
       websiteLabel: 'www.corecoveryhousing.org',
       websiteUrl: 'https://www.corecoveryhousing.org',
       socials: [
+        // TODO (Jennifer): the 8-11-26 mockup draws a LinkedIn icon too, but no
+        // ORH-CO LinkedIn URL was supplied.
         { platform: 'facebook', href: 'https://www.facebook.com/share/192NHyvUsz/?mibextid=wwXIfr' },
       ],
+    },
+    v2: {
+      orgSiteLabel: 'ORH-CO Web',
+      orgSiteUrl: 'https://www.corecoveryhousing.org',
+      fgiNavLabel: 'Fletcher Web',
+      heroBg: '#f6f6fa',
+      heroPhoto: {
+        src: '/images/tenants/colorado/hero-photo.webp',
+        alt: 'A snowy Colorado mountain town main street',
+        width: 1000,
+        height: 665,
+      },
+      heroDots: '/images/tenants/colorado/dots.webp',
+      highlightTileBg: '#fffdf4',
+      hostedBar2: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact FGI' },
+      certification: {
+        heading: 'Becoming a Colorado Certified Recovery Residence',
+        // Verbatim from the mockup, which is much shorter than the 7-23-26 copy.
+        // NB it says corecoveryhousing.com while the footer says .org — the same
+        // mismatch exists in the source; flagged for Jennifer.
+        bodyHtml: `
+          <p>To begin, watch all seven videos in &ldquo;So You Want to Be a Recovery Residence Owner or Operator?&rdquo; and review the Certification documents (all available in the &ldquo;Certification Info&rdquo; filter). After completing these, finish the brief survey and download your completion certificate.</p>
+          <p>To proceed with certification, visit our website to apply. Your certificate of completion may be required.</p>
+          <p>For questions, portal access, or to schedule a meeting with our team, email <a href="mailto:cert@corecoveryhousing.com">cert@corecoveryhousing.com</a> with your completion certificate attached.</p>
+        `,
+        image: '/images/tenants/colorado/stamp.webp',
+        imageAlt: 'Colorado postage stamp',
+        panelBg: '#8f94c9',
+      },
+      footerSupport: {
+        label: 'Learning Center Support',
+        href: 'mailto:LC@fletchergroup.org',
+        buttonLabel: 'Contact',
+      },
     },
   },
 

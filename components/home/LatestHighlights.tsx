@@ -13,7 +13,21 @@ export interface HighlightTile {
  * overlaps the bottom of the blue hero band, so it is rendered as a sibling of
  * the hero with a negative top margin rather than inside it.
  */
-export default function LatestHighlights({ tiles }: { tiles: HighlightTile[] }) {
+interface Props {
+  tiles: HighlightTile[];
+  /** Tile fill — cream on the Colorado portal, pale blue on FGI. */
+  tileBg?: string;
+  tileBorder?: string;
+  /** Colour of the rule beside the heading. */
+  accent?: string;
+}
+
+export default function LatestHighlights({
+  tiles,
+  tileBg = 'var(--fgi-tile)',
+  tileBorder = '#dcedf7',
+  accent = 'var(--fgi-gold)',
+}: Props) {
   if (!tiles.length) return null;
 
   return (
@@ -32,7 +46,7 @@ export default function LatestHighlights({ tiles }: { tiles: HighlightTile[] }) 
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.1rem' }}>
           <span style={{
-            width: '4px', height: '22px', background: 'var(--fgi-gold)',
+            width: '4px', height: '22px', background: accent,
             borderRadius: '2px', flexShrink: 0,
           }} />
           <h2 style={{
@@ -54,8 +68,8 @@ export default function LatestHighlights({ tiles }: { tiles: HighlightTile[] }) 
               href={tile.href}
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
-                background: 'var(--fgi-tile)',
-                border: '1px solid #dcedf7',
+                background: tileBg,
+                border: `1px solid ${tileBorder}`,
                 borderRadius: '10px',
                 padding: '10px 16px 10px 8px',
                 textDecoration: 'none',
