@@ -50,7 +50,7 @@ export default function TenantFooterV2({ tenant }: { tenant: TenantConfig }) {
               alt={tenant.logoAlt}
               width={v2.footerLogo?.width ?? 300}
               height={v2.footerLogo?.height ?? 300}
-              style={{ width: v2.footerLogo ? '320px' : '150px', height: 'auto' }}
+              style={{ width: v2.footerLogo?.displayWidth ?? '150px', height: 'auto' }}
             />
           </div>
 

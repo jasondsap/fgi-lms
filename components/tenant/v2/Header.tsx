@@ -61,7 +61,7 @@ export default function TenantHeaderV2({
             alt={tenant.logoAlt}
             width={600}
             height={418}
-            style={{ width: 'auto', height: v2.logoOnWhite ? '88px' : '76px' }}
+            style={{ width: 'auto', height: v2.logoOnWhite ? '88px' : '80px' }}
             priority
           />
         </Link>

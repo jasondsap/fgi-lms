@@ -87,8 +87,11 @@ export interface TenantV2 {
   };
   /** Header/footer logo treatment — Colorado boxes its mark on white. */
   logoOnWhite: boolean;
-  /** Footer mark, when it differs from the header's (SCARR uses a lockup). */
-  footerLogo?: { src: string; width: number; height: number };
+  /**
+   * Footer mark. `displayWidth` is the rendered width; `width`/`height` are the
+   * asset's intrinsic dimensions for next/image.
+   */
+  footerLogo?: { src: string; width: number; height: number; displayWidth: string };
   highlightTileBg: string;
   hostedBar2: { bg: string; fg: string; buttonLabel: string };
   certification: {
@@ -165,8 +168,10 @@ const TENANTS: Record<string, TenantConfig> = {
     slug: 'colorado',
     name: 'Ohio Recovery Housing – Colorado',
     fgiSiteUrl: 'https://resource.made180.dev',
-    logo: '/images/tenants/colorado-logo.png',
-    logoWhite: '/images/tenants/colorado-logo-white.png',
+    // Reverse mark (white outlines + white wordmark), so it sits directly on
+    // the navy header and footer with no white box (Jason, 8-11).
+    logo: '/images/tenants/colorado/logo-white.webp',
+    logoWhite: '/images/tenants/colorado/logo-white.webp',
     logoAlt: 'Ohio Recovery Housing – Colorado',
     primary: '#001970',   // CO blue
     accent: '#ffd100',    // CO yellow
@@ -227,7 +232,11 @@ const TENANTS: Record<string, TenantConfig> = {
         media: { left: 21.8, top: 108.1, width: 277.5 },
         ring:  { cx: 209, cy: 178, d: 287 },
       },
-      logoOnWhite: true,
+      logoOnWhite: false,
+      footerLogo: {
+        src: '/images/tenants/colorado/logo-white.webp',
+        width: 600, height: 447, displayWidth: '230px',
+      },
       highlightTileBg: '#fffdf4',
       hostedBar2: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact FGI' },
       certification: {
@@ -322,7 +331,10 @@ const TENANTS: Record<string, TenantConfig> = {
         ring:  { cx: 212.7, cy: 204.5, d: 287 },
       },
       logoOnWhite: false,
-      footerLogo: { src: '/images/tenants/scarr/logo-horizontal.webp', width: 367, height: 97 },
+      footerLogo: {
+        src: '/images/tenants/scarr/logo-horizontal.webp',
+        width: 367, height: 97, displayWidth: '320px',
+      },
       highlightTileBg: '#fffdf4',
       hostedBar2: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact Us' },
       certification: {
