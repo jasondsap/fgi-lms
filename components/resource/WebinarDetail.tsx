@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import PresenterBio from '@/components/resource/PresenterBio';
+import PresenterCard from '@/components/resource/PresenterCard';
 import { getRelatedWebinars } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import {
   AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, MATERIAL_KIND_LABELS,
   RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS,
-  type MaterialKind, type Presenter, type Resource, type ResourceMaterial,
+  type MaterialKind, type Resource, type ResourceMaterial,
 } from '@/types';
 
 // The Fletcher Group webinar series card, per the 4-21-26 mockup. Webinars
@@ -258,64 +258,6 @@ export default async function WebinarDetail(
             ))}
           </div>
         </section>
-      )}
-    </div>
-  );
-}
-
-function PresenterCard({ presenter: p, accent }: { presenter: Presenter; accent: string }) {
-  return (
-    <div style={{
-      background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: '8px',
-      padding: '1.5rem', display: 'grid',
-      gridTemplateColumns: p.org_logo_url ? '140px 1fr 180px' : '140px 1fr',
-      gap: '1.75rem', alignItems: 'start',
-    }}>
-      <div>
-        {p.photo_url ? (
-          <Image
-            src={p.photo_url} alt={p.name} width={140} height={140}
-            style={{ width: '140px', height: '140px', objectFit: 'cover', borderRadius: '4px' }}
-          />
-        ) : (
-          <div style={{
-            width: '140px', height: '140px', borderRadius: '4px',
-            background: 'var(--body-bg)', border: '1px solid var(--border-color)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '32px', fontWeight: 700, color: 'var(--text-muted)',
-          }}>
-            {p.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-body-dark)' }}>
-          {p.name}{p.credentials ? `, ${p.credentials}` : ''}
-        </div>
-        {p.title && (
-          <div style={{ fontSize: '14px', fontWeight: 600, color: accent, margin: '2px 0 10px' }}>
-            {p.title}
-          </div>
-        )}
-        {p.bio && <PresenterBio bio={p.bio} accent={accent} />}
-      </div>
-
-      {p.org_logo_url && (
-        <div style={{ textAlign: 'center' }}>
-          <Image
-            src={p.org_logo_url} alt={p.org_name ?? ''} width={180} height={90}
-            style={{ width: '100%', maxWidth: '180px', height: 'auto', objectFit: 'contain' }}
-          />
-          {p.org_url && (
-            <a
-              href={p.org_url} target="_blank" rel="noopener noreferrer"
-              style={{ display: 'block', marginTop: '8px', fontSize: '13px', color: accent }}
-            >
-              {p.org_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-            </a>
-          )}
-        </div>
       )}
     </div>
   );

@@ -8,7 +8,10 @@
    - Text: #000000 / #ffffff
    ============================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+/* Variable Open Sans — the width axis is what gives the PDF-shell page title
+   its condensed cut (Jennifer's 8-11-26 shell sets it in OpenSans Condensed
+   Bold). Weights requested are unchanged, so everything else renders as before. */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wdth,wght@75..100,400..800&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -23,7 +26,8 @@
   --fgi-navy:        #163d5b;  /* dark logo-bar navy, from the teaser email header/footer */
   --fgi-teal:        #29abe2;  /* accent strip under the header */
   --fgi-gold:        #f5a623;  /* gold accent — Welcome underline, "Explore…" bar, section rules (7-22-26) */
-  --fgi-tan:         #f3e7ce;  /* warm tan "Need help?" support bar (7-22-26) */
+  --fgi-tan:         #f3e7ce;
+  --fgi-amber:       #f2b134;  /* "Share Your Feedback" button on the PDF shell (8-11-26) */  /* warm tan "Need help?" support bar (7-22-26) */
   --fgi-hero:        #e4f5fc;  /* light-blue hero band (8-10-26 mockup) */
   --fgi-band:        #ebeff1;  /* grey support bar + resource-card body */
   --fgi-card-face:   #f4f6f7;  /* resource-card illustration band */
@@ -69,6 +73,18 @@ img { max-width: 100%; height: auto; display: block; }
 .tenant-prose p { margin: 0 0 0.9rem; }
 .tenant-prose p:last-child { margin-bottom: 0; }
 .tenant-prose a { color: inherit; text-decoration: underline; font-weight: 700; }
+
+/* PDF shell (8-11-26) — document column + action rail. Inline styles can't
+   carry a media query, so the one breakpoint on the page lives here. */
+.pdf-shell-grid {
+  display: grid;
+  grid-template-columns: 1fr 376px;
+  gap: 64px;
+  align-items: start;
+}
+@media (max-width: 1000px) {
+  .pdf-shell-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+}
 
 /* Utility */
 .sr-only {

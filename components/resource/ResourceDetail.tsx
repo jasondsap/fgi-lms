@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { authEnabled, getSession, signIn } from '@/auth';
 import CategoryImage from '@/components/library/CategoryImage';
 import DetailFooter from '@/components/resource/DetailFooter';
+import PdfDetail from '@/components/resource/PdfDetail';
 import PdfViewer from '@/components/resource/PdfViewer';
 import WebinarDetail from '@/components/resource/WebinarDetail';
 import { getResourceBySlug } from '@/lib/resources';
@@ -70,6 +71,19 @@ export default async function ResourceDetail(
   // Courses require a signed-in user (no-op until Cognito env vars exist)
   const isCourse    = type === 'course' || type === 'naadac_ce';
   const courseGated = isCourse && authEnabled && !(await getSession());
+
+  // Anything whose substance is a document — Learning Brief, Newsletter,
+  // Publication, Success Story, Guide, Cert. Document, Infographic — gets the
+  // 8-11-26 PDF shell. Courses open in Moodle and videos play inline, so both
+  // stay on the generic template below even when a PDF hangs off them.
+  if (isPDF && !isCourse && !isVideo) {
+    return (
+      <>
+        <PdfDetail resource={resource} surface={surface} />
+        <DetailFooter />
+      </>
+    );
+  }
 
   return (
     <div style={{ background: '#ffffff', minHeight: '60vh' }}>

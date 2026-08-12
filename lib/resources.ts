@@ -201,6 +201,102 @@ export async function getRelatedWebinars(
 }
 
 /**
+ * "You might also be interested in" for a non-webinar resource.
+ *
+ * Tag-driven matching is not an option here: `topic_tags` is populated on 8 of
+ * the 130-odd non-webinar rows, so it would return nothing for almost every
+ * page. What every row does have is a title and a description, so this ranks
+ * the rest of the catalog by Postgres full-text relevance against them —
+ * title terms weighted three times description terms, since a title overlap
+ * ("Communicate in a Crisis" ↔ "Communication in a Crisis") is the far stronger
+ * signal. Anything below MIN_SCORE is dropped rather than padded out with a
+ * generic course, and a type cap keeps the 76-course block from filling the
+ * whole list.
+ *
+ * Jennifer's shell note asks for the companion Newsletter and webinar of the
+ * month. That mapping isn't in the data — newsletters stop at March 2026 while
+ * the briefs start in May — so it stays a manual curation to layer on later;
+ * relevance is what can be derived honestly today.
+ */
+export interface RelatedItem { slug: string; title: string; type: ResourceType }
+
+// Words carrying no matching signal. Postgres drops English stopwords itself;
+// this list only has to keep them out of the tsquery we hand it.
+const RELATED_STOPWORDS = new Set([
+  'and', 'are', 'but', 'for', 'from', 'has', 'have', 'how', 'his', 'her', 'its',
+  'into', 'not', 'our', 'she', 'that', 'the', 'their', 'them', 'they', 'this',
+  'was', 'were', 'what', 'when', 'which', 'who', 'will', 'with', 'you', 'your',
+]);
+
+/** Title/description -> a safe `a | b | c` tsquery. Only [a-z0-9] survives. */
+function toOrQuery(text: string, cap: number): string {
+  const words = (text || '').toLowerCase().match(/[a-z][a-z0-9]{2,}/g) ?? [];
+  const seen = new Set<string>();
+  for (const word of words) {
+    if (!RELATED_STOPWORDS.has(word)) seen.add(word);
+    if (seen.size >= cap) break;
+  }
+  return [...seen].join(' | ');
+}
+
+export async function getRelatedResources(
+  resource: Pick<Resource, 'id' | 'title' | 'description'>,
+  tenantSlug: string,
+  limit = 3,
+): Promise<RelatedItem[]> {
+  const titleQuery = toOrQuery(resource.title, 12);
+  const bodyQuery  = toOrQuery(resource.description ?? '', 30);
+  if (!titleQuery && !bodyQuery) return [];
+
+  // A resource matching only one of the two queries still has to be scored
+  // against both, so an empty query has to be a legal tsquery: '' is not, and
+  // to_tsquery would throw on it. A term no document can contain scores zero.
+  const NO_MATCH = 'zzzznomatch';
+
+  // Weighted document vector, repeated in the score, the filter and the rank —
+  // spelled once here so the three can't drift apart.
+  const VECTOR = `(setweight(to_tsvector('english', r.title), 'A')
+                   || setweight(to_tsvector('english', coalesce(r.description, '')), 'B'))`;
+
+  const rows = await sql(
+    `SELECT r.slug, r.title, r.type::text AS type,
+            3 * ts_rank(${VECTOR}, to_tsquery('english', $1))
+              + ts_rank(${VECTOR}, to_tsquery('english', $2)) AS score
+       FROM resources r
+      WHERE r.published = TRUE
+        AND r.id <> $3
+        AND (${VECTOR} @@ to_tsquery('english', $1)
+             OR ${VECTOR} @@ to_tsquery('english', $2))
+        AND EXISTS (
+          SELECT 1 FROM resource_visibility rv
+          JOIN tenants t ON t.id = rv.tenant_id
+          WHERE rv.resource_id = r.id AND t.slug = $4
+        )
+      ORDER BY score DESC, r.published_at DESC NULLS LAST
+      LIMIT 20`,
+    [titleQuery || NO_MATCH, bodyQuery || NO_MATCH, resource.id, tenantSlug],
+  ) as unknown as Array<RelatedItem & { score: number }>;
+
+  // Below this a "match" is two rows sharing the vocabulary every recovery
+  // housing resource shares. Tuned against the 8-12-26 catalog: it keeps the
+  // NIMBYism course under the NIMBYism brief and drops "Recovery House Alumni
+  // Best Practices" from under "Conduct a Needs Assessment".
+  const MIN_SCORE = 0.5;
+  const MAX_PER_TYPE = 2;
+
+  const perType = new Map<string, number>();
+  const picked: RelatedItem[] = [];
+  for (const row of rows) {
+    if (row.score < MIN_SCORE || picked.length >= limit) break;
+    const seen = perType.get(row.type) ?? 0;
+    if (seen >= MAX_PER_TYPE) continue;
+    perType.set(row.type, seen + 1);
+    picked.push({ slug: row.slug, title: row.title, type: row.type });
+  }
+  return picked;
+}
+
+/**
  * The newest published webinar on the FGI surface — what the "FGI's Latest
  * Webinar" tile points at on the homepage and on both tenant landing pages.
  *
