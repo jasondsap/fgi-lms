@@ -24,6 +24,10 @@
   --fgi-teal:        #29abe2;  /* accent strip under the header */
   --fgi-gold:        #f5a623;  /* gold accent — Welcome underline, "Explore…" bar, section rules (7-22-26) */
   --fgi-tan:         #f3e7ce;  /* warm tan "Need help?" support bar (7-22-26) */
+  --fgi-hero:        #e4f5fc;  /* light-blue hero band (8-10-26 mockup) */
+  --fgi-band:        #ebeff1;  /* grey support bar + resource-card body */
+  --fgi-card-face:   #f4f6f7;  /* resource-card illustration band */
+  --fgi-tile:        #f2fafd;  /* Latest Highlights tile fill */
   --text-body-dark:  #333333;
   --body-bg:         #f6f6f6;
   --card-bg:         #ffffff;

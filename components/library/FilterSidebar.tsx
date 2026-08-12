@@ -2,11 +2,21 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import {
-  RESOURCE_TYPE_LABELS, AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, DURATION_LABELS,
-  type ResourceType, type AudienceTag, type TopicTag,
+  RESOURCE_TYPE_LABELS, AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, FILTER_GROUPS,
 } from '@/types';
 
-interface Props { total: number; targetPath?: string; }
+interface Props {
+  total: number;
+  targetPath?: string;
+  /** True on a tenant portal — controls the Certification Info group. */
+  isTenant?: boolean;
+}
+
+const LABEL_MAPS: Record<string, Record<string, string>> = {
+  type:     RESOURCE_TYPE_LABELS,
+  audience: AUDIENCE_TAG_LABELS,
+  topic:    TOPIC_TAG_LABELS,
+};
 
 /**
  * Accordion filter group. Collapsed by default (per Jennifer's 7-18-26 mockup);
@@ -60,7 +70,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
-export default function FilterSidebar({ total, targetPath }: Props) {
+export default function FilterSidebar({ total, targetPath, isTenant = false }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -79,21 +89,23 @@ export default function FilterSidebar({ total, targetPath }: Props) {
     router.push(`${dest}?${params.toString()}`);
   }, [router, dest, searchParams]);
 
-  const setParam = useCallback((key: string, value: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === null) { params.delete(key); } else { params.set(key, value); }
-    params.set('page', '1');
-    router.push(`${dest}?${params.toString()}`);
-  }, [router, dest, searchParams]);
-
   const clearAll = useCallback(() => { router.push(dest); }, [router, dest]);
 
-  const activeTypes    = searchParams.getAll('type') as ResourceType[];
-  const activeAudience = searchParams.getAll('audience') as AudienceTag[];
-  const activeTopics   = searchParams.getAll('topic') as TopicTag[];
-  const activeDuration = searchParams.get('duration');
-  const activeMatch    = searchParams.get('match') || 'any';
-  const hasFilters     = activeTypes.length || activeAudience.length || activeTopics.length || activeDuration;
+  const active: Record<string, string[]> = {
+    type:     searchParams.getAll('type'),
+    audience: searchParams.getAll('audience'),
+    topic:    searchParams.getAll('topic'),
+  };
+  const hasFilters = active.type.length || active.audience.length || active.topic.length
+    || searchParams.get('duration');
+
+  const groups = FILTER_GROUPS
+    .filter(g => !g.tenantOnly || isTenant)
+    .map(g => ({
+      ...g,
+      items: isTenant ? g.items.filter(i => !g.excludeOnTenant?.includes(i)) : g.items,
+    }))
+    .filter(g => g.items.length > 0);
 
   return (
     <aside style={{
@@ -118,48 +130,26 @@ export default function FilterSidebar({ total, targetPath }: Props) {
         ) : null}
       </div>
 
-      <FilterGroup title="Resource Type" defaultOpen={activeTypes.length > 0}>
-        {(Object.keys(RESOURCE_TYPE_LABELS) as ResourceType[]).map(type => (
-          <CheckItem key={type} label={RESOURCE_TYPE_LABELS[type]}
-            checked={activeTypes.includes(type)} onChange={() => toggle('type', type)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="I Am A…" defaultOpen={activeAudience.length > 0}>
-        {(Object.keys(AUDIENCE_TAG_LABELS) as AudienceTag[]).map(tag => (
-          <CheckItem key={tag} label={AUDIENCE_TAG_LABELS[tag]}
-            checked={activeAudience.includes(tag)} onChange={() => toggle('audience', tag)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="I Want To Learn About…" defaultOpen={activeTopics.length > 0}>
-        {(Object.keys(TOPIC_TAG_LABELS) as TopicTag[]).map(tag => (
-          <CheckItem key={tag} label={TOPIC_TAG_LABELS[tag]}
-            checked={activeTopics.includes(tag)} onChange={() => toggle('topic', tag)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="Length" defaultOpen={Boolean(activeDuration)}>
-        {(Object.keys(DURATION_LABELS) as Array<keyof typeof DURATION_LABELS>).map(key => (
-          <CheckItem key={key} label={DURATION_LABELS[key]}
-            checked={activeDuration === key}
-            onChange={() => setParam('duration', activeDuration === key ? null : key)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="Match Categories" defaultOpen={activeMatch === 'all'}>
-        {['any', 'all'].map(val => (
-          <label key={val} style={{
-            display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
-            fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '5px',
-          }}>
-            <input type="radio" name="match" value={val} checked={activeMatch === val}
-              onChange={() => setParam('match', val)}
-              style={{ accentColor: 'var(--fgi-blue)' }} />
-            {val === 'any' ? 'Match Any Category' : 'Match All Categories'}
-          </label>
-        ))}
-      </FilterGroup>
+      {groups.map(group => {
+        const labels = LABEL_MAPS[group.param];
+        const selected = active[group.param];
+        return (
+          <FilterGroup
+            key={group.title}
+            title={group.title}
+            defaultOpen={group.items.some(i => selected.includes(i))}
+          >
+            {group.items.map(item => (
+              <CheckItem
+                key={item}
+                label={group.labels?.[item] ?? labels[item] ?? item}
+                checked={selected.includes(item)}
+                onChange={() => toggle(group.param, item)}
+              />
+            ))}
+          </FilterGroup>
+        );
+      })}
     </aside>
   );
 }

@@ -44,7 +44,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   const query = filterQuery(searchParams);
 
   return (
-    <div style={{ background: 'var(--body-bg)', padding: '2rem 2rem 4rem' }}>
+    <div style={{ background: '#ffffff', padding: '2rem 2rem 4rem' }}>
       <div style={{
         maxWidth: 'var(--max-width)', margin: '0 auto',
         display: 'flex', gap: '2rem', alignItems: 'flex-start',
@@ -66,7 +66,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
             apiQuery={query}
             fallbackBase="/library"
             fallbackQuery={query}
-            buttonColor="var(--fgi-blue)"
+            total={data.total}
           />
         </div>
       </div>

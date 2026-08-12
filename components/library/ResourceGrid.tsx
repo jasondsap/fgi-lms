@@ -20,7 +20,8 @@ interface Props {
   /** Path + query used for the no-JS href on the button (e.g. "/colorado?type=course"). */
   fallbackBase: string;
   fallbackQuery: string;
-  buttonColor: string;
+  /** Total matching resources — drives the "Showing N of M" line. */
+  total: number;
   /** Link prefix for cards — '' on FGI, '/colorado' or '/scarr'. */
   basePath?: string;
 }
@@ -36,7 +37,7 @@ interface Props {
  * remounts this and resets the accumulated list.
  */
 export default function ResourceGrid({
-  initial, startPage, totalPages, perPage, apiQuery, fallbackBase, fallbackQuery, buttonColor,
+  initial, startPage, totalPages, perPage, apiQuery, fallbackBase, fallbackQuery, total,
   basePath = '',
 }: Props) {
   const [items, setItems] = useState<Resource[]>(initial);
@@ -102,31 +103,42 @@ export default function ResourceGrid({
         ))}
       </div>
 
-      {hasMore && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+      {/* Count + append-style Load More (8-10-26 mockup: a text link with a
+          chevron, not a filled button) */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
+      }}>
+        <div style={{ fontSize: '17px', color: 'var(--fgi-navy)' }}>
+          Showing <strong>{items.length}</strong> of {total} resources
+        </div>
+
+        {hasMore && (
           <a
             href={hrefFor(page + 1)}
             onClick={loadMore}
             aria-busy={loading}
             style={{
-              background: buttonColor, color: '#fff',
-              padding: '11px 36px', borderRadius: 'var(--radius-md)',
-              fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-              display: 'inline-block',
+              display: 'inline-flex', alignItems: 'center', gap: '14px',
+              color: 'var(--text-primary)', textDecoration: 'none',
+              fontWeight: 700, fontSize: '17px',
               opacity: loading ? 0.65 : 1,
               cursor: loading ? 'default' : 'pointer',
               transition: 'opacity 120ms ease',
             }}
           >
             {loading ? 'Loading…' : 'Load More'}
+            <svg width="26" height="14" viewBox="0 0 26 14" fill="none" aria-hidden>
+              <path d="M1 1l12 11L25 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </a>
-          {error && (
-            <div role="alert" style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-              {error}
-            </div>
-          )}
-        </div>
-      )}
+        )}
+
+        {error && (
+          <div role="alert" style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+            {error}
+          </div>
+        )}
+      </div>
     </>
   );
 }

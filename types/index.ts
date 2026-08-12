@@ -158,16 +158,16 @@ export interface ResourceListResponse {
 // ---------------------------------------------------------------------------
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
-  course:        'Course / Training',
-  naadac_ce:     'NAADAC CE Course',
+  course:        'Course/Training',
+  naadac_ce:     'NAADAC CE',
   toolkit:       'Learning Brief',
-  guidebook:     'Guidebook',
-  handbook:      'Handbook / RH Templates',
+  guidebook:     'R.H. Guide/Handbook & Templates',
+  handbook:      'Cert. Documents',
   webinar:       'Webinar',
   newsletter:    'Newsletter',
   video:         'Video',
   podcast:       'Podcast',
-  paper:         'Publications',
+  paper:         'Publications & Papers',
   whitepaper:    'Whitepaper / Brief',
   infographic:   'Infographic',
   success_story: 'Success Story',
@@ -187,8 +187,8 @@ export const AUDIENCE_TAG_LABELS: Record<AudienceTag, string> = {
 
 export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
   establishing_rh:    'Establishing an RH',
-  rh_management:      'RH Management',
-  operations:         'RH Operations',
+  rh_management:      'RH Management & Staff',
+  operations:         'RH Operations & Best Practices',
   recovery_support:   'Recovery Support Services',
   social_model:       'Social Model of Recovery',
   reentry:            'Re-entry / Criminal Justice',
@@ -196,7 +196,7 @@ export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
   funding:            'Funding',
   research:           'Research / Data / Recovery Economic Calculator',
   mental_health:      'Co-Occurring Mental Health',
-  self_care:          'Self-care',
+  self_care:          'Safety, Security & Self-care',
   hud:                'HUD',
   recovery_ky_model:  'Recovery KY Model',
   rhoar_model:        'RHOAR Model',
@@ -204,6 +204,88 @@ export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
   rh_policies:        'RH Policies & Procedures',
   fgi_services:       'FGI Services',
 };
+
+// ---------------------------------------------------------------------------
+// Filter sidebar structure — Jennifer's 8-11-26 "lrc filter bar" doc
+// ---------------------------------------------------------------------------
+// The sidebar is no longer "one group per label map". Resource types are split
+// across three groups, topics across two, and the order inside each group is
+// hers, not the map's. Keep this list as the single source of that order.
+//
+// Length and Match Categories are deliberately absent: Jennifer asked for
+// Match Categories removed and Length hidden "for now" (NAADAC timing is
+// spelled out in the course shell, video length is visible on open, and
+// everything else is self-paced). The `duration` and `match` query params
+// still work in lib/resources.ts, so restoring Length is a UI-only change.
+
+export interface FilterGroupSpec {
+  title: string;
+  /** Query-string key the group's checkboxes write to. */
+  param: 'type' | 'audience' | 'topic';
+  /** Keys into the matching label map, in display order. */
+  items: string[];
+  /** Per-group label overrides — the same type reads differently here. */
+  labels?: Record<string, string>;
+  /** Render only on a tenant portal (Colorado / SCARR). */
+  tenantOnly?: boolean;
+  /** Items to drop when rendering on a tenant portal. */
+  excludeOnTenant?: string[];
+}
+
+export const FILTER_GROUPS: FilterGroupSpec[] = [
+  {
+    // New for SCARR + CORR. Backed by existing types rather than new ones
+    // (Jason, 8-11): on those portals `video` is the seven-part certification
+    // series and `handbook` is the certification paperwork.
+    title: 'Certification Info',
+    param: 'type',
+    items: ['video', 'handbook'],
+    labels: { video: 'Required Videos', handbook: 'Cert. Documents' },
+    tenantOnly: true,
+  },
+  {
+    title: 'Courses',
+    param: 'type',
+    items: ['naadac_ce', 'course'],
+  },
+  {
+    title: 'Resource Type',
+    param: 'type',
+    items: [
+      'webinar', 'podcast', 'toolkit', 'guidebook', 'newsletter',
+      'video', 'paper', 'infographic', 'success_story', 'non_fgi',
+    ],
+    // Video is already the tenant's "Required Videos" above; listing it twice
+    // would offer the same rows under two names.
+    excludeOnTenant: ['video'],
+  },
+  {
+    // Unchanged — the only group Jennifer's doc leaves alone.
+    title: 'I Am A…',
+    param: 'audience',
+    items: ['house_owner', 'peer_support', 'community', 'criminal_justice',
+            'clinical', 'medical', 'workforce'],
+  },
+  {
+    title: 'I Want To Learn About…',
+    param: 'topic',
+    items: [
+      'establishing_rh', 'rh_management', 'operations', 'recovery_support',
+      'social_model', 'workforce', 'research', 'reentry', 'funding',
+      'self_care', 'mental_health', 'recovery_ecosystems',
+    ],
+  },
+  {
+    title: 'Recovery House Models',
+    param: 'topic',
+    items: ['rhoar_model', 'recovery_ky_model'],
+  },
+];
+
+// Types and topics that exist in the data model but are no longer offered as
+// filters (8-11-26 doc): types `whitepaper` and `fgi_service`, topics `hud`,
+// `rh_policies` and `fgi_services`. Only `rh_policies` is actually in use
+// (9 resources); those rows keep the tag, they just cannot be filtered by it.
 
 export const DURATION_LABELS = {
   under_15:  'Under 15 mins',

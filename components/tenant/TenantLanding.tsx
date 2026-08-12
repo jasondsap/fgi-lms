@@ -183,7 +183,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
       <section id="library" style={{ background: 'var(--body-bg)', padding: '2rem 2rem 4rem', scrollMarginTop: '90px' }}>
         <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
-            <FilterSidebar total={data.total} targetPath={home} />
+            <FilterSidebar total={data.total} targetPath={home} isTenant />
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath={home} />
@@ -197,7 +197,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
               apiQuery={apiQuery}
               fallbackBase={home}
               fallbackQuery={linkQuery}
-              buttonColor={tenant.primary}
+              total={data.total}
               basePath={home}
             />
           </div>

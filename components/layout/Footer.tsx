@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import Partners from './Partners';
+import ContactButton from './ContactButton';
 
 /* Circular icon button used in the "Stay Connected" box. */
 function IconCircle({ href, label, children }: {
@@ -32,6 +33,9 @@ const PODCAST_URL = 'https://www.fletchergroup.org';
 export default function Footer() {
   return (
     <>
+      {/* ── In Partnership With — above the navy block in the 8-10-26 mockup ── */}
+      <Partners />
+
       {/* ── Contact / Stay Connected ── */}
       <footer style={{
         backgroundColor: 'var(--fgi-navy)',
@@ -59,29 +63,26 @@ export default function Footer() {
                 height={50}
                 style={{ objectFit: 'contain', objectPosition: 'left', marginBottom: '6px' }}
               />
-              <div style={{
-                color: '#ffffff',
-                fontSize: '11px',
-                fontWeight: 400,
-                letterSpacing: '1.6px',
-                textTransform: 'uppercase',
-                marginBottom: '18px',
-              }}>
-                Building Recovery Ecosystems
-              </div>
               <Link
                 href="https://www.fletchergroup.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: '#ffffff', fontSize: '15px', textDecoration: 'none' }}
+                style={{
+                  color: '#ffffff', fontSize: '16px', textDecoration: 'underline',
+                  display: 'inline-block', marginTop: '1.25rem', marginBottom: '2rem',
+                }}
               >
                 www.fletchergroup.org
               </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '16px' }}>Need Platform Help?</span>
+                <ContactButton fontSize="16px" />
+              </div>
             </div>
 
             {/* Col 2 — Stay Connected box */}
             <div style={{
-              border: '1.5px solid var(--fgi-teal)',
+              border: '1.5px solid #ffffff',
               borderRadius: 'var(--radius-lg)',
               padding: '1rem 1.25rem 1.35rem',
             }}>
@@ -154,12 +155,15 @@ export default function Footer() {
             </div>
 
             {/* Col 3 — office locations */}
-            <div style={{ fontSize: '15px', lineHeight: 1.6, justifySelf: 'end' }}>
-              <div style={{ marginBottom: '1.1rem' }}>
+            <div style={{
+              fontSize: '16px', lineHeight: 1.7, justifySelf: 'end',
+              textDecoration: 'underline', textUnderlineOffset: '3px',
+            }}>
+              <div style={{ marginBottom: '1.25rem' }}>
                 <div>Kentucky Location:</div>
                 <div>601 Meyers Baker Road, Suite 238</div>
                 <div>London, Kentucky 40741</div>
-                <a href="mailto:info@fletchergroup.org" style={{ color: '#ffffff', textDecoration: 'none' }}>
+                <a href="mailto:info@fletchergroup.org" style={{ color: '#ffffff' }}>
                   info@fletchergroup.org
                 </a>
               </div>
@@ -171,66 +175,40 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Support line */}
-          <div style={{
-            textAlign: 'center', marginTop: '2rem',
-            fontSize: '17px', fontWeight: 700,
-          }}>
-            For Learning Center Support Contact{' '}
-            <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-teal)' }}>
-              LC@fletchergroup.org
-            </a>
-          </div>
         </div>
       </footer>
 
-      {/* ── In Partnership With ── */}
-      <Partners />
-
       {/* ── RCORP / HRSA disclaimer ── */}
-      <section style={{ background: 'var(--fgi-navy)', color: '#ffffff' }}>
+      <section style={{ background: '#ffffff', color: 'var(--text-primary)' }}>
         <div style={{
           maxWidth: 'var(--max-width)',
           margin: '0 auto',
-          padding: '2.25rem 2rem',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '3rem',
-          alignItems: 'start',
+          padding: '1.5rem 2rem 1.75rem',
         }}>
-          <div>
-            <p style={{ fontSize: '15px', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+          <div style={{
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+            gap: '2rem', flexWrap: 'wrap', marginBottom: '0.9rem',
+          }}>
+            <p style={{ fontSize: '17px' }}>
               Fletcher Group is a RCORP Rural Center of Excellence in Substance Use Disorder Recovery
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-              <Image
-                src="/images/logos/rcorp-badge.png"
-                alt="RCORP"
-                width={104}
-                height={104}
-                style={{ objectFit: 'contain' }}
-              />
-              <Link
-                href="https://www.hrsa.gov"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: '#ffffff', fontSize: '16px', textDecoration: 'none' }}
-              >
-                www.hrsa.org
-              </Link>
-            </div>
+            <Link
+              href="https://www.hrsa.gov"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--text-primary)', fontSize: '18px', textDecoration: 'underline' }}
+            >
+              www.hrsa.org
+            </Link>
           </div>
 
-          <div>
-            <div style={{ fontSize: '15px', marginBottom: '1.25rem' }}>HRSA Disclaimer</div>
-            <p style={{ fontSize: '15px', lineHeight: 1.6, textAlign: 'justify' }}>
-              This website is supported by the Health Resources and Services Administration (HRSA) of the
-              U.S. Department of Health and Human Services (HHS) as part of an award totaling $3.3 million,
-              with 0% financed with non-governmental sources. The contents are those of the author(s) and
-              do not necessarily represent the official views of, nor an endorsement, by HRSA, HHS, or the
-              U.S. Government.
-            </p>
-          </div>
+          <p style={{ fontSize: '14px', lineHeight: 1.55 }}>
+            The Learning Center is supported by the Health Resources and Services Administration
+            (HRSA) of the U.S. Department of Health and Human Services (HHS) as part of an award
+            totaling $3.3 million, with 0% financed with non-governmental sources. The contents are
+            those of the author(s) and do not necessarily represent the official views of, nor an
+            endorsement, by HRSA, HHS, or the U.S. Government.
+          </p>
         </div>
       </section>
     </>

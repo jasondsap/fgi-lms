@@ -11,7 +11,7 @@
 import { sql } from './db';
 import { getPresignedUrl, getPresignedDownloadUrl } from './s3';
 import type {
-  Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial,
+  Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial, ResourceType,
 } from '@/types';
 
 // Whitelist of duration keys → SQL fragments. Lookup is by key only;
@@ -209,21 +209,34 @@ export async function getRelatedWebinars(
  * date in a source info sheet would promote the wrong webinar here (one such
  * typo was found and fixed during the July 2026 webinar load).
  */
-export async function getLatestWebinar(): Promise<{ slug: string; title: string } | null> {
-  const rows = await sql`
-    SELECT r.slug, r.title
-    FROM resources r
-    WHERE r.type = 'webinar'
-      AND r.published = TRUE
-      AND EXISTS (
-        SELECT 1 FROM resource_visibility rv
-        JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = 'fgi'
-      )
-    ORDER BY r.published_at DESC NULLS LAST, r.id DESC
-    LIMIT 1
-  `;
-  return (rows[0] as { slug: string; title: string }) ?? null;
+export interface LatestItem { slug: string; title: string }
+
+/*
+ * Newest published resource of one type on the FGI surface — drives the
+ * homepage "Latest Highlights" tiles. Returns null when the catalog holds
+ * nothing of that type yet (podcasts, as of 8-11-26), so callers can decide
+ * whether to hide the tile or fall back.
+ */
+export async function getLatestByType(type: ResourceType): Promise<LatestItem | null> {
+  const rows = await sql(
+    `SELECT r.slug, r.title
+       FROM resources r
+      WHERE r.type = $1
+        AND r.published = TRUE
+        AND EXISTS (
+          SELECT 1 FROM resource_visibility rv
+          JOIN tenants t ON t.id = rv.tenant_id
+          WHERE rv.resource_id = r.id AND t.slug = 'fgi'
+        )
+      ORDER BY r.published_at DESC NULLS LAST, r.id DESC
+      LIMIT 1`,
+    [type],
+  );
+  return (rows[0] as LatestItem) ?? null;
+}
+
+export async function getLatestWebinar(): Promise<LatestItem | null> {
+  return getLatestByType('webinar');
 }
 
 // Course-player lookup — includes moodle_course_id, which the public

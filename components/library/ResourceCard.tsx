@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import type { Resource } from '@/types';
-import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS } from '@/types';
+import { RESOURCE_TYPE_LABELS } from '@/types';
 
 interface Props {
   resource: Resource;
@@ -9,24 +9,36 @@ interface Props {
   basePath?: string;
 }
 
-// Jennifer's 7-7-26 card set — banner-free 640×360 photos, one per type
+/*
+ * Jennifer's 8-11-26 illustration set — twelve flat, transparent-background
+ * drawings on a shared 16:9 canvas, so `contain` places every one of them at
+ * the same scale inside the card's illustration band.
+ *
+ * Three types have no drawing of their own and borrow the nearest one
+ * (Jason, 8-11): NAADAC CE reuses the course laptop and Whitepaper reuses the
+ * publication stack. FGI Services has no equivalent at all and keeps its
+ * 7-22-26 photo, so it is the one card in the grid still using the old style.
+ */
 const CATEGORY_CARD_IMAGE: Record<string, string> = {
-  newsletter:    '/images/category-cards/newsletter.png',
-  toolkit:       '/images/category-cards/learning-brief.png',
-  handbook:      '/images/category-cards/handbook.png',
-  webinar:       '/images/category-cards/webinar.png',
-  podcast:       '/images/category-cards/podcast.png',
-  paper:         '/images/category-cards/publication.png',
-  infographic:   '/images/category-cards/infographic.png',
-  success_story: '/images/category-cards/success-story.png',
-  course:        '/images/category-cards/course.png',
-  naadac_ce:     '/images/category-cards/course.png',
-  guidebook:     '/images/category-cards/guidebook.png',
-  whitepaper:    '/images/category-cards/whitepaper.png',
+  course:        '/images/category-cards/course.webp',
+  naadac_ce:     '/images/category-cards/course.webp',
+  toolkit:       '/images/category-cards/learning.webp',
+  guidebook:     '/images/category-cards/guidebook.webp',
+  handbook:      '/images/category-cards/certification.webp',
+  webinar:       '/images/category-cards/webinar.webp',
+  newsletter:    '/images/category-cards/newsletter.webp',
+  video:         '/images/category-cards/video.webp',
+  podcast:       '/images/category-cards/podcast.webp',
+  paper:         '/images/category-cards/publication.webp',
+  whitepaper:    '/images/category-cards/publication.webp',
+  infographic:   '/images/category-cards/infographic.webp',
+  success_story: '/images/category-cards/success-story.webp',
+  non_fgi:       '/images/category-cards/recommendations.webp',
   fgi_service:   '/images/category-cards/fgi-services.png',
-  non_fgi:       '/images/category-cards/non-fgi.png',
-  video:         '/images/category-cards/video.png',
 };
+
+/** Types still on a photo rather than a transparent illustration. */
+const PHOTO_TYPES = new Set(['fgi_service']);
 
 function formatDuration(mins: number | null): string {
   if (!mins) return '';
@@ -37,9 +49,12 @@ function formatDuration(mins: number | null): string {
 }
 
 export default function ResourceCard({ resource, basePath = '' }: Props) {
-  const badgeColor   = RESOURCE_TYPE_COLORS[resource.type] ?? '#0e72a2';
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
+
+  // Illustrations are drawn to fit their canvas, so they must not be cropped;
+  // an editor-supplied photo still fills the band edge to edge.
+  const fitsBand = Boolean(resource.thumbnail_url) || PHOTO_TYPES.has(resource.type);
 
   return (
     <Link
@@ -48,94 +63,85 @@ export default function ResourceCard({ resource, basePath = '' }: Props) {
     >
       <article
         style={{
-          background: 'var(--card-bg)',
-          borderRadius: '25px',        // match PsychArmor's rounded collection cards
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          background: 'var(--fgi-band)',
+          borderRadius: '14px',
           overflow: 'hidden',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           transition: 'box-shadow 0.18s, transform 0.18s',
-          border: '1px solid #ebebeb',
         }}
         onMouseEnter={e => {
-          (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.11)';
+          (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 22px rgba(22,61,91,0.14)';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
         }}
         onMouseLeave={e => {
-          (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
+          (e.currentTarget as HTMLElement).style.boxShadow = 'none';
           (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
         }}
       >
-        {/* Thumbnail — category photos are 640×360, shown edge-to-edge, with a
-            full-width brand-color type bar across the bottom (7-22-26 mockup) */}
+        {/* Illustration band — shorter than the source 16:9 canvas, which is
+            what centres each drawing with air around it (8-10-26 mockup) */}
         <div style={{
           position: 'relative',
-          aspectRatio: '16 / 9',
+          aspectRatio: '16 / 7',
           flexShrink: 0,
-          background: '#f5f5f5',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: 'var(--fgi-card-face)',
           overflow: 'hidden',
         }}>
           {thumbnailSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={thumbnailSrc}
-              alt={resource.title}
+              alt=""
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
+                objectFit: fitsBand ? 'cover' : 'contain',
                 display: 'block',
               }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
-          ) : (
-            <div style={{
-              width: '100%', height: '100%',
-              background: `${badgeColor}33`, // 20% tint per brand palette
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '36px', opacity: 0.3,
-            }}>📄</div>
-          )}
+          ) : null}
 
-          {/* NAADAC CE overlay — top-right of the image */}
+          {/* NAADAC CE overlay — top-right of the illustration */}
           {resource.is_naadac_ce && (
             <span style={{
               position: 'absolute', top: '10px', right: '10px',
-              background: '#0e72a2', color: '#fff',
+              background: 'var(--fgi-blue)', color: '#fff',
               fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
               padding: '3px 8px', borderRadius: '20px',
             }}>
               NAADAC CE
             </span>
           )}
-
-          {/* Type color bar — full width across the bottom of the image */}
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            background: badgeColor,
-            color: '#fff',
-            fontSize: '14px',
-            fontWeight: 700,
-            letterSpacing: '0.01em',
-            padding: '7px 16px',
-          }}>
-            {typeLabel}
-          </div>
         </div>
 
         {/* Card body */}
-        <div style={{ padding: '14px 16px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '14px 18px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+          {/* Type pill — navy for every type (8-10-26 mockup replaced the
+              per-type brand colour bar with a single pill) */}
+          <span style={{
+            alignSelf: 'flex-start',
+            background: 'var(--fgi-navy)',
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: 700,
+            lineHeight: 1.2,
+            padding: '6px 15px',
+            borderRadius: '999px',
+            marginBottom: '12px',
+          }}>
+            {typeLabel}
+          </span>
 
           {/* Title */}
           <h3 style={{
             fontSize: '17px',
             fontWeight: 700,
             lineHeight: 1.35,
-            marginBottom: '6px',
+            marginBottom: '10px',
             color: 'var(--text-primary)',
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -147,12 +153,12 @@ export default function ResourceCard({ resource, basePath = '' }: Props) {
 
           {/* Description */}
           <p style={{
-            fontSize: '13px',
+            fontSize: '14px',
             color: 'var(--text-body-dark)',
             lineHeight: 1.55,
             flex: 1,
             display: '-webkit-box',
-            WebkitLineClamp: 3,
+            WebkitLineClamp: 5,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             marginBottom: '8px',

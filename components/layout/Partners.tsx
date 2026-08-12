@@ -8,20 +8,22 @@ const PARTNERS = [
   { file: 'partner-marr',       alt: 'MARR — Michigan Association of Recovery Resources', width: 110, height: 56 },
   { file: 'partner-ohio-rh',    alt: 'Ohio Recovery Housing Colorado',     width: 100, height: 72  },
   { file: 'partner-scarr',      alt: 'SCARR — South Carolina Alliance for Recovery Residences', width: 100, height: 72 },
+  // TODO (Jason): the 8-10-26 mockup adds a seventh logo, Webberized. No
+  // artwork for it was supplied in the drop, so the row is still six wide.
 ];
 
 export default function Partners() {
   return (
     <section style={{
       background: '#ffffff',
-      padding: '2.5rem 2rem 3rem',
+      padding: '2.75rem 2rem 3rem',
     }}>
       <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
         <h2 style={{
-          fontSize: '30px',
+          fontSize: '28px',
           fontWeight: 700,
           color: 'var(--fgi-navy)',
-          marginBottom: '2rem',
+          marginBottom: '1.75rem',
         }}>
           In Partnership With
         </h2>
@@ -29,7 +31,7 @@ export default function Partners() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '2rem',
+          gap: '2.5rem',
           flexWrap: 'wrap',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
@@ -46,18 +48,29 @@ export default function Partners() {
             ))}
           </div>
 
-          <Link
-            href="mailto:LC@fletchergroup.org"
-            style={{
-              color: 'var(--fgi-navy)',
-              fontSize: '19px',
-              fontWeight: 700,
-              textDecoration: 'underline',
-              marginLeft: 'auto',
-            }}
-          >
-            Interested in Partnering with us?
-          </Link>
+          {/* Partner-with-us call to action (8-10-26 mockup) */}
+          <div style={{ marginLeft: 'auto', textAlign: 'left' }}>
+            <div style={{
+              fontSize: '19px', fontWeight: 700, color: 'var(--fgi-navy)',
+              lineHeight: 1.35, marginBottom: '0.9rem', maxWidth: '20ch',
+            }}>
+              Interested in Partnering with us or Have New Resource Ideas?
+            </div>
+            <Link
+              href="mailto:LC@fletchergroup.org"
+              style={{
+                display: 'inline-block',
+                background: 'var(--fgi-blue)',
+                color: '#ffffff',
+                fontSize: '18px',
+                textDecoration: 'none',
+                padding: '10px 26px',
+                borderRadius: '999px',
+              }}
+            >
+              Get in Touch!
+            </Link>
+          </div>
         </div>
       </div>
     </section>
