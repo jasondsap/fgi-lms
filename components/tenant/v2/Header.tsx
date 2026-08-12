@@ -45,21 +45,23 @@ export default function TenantHeaderV2({
         gap: '2.25rem',
         height: '92px',
       }}>
-        {/* Logo in a white box that fills the bar's height */}
+        {/* Colorado boxes its mark on white; SCARR's already reads on navy. */}
         <Link
           href={home}
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#ffffff', alignSelf: 'stretch',
-            width: '104px', flexShrink: 0, marginLeft: '12px',
+            background: v2.logoOnWhite ? '#ffffff' : 'transparent',
+            alignSelf: 'stretch',
+            width: v2.logoOnWhite ? '104px' : 'auto',
+            flexShrink: 0, marginLeft: '12px',
           }}
         >
           <Image
             src={tenant.logo}
             alt={tenant.logoAlt}
-            width={300}
-            height={300}
-            style={{ width: '88px', height: 'auto' }}
+            width={600}
+            height={418}
+            style={{ width: 'auto', height: v2.logoOnWhite ? '88px' : '76px' }}
             priority
           />
         </Link>

@@ -218,7 +218,7 @@ export default async function TenantLandingV2({ tenant, searchParams }: Props) {
           <div style={{
             background: v2.certification.panelBg,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '1.5rem',
+            padding: v2.certification.imagePadding ?? '1.5rem',
           }}>
             <Image
               src={v2.certification.image}

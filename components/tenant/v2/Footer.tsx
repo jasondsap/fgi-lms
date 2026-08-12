@@ -37,16 +37,20 @@ export default function TenantFooterV2({ tenant }: { tenant: TenantConfig }) {
       }}>
         {/* Left — logo, website, support button */}
         <div>
+          {/* SCARR supplies a horizontal lockup for the dark footer; Colorado
+              reuses the header mark, boxed on white. */}
           <div style={{
-            background: '#ffffff', display: 'inline-flex', padding: '10px',
+            background: v2.logoOnWhite ? '#ffffff' : 'transparent',
+            display: 'inline-flex',
+            padding: v2.logoOnWhite ? '10px' : 0,
             marginBottom: '1.1rem',
           }}>
             <Image
-              src={tenant.logo}
+              src={v2.footerLogo?.src ?? tenant.logo}
               alt={tenant.logoAlt}
-              width={300}
-              height={300}
-              style={{ width: '150px', height: 'auto' }}
+              width={v2.footerLogo?.width ?? 300}
+              height={v2.footerLogo?.height ?? 300}
+              style={{ width: v2.footerLogo ? '320px' : '150px', height: 'auto' }}
             />
           </div>
 

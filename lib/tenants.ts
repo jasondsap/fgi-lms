@@ -70,9 +70,25 @@ export interface TenantV2 {
    */
   fgiNavLabel: string;
   heroBg: string;
-  heroPhoto: { src: string; alt: string; width: number; height: number };
-  /** Halftone dot ring behind the hero photo. */
+  /** Optional heading above the hero media (SCARR's "Why Certification"). */
+  heroHeading?: string;
+  heroMedia:
+    | { kind: 'photo'; src: string; alt: string; width: number; height: number }
+    | { kind: 'video'; embedUrl: string; title: string };
+  /** Halftone dot ring behind the hero media. */
   heroDots: string;
+  /**
+   * Placement in the shared 470 x 410 hero unit space, measured off each
+   * mockup: `media` is the framed photo/video, `ring` the halftone circle.
+   */
+  heroLayout: {
+    media: { left: number; top: number; width: number };
+    ring: { cx: number; cy: number; d: number };
+  };
+  /** Header/footer logo treatment — Colorado boxes its mark on white. */
+  logoOnWhite: boolean;
+  /** Footer mark, when it differs from the header's (SCARR uses a lockup). */
+  footerLogo?: { src: string; width: number; height: number };
   highlightTileBg: string;
   hostedBar2: { bg: string; fg: string; buttonLabel: string };
   certification: {
@@ -82,6 +98,11 @@ export interface TenantV2 {
     imageAlt: string;
     /** Fill behind the certification image. */
     panelBg: string;
+    /**
+     * Padding around that image. Colorado's stamp is inset; SCARR's banner
+     * runs edge to edge in its panel, as drawn.
+     */
+    imagePadding?: string;
   };
   /** Footer support line — label plus a branded button. */
   footerSupport: { label: string; href: string; buttonLabel: string };
@@ -194,13 +215,19 @@ const TENANTS: Record<string, TenantConfig> = {
       orgSiteUrl: 'https://www.corecoveryhousing.org',
       fgiNavLabel: 'Fletcher Web',
       heroBg: '#f6f6fa',
-      heroPhoto: {
+      heroMedia: {
+        kind: 'photo',
         src: '/images/tenants/colorado/hero-photo.webp',
         alt: 'A snowy Colorado mountain town main street',
         width: 1000,
         height: 665,
       },
       heroDots: '/images/tenants/colorado/dots.webp',
+      heroLayout: {
+        media: { left: 21.8, top: 108.1, width: 277.5 },
+        ring:  { cx: 209, cy: 178, d: 287 },
+      },
+      logoOnWhite: true,
       highlightTileBg: '#fffdf4',
       hostedBar2: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact FGI' },
       certification: {
@@ -229,16 +256,19 @@ const TENANTS: Record<string, TenantConfig> = {
     slug: 'scarr',
     name: 'South Carolina Alliance for Recovery Residences',
     fgiSiteUrl: 'https://resource.made180.dev',
-    logo: '/images/tenants/scarr-logo.jpg',
-    logoWhite: '/images/tenants/scarr-logo.jpg',
+    logo: '/images/tenants/scarr/logo-square.webp',
+    logoWhite: '/images/tenants/scarr/logo-horizontal.webp',
     logoAlt: 'South Carolina Alliance for Recovery Residences (SCARR)',
     primary: '#041e42',   // SCARR navy
     accent: '#f5d300',    // SCARR yellow
+    // 8-11-26 mockup uses FGI's generic wording verbatim, as Colorado's does.
     heroParagraphs: [
-      HERO_P1,
-      'Our Learning Center content, developed by subject matter experts in ' +
-      'substance use disorder recovery, has been <strong>curated to support ' +
-      'South Carolina Recovery House owners, operators, and related supports.</strong>',
+      'Your one-stop, no-cost library for building stronger recovery housing and ' +
+      'support programs — <strong>courses, guides, webinars, podcasts, NAADAC CE ' +
+      'opportunities, research, and more.</strong>',
+      'Whether you’re opening your first recovery home, leading an established ' +
+      'program, working as a peer or recovery support provider, or a community ' +
+      'partner, there’s something here for you.',
     ],
     heroRight: {
       kind: 'video',
@@ -268,11 +298,50 @@ const TENANTS: Record<string, TenantConfig> = {
       `,
       websiteLabel: 'www.scarronline.org',
       websiteUrl: 'https://scarronline.org',
+      // The 8-11-26 mockup's Follow Us box shows only Facebook and LinkedIn.
       socials: [
         { platform: 'facebook',  href: 'https://www.facebook.com/screcoveryresidences/' },
-        { platform: 'instagram', href: 'https://www.instagram.com/scaforrr/' },
         { platform: 'linkedin',  href: 'https://www.linkedin.com/company/south-carolina-alliance-for-recovery-residences/' },
       ],
+    },
+    v2: {
+      orgSiteLabel: 'SCARR Web',
+      orgSiteUrl: 'https://scarronline.org',
+      fgiNavLabel: 'Fletcher Web',
+      heroBg: '#f6f7f8',
+      heroHeading: 'Why Certification',
+      heroMedia: {
+        kind: 'video',
+        embedUrl: 'https://player.vimeo.com/video/1211785746?badge=0&autopause=0&player_id=0&app_id=58479',
+        title: 'Why Certification — SCARR',
+      },
+      heroDots: '/images/tenants/scarr/dots.webp',
+      // SCARR's video sits lower than Colorado's photo, and the ring follows it.
+      heroLayout: {
+        media: { left: 15.3, top: 141.3, width: 285 },
+        ring:  { cx: 212.7, cy: 204.5, d: 287 },
+      },
+      logoOnWhite: false,
+      footerLogo: { src: '/images/tenants/scarr/logo-horizontal.webp', width: 367, height: 97 },
+      highlightTileBg: '#fffdf4',
+      hostedBar2: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact Us' },
+      certification: {
+        heading: 'Becoming a South Carolina Certified Recovery Residence',
+        bodyHtml: `
+          <p>To begin, watch all seven videos in &ldquo;So You Want to Be a Recovery Residence Owner or Operator?&rdquo; and review the Certification documents (all available in the &ldquo;Certification Info&rdquo; filter). After completing these, finish the brief survey and download your completion certificate.</p>
+          <p>To proceed with certification, visit our website to apply. Your certificate of completion may be required.</p>
+          <p>For questions, portal access, or to schedule a meeting with our team, email <a href="mailto:info@scarronline.org">info@scarronline.org</a> with your completion certificate attached.</p>
+        `,
+        image: '/images/tenants/scarr/cert-image.webp',
+        imageAlt: 'Recovery is home — find yours today',
+        panelBg: '#2c4362',
+        imagePadding: '0',
+      },
+      footerSupport: {
+        label: 'Learning Center Support',
+        href: 'mailto:LC@fletchergroup.org',
+        buttonLabel: 'Contact',
+      },
     },
   },
 };
