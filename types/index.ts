@@ -102,6 +102,11 @@ export interface Resource {
   course_code?: string | null;
   /** NAADAC skill groups printed on the webinar shell; Jennifer-supplied. */
   naadac_skill_groups?: string[] | null;
+  /** Formatted citation for a peer-reviewed publication. Trusted HTML —
+      the journal name carries <em>, exactly as the research sheet marks it. */
+  citation?: string | null;
+  /** Full published abstract. `description` stays short for cards and search. */
+  abstract?: string | null;
   /** True once a Moodle course backs this resource — drives "Start Webinar".
       The course id itself is never sent to the client. */
   has_moodle_course?: boolean;

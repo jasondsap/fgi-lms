@@ -364,6 +364,7 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
            thumbnail_url, vimeo_id, external_url,
            is_naadac_ce, audience_tags, topic_tags, published_at, s3_key,
            event_date, ceu_credits, course_code, naadac_skill_groups,
+           citation, abstract,
            -- The id itself stays server-side (see getCourseResource); the
            -- shells only need to know whether the course exists, and this
            -- shape is returned verbatim by /api/resources/[slug].

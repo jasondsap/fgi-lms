@@ -52,6 +52,13 @@ function formatMonth(value: string | Date | null | undefined): string | null {
  * beside them, then the document itself in an inline viewer with a grey action
  * rail alongside — download, related resources, and the feedback survey.
  *
+ * A peer-reviewed publication (8-12-26 shell) is the same page with three
+ * additions, all driven by data rather than a separate component: the formatted
+ * citation under the title, "Abstract Description" over the longer abstract, and
+ * a "Publication Link" button to the DOI. Most publications may not be hosted as
+ * a PDF at all — the publisher's terms decide — so on those the viewer and the
+ * download simply do not render and the DOI is the way through.
+ *
  * The mockup's presenter card and "sponsored by" block are PsychArmor filler:
  * no document in the catalog carries presenter or sponsor rows today. They are
  * built here but render only once that data exists, rather than being faked.
@@ -67,6 +74,20 @@ export default async function PdfDetail(
   const materials  = resource.materials ?? [];
   const published  = formatMonth(resource.published_at);
   const related    = await getRelatedResources(resource, surface.key, 3);
+
+  // A publication is a document that carries a citation. Its date is only ever
+  // a year of publication, so the month formatting above would invent precision.
+  const isPublication = Boolean(resource.citation);
+  // published_at arrives as a Date on one driver path and a string on the
+  // other; String(Date) starts "Sun Jan 01 …", so it has to be normalised.
+  // The Resource type says string, but the Neon driver hands back a Date on one
+  // of its paths, and String(Date) starts "Sun Jan 01 …".
+  const publishedAt = resource.published_at as string | Date | null | undefined;
+  const year = publishedAt
+    ? (publishedAt instanceof Date ? publishedAt.toISOString() : String(publishedAt)).slice(0, 4)
+    : '';
+  const dateLabel = isPublication ? (year || null) : published;
+  const body = resource.abstract || resource.description;
 
   return (
     <div style={{ background: '#ffffff', minHeight: '60vh' }}>
@@ -96,23 +117,40 @@ export default async function PdfDetail(
                 course code, so the slot carries what a reader can use. */}
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code ? `Course ID: ${resource.course_code}` : typeLabel}
-              {published && <span style={{ color: 'var(--text-muted)' }}> · {published}</span>}
+              {dateLabel && <span style={{ color: 'var(--text-muted)' }}> · {dateLabel}</span>}
             </div>
 
-            {resource.description && (
+            {/* The citation sits between the title and the ID line, indented,
+                with the journal in italics. The HTML comes from the research
+                sheet's own formatting and is editor-controlled — see
+                scripts/load-publications.js, which emits only <em>. */}
+            {resource.citation && (
+              <p
+                style={{
+                  fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
+                  maxWidth: '62ch', margin: '1rem 0 0 1.25rem',
+                }}
+                dangerouslySetInnerHTML={{ __html: resource.citation }}
+              />
+            )}
+
+            {body && (
               <>
                 <div style={{
                   fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
                   margin: '1.5rem 0 0.75rem',
                 }}>
-                  Description
+                  {isPublication ? 'Abstract Description' : 'Description'}
                 </div>
-                <p style={{
-                  fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
-                  maxWidth: '62ch',
-                }}>
-                  {resource.description}
-                </p>
+                {/* Abstracts arrive as several paragraphs; keep the breaks. */}
+                {body.split(/\n+/).filter(Boolean).map((para, i) => (
+                  <p key={i} style={{
+                    fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
+                    maxWidth: '62ch', marginBottom: '0.75rem',
+                  }}>
+                    {para}
+                  </p>
+                ))}
               </>
             )}
           </div>
@@ -151,23 +189,29 @@ export default async function PdfDetail(
             presenters={presenters}
             related={related}
             action={
-              (resource.attachment_url || resource.download_url) ? (
-                // `attachment_url` is signed with an attachment disposition — a
-                // plain `download` attribute is ignored on a cross-origin URL.
-                <a
-                  href={resource.attachment_url ?? resource.download_url}
-                  style={{ ...RAIL_BUTTON, background: surface.primary }}
-                >
-                  Download
-                </a>
-              ) : resource.external_url ? (
-                <a
-                  href={resource.external_url} target="_blank" rel="noopener noreferrer"
-                  style={{ ...RAIL_BUTTON, background: surface.primary }}
-                >
-                  Open Resource
-                </a>
-              ) : null
+              <>
+                {/* `attachment_url` is signed with an attachment disposition — a
+                    plain `download` attribute is ignored on a cross-origin URL. */}
+                {(resource.attachment_url || resource.download_url) && (
+                  <a
+                    href={resource.attachment_url ?? resource.download_url}
+                    style={{ ...RAIL_BUTTON, background: surface.primary }}
+                  >
+                    {isPublication ? 'Download PDF' : 'Download'}
+                  </a>
+                )}
+                {resource.external_url && (
+                  <a
+                    href={resource.external_url} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      ...RAIL_BUTTON, background: surface.primary,
+                      marginTop: (resource.download_url || resource.attachment_url) ? '12px' : 0,
+                    }}
+                  >
+                    {isPublication ? 'Publication Link' : 'Open Resource'}
+                  </a>
+                )}
+              </>
             }
             extras={
               materials.length > 0 ? (

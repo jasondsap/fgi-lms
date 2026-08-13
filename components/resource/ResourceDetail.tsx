@@ -76,7 +76,12 @@ export default async function ResourceDetail(
   // Publication, Success Story, Guide, Cert. Document, Infographic — gets the
   // 8-11-26 PDF shell. Courses open in Moodle and videos play inline, so both
   // stay on the generic template below even when a PDF hangs off them.
-  if (isPDF && !isCourse && !isVideo) {
+  //
+  // Note this is not conditioned on there *being* a PDF: most peer-reviewed
+  // publications may not be hosted (the publisher's terms decide), and those
+  // pages are the citation, the abstract and a DOI link. Sending them to the
+  // legacy template instead cost them the citation and mis-rendered their year.
+  if (!isCourse && !isVideo) {
     return (
       <>
         <PdfDetail resource={resource} surface={surface} />
