@@ -1,12 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import MailingListModal from './MailingListModal';
 
 /*
  * Header navigation. Client-side only because the 8-10-26 mockup marks the
  * current page in gold with a gold underline, which needs the pathname.
  * "Mailing List Sign Up" is a filled pill in the mockup rather than a plain
- * link, so it is rendered separately after the list.
+ * link, so it is rendered separately after the list — and since 8-13-26 it
+ * opens the signup in a modal instead of sending the visitor to Mailchimp.
  */
 const LINKS = [
   { label: 'Home',         href: '/' },
@@ -14,9 +16,6 @@ const LINKS = [
   { label: 'Fletcher Web', href: 'https://www.fletchergroup.org', external: true },
   { label: 'TA Request',   href: 'https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form', external: true },
 ];
-
-const MAILING_LIST =
-  'https://fletchergroup.us10.list-manage.com/subscribe?u=920c4fe7f0dead37ebaa7057b&id=342805a659';
 
 export default function NavLinks() {
   const pathname = usePathname();
@@ -57,23 +56,7 @@ export default function NavLinks() {
         })}
 
         <li>
-          <Link
-            href={MAILING_LIST}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              background: 'var(--fgi-blue)',
-              color: '#ffffff',
-              fontSize: '16px',
-              textDecoration: 'none',
-              padding: '7px 20px',
-              borderRadius: '999px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Mailing List Sign Up
-          </Link>
+          <MailingListModal />
         </li>
       </ul>
     </nav>
