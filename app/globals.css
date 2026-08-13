@@ -75,15 +75,24 @@ img { max-width: 100%; height: auto; display: block; }
 .tenant-prose a { color: inherit; text-decoration: underline; font-weight: 700; }
 
 /* PDF shell (8-11-26) — document column + action rail. Inline styles can't
-   carry a media query, so the one breakpoint on the page lives here. */
+   carry a media query, so the breakpoints for the page live here. */
 .pdf-shell-grid {
   display: grid;
-  grid-template-columns: 1fr 376px;
+  /* The rail may give up width before the document does; minmax(0,1fr) stops a
+     wide child (the PDF iframe) from forcing the column past its share. */
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 376px);
   gap: 64px;
   align-items: start;
 }
+@media (max-width: 1180px) {
+  .pdf-shell-grid { gap: 36px; }
+}
 @media (max-width: 1000px) {
-  .pdf-shell-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .pdf-shell-grid { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+  /* Stacked, the rail would otherwise sit below a full-height document viewer,
+     putting Download / Start Webinar at the very bottom of the page. A browser
+     side panel is enough to trigger this on a normal laptop. */
+  .pdf-shell-grid--body > aside { order: -1; }
 }
 
 /* Utility */

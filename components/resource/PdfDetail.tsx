@@ -103,7 +103,7 @@ export default async function PdfDetail(
           <span>{resource.title}</span>
         </nav>
 
-        {/* ── Title + description, illustration alongside ── */}
+        {/* ── Title, citation and illustration ── */}
         <div className="pdf-shell-grid">
           <div>
             <h1 style={{
@@ -134,25 +134,6 @@ export default async function PdfDetail(
               />
             )}
 
-            {body && (
-              <>
-                <div style={{
-                  fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
-                  margin: '1.5rem 0 0.75rem',
-                }}>
-                  {isPublication ? 'Abstract Description' : 'Description'}
-                </div>
-                {/* Abstracts arrive as several paragraphs; keep the breaks. */}
-                {body.split(/\n+/).filter(Boolean).map((para, i) => (
-                  <p key={i} style={{
-                    fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
-                    maxWidth: '62ch', marginBottom: '0.75rem',
-                  }}>
-                    {para}
-                  </p>
-                ))}
-              </>
-            )}
           </div>
 
           {illustration && (
@@ -165,10 +146,36 @@ export default async function PdfDetail(
           )}
         </div>
 
-        {/* ── Document + action rail ── */}
-        <div className="pdf-shell-grid" style={{ marginTop: '2rem' }}>
+        {/* ── Body + action rail ──
+            The description lives in this row, not the one above: the rail is the
+            second row's right-hand cell, so anything tall in the first row's
+            left cell pushes it down the page. With a 2,000-character abstract up
+            there the rail ended up level with the middle of the article. Here
+            the rail starts alongside the top of the body, directly under the
+            illustration, which is where Jennifer's shell puts it. */}
+        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '2rem' }}>
           {/* LEFT — the document, then anyone credited on it */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {body && (
+              <div>
+                <div style={{
+                  fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
+                  marginBottom: '0.75rem',
+                }}>
+                  {isPublication ? 'Abstract Description' : 'Description'}
+                </div>
+                {/* Abstracts arrive as several paragraphs; keep the breaks. */}
+                {body.split(/\n+/).filter(Boolean).map((para, i) => (
+                  <p key={i} style={{
+                    fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
+                    maxWidth: '62ch', marginBottom: '0.75rem',
+                  }}>
+                    {para}
+                  </p>
+                ))}
+              </div>
+            )}
+
             {resource.download_url && (
               <PdfViewer
                 url={resource.download_url}

@@ -85,7 +85,7 @@ export default async function WebinarDetail(
           <span>{resource.title}</span>
         </nav>
 
-        {/* ── Title + description, illustration alongside ── */}
+        {/* ── Title and illustration ── */}
         <div className="pdf-shell-grid">
           <div>
             <h1 style={{
@@ -102,12 +102,6 @@ export default async function WebinarDetail(
               {eventDate && <span style={{ color: 'var(--text-muted)' }}> · {eventDate}</span>}
             </div>
 
-            {resource.description && (
-              <>
-                <div style={{ ...PANEL_TITLE, margin: '1.5rem 0 0.75rem' }}>Description</div>
-                <p style={{ ...PANEL_TEXT, maxWidth: '62ch' }}>{resource.description}</p>
-              </>
-            )}
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -119,8 +113,15 @@ export default async function WebinarDetail(
         </div>
 
         {/* ── Presenters, CE panels, and the action rail ── */}
-        <div className="pdf-shell-grid" style={{ marginTop: '2rem' }}>
+        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '2rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {resource.description && (
+              <div>
+                <div style={{ ...PANEL_TITLE }}>Description</div>
+                <p style={{ ...PANEL_TEXT, maxWidth: '62ch' }}>{resource.description}</p>
+              </div>
+            )}
+
             {/* Until this webinar has a Moodle course, the recording still
                 plays here — see the component note. */}
             {!inMoodle && resource.vimeo_id && (
