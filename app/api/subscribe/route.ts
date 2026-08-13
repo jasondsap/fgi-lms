@@ -82,8 +82,25 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Both names are enforced here rather than by Mailchimp, where the merge
+  // fields are optional — it would happily store a contact with neither.
+  const firstName = typeof payload.first_name === 'string' ? payload.first_name.trim() : '';
+  const lastName  = typeof payload.last_name  === 'string' ? payload.last_name.trim()  : '';
+  if (!firstName || !lastName) {
+    return NextResponse.json(
+      { error: 'Please enter your first and last name.' },
+      { status: 400 },
+    );
+  }
+  if (firstName.length > 80 || lastName.length > 80) {
+    return NextResponse.json(
+      { error: 'That name is longer than we can store.' },
+      { status: 400 },
+    );
+  }
+
   try {
-    return NextResponse.json(await subscribe(email));
+    return NextResponse.json(await subscribe({ email, firstName, lastName }));
   } catch (error) {
     // The address is never logged — it is the whole of the personal data here.
     console.error('Mailchimp subscribe failed:',

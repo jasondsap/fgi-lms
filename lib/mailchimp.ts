@@ -39,6 +39,17 @@ export type SubscribeOutcome =
   | { status: 'already';    message: string }
   | { status: 'invalid';    message: string };
 
+/**
+ * FNAME and LNAME are `enabled: false` in Jennifer's embed config, which only
+ * governs whether her hosted form draws them — they are merge fields 1 and 2 on
+ * the audience either way, so sending them here populates the contact properly.
+ */
+export interface Subscriber {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 export class MailchimpError extends Error {}
 
 /**
@@ -73,10 +84,14 @@ function isAlreadySubscribed(message: string): boolean {
   return /already subscribed/i.test(message);
 }
 
-export async function subscribe(email: string): Promise<SubscribeOutcome> {
+export async function subscribe(
+  { email, firstName, lastName }: Subscriber,
+): Promise<SubscribeOutcome> {
   const query = new URLSearchParams({
     ...AUDIENCE,
     EMAIL: email,
+    FNAME: firstName,
+    LNAME: lastName,
     tags: TAG,
     [HONEYPOT_FIELD]: '',
     c: 'cb',           // JSONP callback name, stripped below

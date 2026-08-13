@@ -10,18 +10,36 @@ import { HONEYPOT_FIELD } from '@/lib/mailchimp';
  * close, backdrop click to close, page scroll locked while open — so the two
  * dialogs on the site behave identically.
  *
- * The form is only an email field because that is all Jennifer's embed collects:
- * first name, last name and the four "Email Preferences" groups are all present
- * in the Mailchimp form config but disabled. Enabling any of them is a change
- * here and in lib/mailchimp.ts, not a change of approach.
+ * Collects first name, last name and email. All three are required here even
+ * though Mailchimp treats the two name merge fields as optional — the audience
+ * would otherwise accept a contact with no name at all.
+ *
+ * The four "Email Preferences" groups in the Mailchimp form config are still
+ * disabled and so are not offered; adding them is a change here and in
+ * lib/mailchimp.ts, not a change of approach.
  */
+
+const FIELD = {
+  width: '100%', padding: '10px 12px', fontSize: '15px',
+  fontFamily: 'inherit', color: 'var(--text-primary)',
+  background: '#ffffff', border: '1px solid var(--border-color)',
+  borderRadius: 'var(--radius-sm)',
+};
+
+const LABEL = {
+  display: 'block', fontSize: '15px', fontWeight: 600,
+  color: 'var(--text-primary)', marginBottom: '8px',
+};
+
 export default function MailingListModal() {
-  const [open, setOpen]       = useState(false);
-  const [email, setEmail]     = useState('');
-  const [trap, setTrap]       = useState('');       // honeypot; a person leaves it empty
-  const [sending, setSending] = useState(false);
-  const [done, setDone]       = useState<string | null>(null);
-  const [error, setError]     = useState<string | null>(null);
+  const [open, setOpen]           = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [email, setEmail]         = useState('');
+  const [trap, setTrap]           = useState('');   // honeypot; a person leaves it empty
+  const [sending, setSending]     = useState(false);
+  const [done, setDone]           = useState<string | null>(null);
+  const [error, setError]         = useState<string | null>(null);
 
   const inputRef  = useRef<HTMLInputElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
@@ -50,6 +68,8 @@ export default function MailingListModal() {
   const reopen = () => {
     setDone(null);
     setError(null);
+    setFirstName('');
+    setLastName('');
     setEmail('');
     setOpen(true);
   };
@@ -62,7 +82,12 @@ export default function MailingListModal() {
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, [HONEYPOT_FIELD]: trap }),
+        body: JSON.stringify({
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          [HONEYPOT_FIELD]: trap,
+        }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || 'Something went wrong. Please try again.');
@@ -171,17 +196,51 @@ export default function MailingListModal() {
               </div>
             ) : (
               <form onSubmit={submit} style={{ padding: '1.5rem 1.75rem 1.75rem' }}>
-                <label
-                  htmlFor="mailing-list-email"
-                  style={{
-                    display: 'block', fontSize: '15px', fontWeight: 600,
-                    color: 'var(--text-primary)', marginBottom: '8px',
-                  }}
-                >
+                {/* Names share a row down to the narrow breakpoint, where the
+                    grid collapses and they stack. */}
+                <div style={{
+                  display: 'grid', gap: '1rem', marginBottom: '1.125rem',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                }}>
+                  <div>
+                    <label htmlFor="mailing-list-first" style={LABEL}>
+                      First name <span style={{ color: '#b13f08' }}>*</span>
+                    </label>
+                    <input
+                      ref={inputRef}
+                      id="mailing-list-first"
+                      type="text"
+                      name="FNAME"
+                      autoComplete="given-name"
+                      maxLength={80}
+                      required
+                      value={firstName}
+                      onChange={(e) => { setFirstName(e.target.value); setError(null); }}
+                      style={FIELD}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="mailing-list-last" style={LABEL}>
+                      Last name <span style={{ color: '#b13f08' }}>*</span>
+                    </label>
+                    <input
+                      id="mailing-list-last"
+                      type="text"
+                      name="LNAME"
+                      autoComplete="family-name"
+                      maxLength={80}
+                      required
+                      value={lastName}
+                      onChange={(e) => { setLastName(e.target.value); setError(null); }}
+                      style={FIELD}
+                    />
+                  </div>
+                </div>
+
+                <label htmlFor="mailing-list-email" style={LABEL}>
                   Email address <span style={{ color: '#b13f08' }}>*</span>
                 </label>
                 <input
-                  ref={inputRef}
                   id="mailing-list-email"
                   type="email"
                   name="EMAIL"
@@ -189,12 +248,7 @@ export default function MailingListModal() {
                   required
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                  style={{
-                    width: '100%', padding: '10px 12px', fontSize: '15px',
-                    fontFamily: 'inherit', color: 'var(--text-primary)',
-                    background: '#ffffff', border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-sm)',
-                  }}
+                  style={FIELD}
                 />
 
                 {/* Mailchimp's honeypot, kept from the original embed. */}
