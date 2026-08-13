@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="multichoice">
+    <name><text>Q1</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Braided funding is best described as:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Combining distinct funding streams while preserving their requirements</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Using only grant funding</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Replacing grants with donations</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Pooling all funds without tracking</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q2</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the webinar, grants should primarily be viewed as:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Operating revenue</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Emergency funds</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Venture capital for new initiatives</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Board reserves</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q3</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is a major drawback of relying solely on grants?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>They are unrestricted forever</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>They are designed to sustain operations indefinitely</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>They are inconsistent and often non-renewable</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>They require no reporting</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q4</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the difference between braided and blended funding?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Braided preserves each funding stream's identity</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Braided eliminates reporting</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Blended requires more grants</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>There is no difference</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q5</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presenter, what is the first step in building a braided funding strategy?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Hire more staff</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Open a social enterprise</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Audit current revenue streams</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Increase fundraising events</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q6</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What was identified as one of the strongest predictors of recovery outcomes?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Age</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Length of engagement</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Income</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Education</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q7</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why is collecting data important?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>It satisfies curiosity</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>It demonstrates outcomes and supports funding</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>It replaces financial reports</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>It eliminates grant writing</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q8</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which program generated more than 27,000 trips in 2025?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Housing</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Behavioral health</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Transportation</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Community outreach</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q9</text></name>
+    <questiontext format="html"><text><![CDATA[<p>True or False: Nonprofits can generate revenue, but profits must support the mission rather than be distributed to owners.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>True</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>False</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q10</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the ultimate goal of braided funding?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Eliminate all grants</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Create financial resilience while sustaining the mission</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Increase fundraising events</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Reduce community partnerships</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>

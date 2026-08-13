@@ -363,7 +363,11 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
     SELECT id, title, slug, type, description, duration_minutes,
            thumbnail_url, vimeo_id, external_url,
            is_naadac_ce, audience_tags, topic_tags, published_at, s3_key,
-           event_date, ceu_credits, course_code
+           event_date, ceu_credits, course_code, naadac_skill_groups,
+           -- The id itself stays server-side (see getCourseResource); the
+           -- shells only need to know whether the course exists, and this
+           -- shape is returned verbatim by /api/resources/[slug].
+           moodle_course_id IS NOT NULL AS has_moodle_course
     FROM resources
     WHERE slug = ${slug} AND published = TRUE
     LIMIT 1

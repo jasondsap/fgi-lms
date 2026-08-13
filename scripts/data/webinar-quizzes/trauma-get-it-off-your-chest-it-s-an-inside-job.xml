@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="multichoice">
+    <name><text>Q1</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presenter, what question should caregivers ask instead of "What's wrong with you?" when approaching someone who has experienced trauma?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"How can I fix this?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>"What happened to you?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"Why did you do that?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"Who is responsible?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q2</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Why does the presenter encourage caregivers to reflect on their own trauma?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To compare experiences with clients</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To avoid working with trauma survivors</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>To better understand themselves and serve others effectively</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To diagnose themselves</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q3</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the webinar, intrusive thoughts or "head attacks" often occur during:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Only counseling sessions</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Routine daily activities such as brushing your teeth or driving</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Medical appointments only</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Group therapy only</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q4</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The presenter explains that many habits formed after trauma are often attempts to:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Impress others</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Build confidence</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Soothe or regulate emotional pain</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Avoid responsibility</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q5</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the webinar, resilient coping requires people to:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Ignore painful emotions</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Focus only on positive thinking</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Address the root of trauma instead of only the symptoms</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Stay busy to avoid thinking about trauma</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q6</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What assessment did the presenter mention as a tool for understanding childhood trauma?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Myers-Briggs Type Indicator</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>ACEs Assessment</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>DISC Assessment</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>StrengthsFinder</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q7</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presenter, exposure to healthy people and environments helps build:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Independence</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Productivity</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Resiliency</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Confidence only</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q8</text></name>
+    <questiontext format="html"><text><![CDATA[<p>The presenter described "superficial strength" as:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Healthy confidence</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Pretending to be stronger than you really are while suppressing trauma</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Physical fitness</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Leadership ability</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q9</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the webinar, unresolved trauma can be projected onto others through:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Personality type</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Educational background</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Behaviors and reactions</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Work experience</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q10</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What did the presenter identify as an important part of accountability?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Waiting until someone else points out your problems</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Owning your experiences and beginning the work of healing</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Ignoring past experiences</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Focusing only on helping others</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>

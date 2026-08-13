@@ -1,17 +1,13 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import { authEnabled, getSession, signIn } from '@/auth';
 import PresenterCard from '@/components/resource/PresenterCard';
-import { getRelatedWebinars } from '@/lib/resources';
+import ShellRail, { RAIL_BUTTON, RAIL_LABEL } from '@/components/resource/ShellRail';
+import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
-import {
-  AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, MATERIAL_KIND_LABELS,
-  RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS,
-  type MaterialKind, type Resource, type ResourceMaterial,
-} from '@/types';
+import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
-// The Fletcher Group webinar series card, per the 4-21-26 mockup. Webinars
-// don't carry a per-episode still, so every one shows the series artwork.
-const SERIES_IMAGE = '/images/category-cards/webinar.png';
+/** The webinar drawing from the 8-11-26 illustration set, as on the cards. */
+const WEBINAR_ILLUSTRATION = '/images/category-cards/webinar.webp';
 
 /**
  * A date column comes back as either a Date or a 'YYYY-MM-DD' string depending
@@ -28,26 +24,31 @@ function formatEventDate(value: string | Date | null | undefined): string | null
   return `${MONTHS[m - 1]} ${d}, ${y}`;
 }
 
-const SECTION_LABEL = {
-  fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const,
-  letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '10px',
+const PANEL = {
+  background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
+  padding: '1.5rem 1.75rem',
 };
 
-const PANEL = {
-  border: '1px solid var(--border-color)', borderRadius: '8px',
-  padding: '1.25rem 1.5rem', marginBottom: '1.25rem',
+const PANEL_TITLE = {
+  fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px',
+};
+
+const PANEL_TEXT = {
+  fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
 };
 
 /**
- * Webinar detail page — the richer layout Jennifer specced in the 4-21-26
- * mockup: video, description, downloadable materials, and a presenter band with
- * headshot and bio.
+ * Webinar detail page — Jennifer's 8-11-26 webinar shell.
  *
- * Every block is conditional on its data existing, because coverage across the
- * catalog is uneven: some webinars ship a transcript, slides and two presenters,
- * others only a recording. Blocks the source material never supplies (learning
- * objectives, CEU credits, knowledge check) are deliberately absent rather than
- * invented — the mockup's versions of those are PsychArmor filler text.
+ * The shell is a *launcher*, not a player: the recording lives in a Moodle
+ * course (video page + knowledge check + evaluation), which is what earns the
+ * CE credit and the certificate, so "Start Webinar" opens the course player
+ * rather than embedding Vimeo here (Jason, 8-12).
+ *
+ * Three of the twelve webinars have a Moodle course today; the other nine are
+ * queued behind their question banks. Until one is built its page keeps the
+ * inline player it has always had, so no webinar is left with a button that
+ * goes nowhere — each swaps over on its own as its course lands.
  */
 export default async function WebinarDetail(
   { resource, surface }: { resource: Resource; surface: Surface },
@@ -55,14 +56,28 @@ export default async function WebinarDetail(
   const presenters = resource.presenters ?? [];
   const materials  = resource.materials ?? [];
   const eventDate  = formatEventDate(resource.event_date ?? resource.published_at);
-  const related    = await getRelatedWebinars(resource.id, surface.key, 3);
+  const related    = await getRelatedResources(resource, surface.key, 3);
+
+  const inMoodle = Boolean(resource.has_moodle_course);
+  // Moodle needs a real user to enrol and to record completion, so the course
+  // player is sign-in only — same gate the courses use.
+  const gated = inMoodle && authEnabled && !(await getSession());
+
+  const skillGroups: string[] = resource.naadac_skill_groups ?? [];
+  const credits = resource.ceu_credits ? Number(resource.ceu_credits) : null;
+
+  const facts = [
+    resource.duration_minutes ? `⏱ Approx. ${resource.duration_minutes} min.` : '',
+    eventDate ? `Presented ${eventDate}` : '',
+  ].filter(Boolean);
 
   return (
     <div style={{ background: '#ffffff', minHeight: '60vh' }}>
-      <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', padding: '2rem 2rem 3rem' }}>
+      <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', padding: '1.5rem 2rem 3rem' }}>
 
-        {/* Breadcrumb */}
-        <nav style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '1.75rem' }}>
+        {/* Breadcrumb — not in the mockup, but the only way back into a
+            tenant's own portal from here. */}
+        <nav style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
           <Link href={surface.basePath || '/'} style={{ color: surface.primary }}>Home</Link>
           {' / '}
           <Link href={surface.libraryHref} style={{ color: surface.primary }}>Library</Link>
@@ -70,18 +85,48 @@ export default async function WebinarDetail(
           <span>{resource.title}</span>
         </nav>
 
-        <h1 style={{ fontSize: '28px', fontWeight: 700, lineHeight: 1.2, marginBottom: '1.75rem' }}>
-          {resource.title}
-        </h1>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2.5rem', alignItems: 'start' }}>
-
-          {/* ── LEFT ── */}
+        {/* ── Title + description, illustration alongside ── */}
+        <div className="pdf-shell-grid">
           <div>
-            {resource.vimeo_id && (
+            <h1 style={{
+              fontSize: '45px', lineHeight: 1.1, fontWeight: 700,
+              fontStretch: '75%', color: 'var(--text-primary)',
+            }}>
+              {resource.title}
+            </h1>
+
+            <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
+              {resource.course_code
+                ? `ID: ${resource.course_code}`
+                : RESOURCE_TYPE_LABELS.webinar}
+              {eventDate && <span style={{ color: 'var(--text-muted)' }}> · {eventDate}</span>}
+            </div>
+
+            {resource.description && (
+              <>
+                <div style={{ ...PANEL_TITLE, margin: '1.5rem 0 0.75rem' }}>Description</div>
+                <p style={{ ...PANEL_TEXT, maxWidth: '62ch' }}>{resource.description}</p>
+              </>
+            )}
+          </div>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={WEBINAR_ILLUSTRATION}
+            alt=""
+            style={{ width: '454px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
+          />
+        </div>
+
+        {/* ── Presenters, CE panels, and the action rail ── */}
+        <div className="pdf-shell-grid" style={{ marginTop: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Until this webinar has a Moodle course, the recording still
+                plays here — see the component note. */}
+            {!inMoodle && resource.vimeo_id && (
               <div style={{
-                position: 'relative', paddingTop: '56.25%', marginBottom: '1.75rem',
-                borderRadius: '8px', overflow: 'hidden', background: '#111',
+                position: 'relative', paddingTop: '56.25%',
+                borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#111',
               }}>
                 <iframe
                   src={`https://player.vimeo.com/video/${resource.vimeo_id}?badge=0&autopause=0`}
@@ -92,204 +137,102 @@ export default async function WebinarDetail(
               </div>
             )}
 
-            <div style={PANEL}>
-              <div style={SECTION_LABEL}>Description</div>
-              <p style={{ fontSize: '15px', lineHeight: 1.75, color: 'var(--text-secondary)', margin: 0 }}>
-                {resource.description}
-              </p>
-            </div>
-
-            {materials.length > 0 && (
-              <div style={PANEL}>
-                <div style={SECTION_LABEL}>Materials</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {materials.map((m) => (
-                    <MaterialLink key={m.id} material={m} accent={surface.primary} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {resource.audience_tags?.length > 0 && (
-              <div style={PANEL}>
-                <div style={SECTION_LABEL}>Audience</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {resource.audience_tags.map((tag) => (
-                    <span key={tag} style={{
-                      background: 'var(--fgi-blue-light)', color: 'var(--fgi-blue-dark)',
-                      padding: '4px 12px', borderRadius: '20px', fontSize: '13px',
-                    }}>
-                      {AUDIENCE_TAG_LABELS[tag] || tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {resource.topic_tags?.length > 0 && (
-              <div style={{ ...PANEL, marginBottom: 0 }}>
-                <div style={SECTION_LABEL}>Topics</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {resource.topic_tags.map((tag) => (
-                    <span key={tag} style={{
-                      background: '#f0f7ef', color: '#2d6a4f',
-                      padding: '4px 12px', borderRadius: '20px', fontSize: '13px',
-                    }}>
-                      {TOPIC_TAG_LABELS[tag] || tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ── RIGHT ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{
-              borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)',
-              lineHeight: 0,
-            }}>
-              <Image
-                src={SERIES_IMAGE} alt="" width={640} height={360}
-                style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-              />
-            </div>
-
-            <div style={{
-              border: '1px solid var(--border-color)', borderRadius: '8px',
-              padding: '1rem 1.125rem', display: 'flex', flexDirection: 'column', gap: '8px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{
-                  background: RESOURCE_TYPE_COLORS.webinar, color: '#fff', fontSize: '12px',
-                  fontWeight: 600, padding: '3px 10px', borderRadius: '4px',
-                }}>{RESOURCE_TYPE_LABELS.webinar}</span>
-                {resource.is_naadac_ce && (
-                  <span style={{
-                    background: '#0e72a2', color: '#fff', fontSize: '11px',
-                    fontWeight: 700, padding: '3px 8px', borderRadius: '4px',
-                  }}>NAADAC CE</span>
-                )}
-              </div>
-              {resource.duration_minutes && (
-                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  ⏱ Approx. {resource.duration_minutes} min.
-                </div>
-              )}
-              {eventDate && (
-                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                  Presented {eventDate}
-                </div>
-              )}
-            </div>
-
-            {materials.length > 0 && (
-              <div style={{
-                border: '1px solid var(--border-color)', borderRadius: '8px',
-                padding: '1rem 1.125rem',
-              }}>
-                <div style={{ ...SECTION_LABEL, marginBottom: '8px' }}>This webinar also includes</div>
-                {materials.map((m) => (
-                  <div key={m.id} style={{
-                    fontSize: '13px', color: 'var(--text-secondary)',
-                    display: 'flex', gap: '8px', alignItems: 'baseline',
-                  }}>
-                    <span style={{ color: surface.primary, fontWeight: 700 }}>✓</span>
-                    <span>{m.label}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div style={{
-              background: 'var(--fgi-blue-light)', border: '1px solid #cce3f0',
-              borderRadius: '8px', padding: '1rem 1.125rem',
-              fontSize: '13px', color: 'var(--text-secondary)',
-            }}>
-              For support email{' '}
-              <a href="mailto:LC@fletchergroup.org" style={{ color: 'var(--fgi-blue)' }}>
-                LC@fletchergroup.org
-              </a>
-            </div>
-
-            {related.length > 0 && (
-              <div style={{
-                border: '1px solid var(--border-color)', borderRadius: '8px',
-                padding: '1rem 1.125rem',
-              }}>
-                <div style={{ ...SECTION_LABEL, marginBottom: '10px' }}>
-                  You might also be interested in
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {related.map((r) => (
-                    <Link
-                      key={r.id}
-                      href={`${surface.basePath}/resource/${r.slug}`}
-                      style={{
-                        fontSize: '14px', lineHeight: 1.4, fontWeight: 600,
-                        color: surface.primary, textDecoration: 'none',
-                      }}
-                    >
-                      {r.title}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <Link href={surface.libraryHref} style={{
-              display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '8px',
-              border: `1.5px solid ${surface.primary}`, color: surface.primary,
-              fontWeight: 600, fontSize: '14px', textDecoration: 'none',
-            }}>← Back to Library</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Presenter band (full-bleed) ── */}
-      {presenters.length > 0 && (
-        <section style={{ background: 'var(--body-bg)', padding: '2.5rem 2rem' }}>
-          <div style={{
-            maxWidth: 'var(--max-width)', margin: '0 auto',
-            display: 'flex', flexDirection: 'column', gap: '1.25rem',
-          }}>
             {presenters.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
             ))}
+
+            {/* Certificate panel. The mockup also promises an emailed
+                certificate and a download link; neither exists yet
+                (docs/CLAUDE.md §6ab — customcert isn't installed and the
+                per-brand template decision is open), so that paragraph is held
+                back rather than shipped as a promise we can't keep. */}
+            {inMoodle && (
+              <div style={PANEL}>
+                <div style={PANEL_TITLE}>Certificate of Completion Details</div>
+                <p style={PANEL_TEXT}>
+                  To earn a Certificate of Completion, all required activities need to be
+                  completed successfully, including any knowledge checks and evaluations.
+                </p>
+              </div>
+            )}
+
+            {resource.is_naadac_ce && (
+              <div style={PANEL}>
+                <div style={PANEL_TITLE}>NAADAC CE Details</div>
+                <p style={PANEL_TEXT}>
+                  This course has been approved by Fletcher Group, Inc., as a NAADAC Approved
+                  Education Provider, for <strong>{credits ?? 1} CE</strong>. NAADAC Provider
+                  {' '}#242360, Fletcher Group, Inc., is responsible for all aspects of their
+                  programming.
+                </p>
+                {/* Per-webinar wording Jennifer owes us; the line stays off
+                    until naadac_skill_groups is populated. */}
+                {skillGroups.length > 0 && (
+                  <p style={{ ...PANEL_TEXT, marginTop: '1rem' }}>
+                    This course aligns with NAADAC Skill Group(s):<br />
+                    {skillGroups.join(', ')}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
-        </section>
-      )}
+
+          <ShellRail
+            slug={resource.slug}
+            surface={surface}
+            facts={facts}
+            presenters={presenters}
+            related={related}
+            /* Transcripts and slide decks belong in the Moodle course now
+               (Jason, 8-12). They stay listed here only while this webinar has
+               no course to hold them, so nothing goes missing mid-migration. */
+            extras={
+              !inMoodle && materials.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={RAIL_LABEL}>Also included</div>
+                  {materials.map((m) => (
+                    <a
+                      key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
+                    >
+                      {m.label}
+                    </a>
+                  ))}
+                </div>
+              ) : null
+            }
+            action={
+              inMoodle && !gated ? (
+                <Link
+                  href={`${surface.basePath}/course/${resource.slug}`}
+                  style={{ ...RAIL_BUTTON, background: surface.primary }}
+                >
+                  Start Webinar
+                </Link>
+              ) : gated ? (
+                <form
+                  action={async () => {
+                    'use server';
+                    await signIn('cognito', {
+                      redirectTo: `${surface.basePath}/course/${resource.slug}`,
+                    });
+                  }}
+                >
+                  <button type="submit" style={{ ...RAIL_BUTTON, background: surface.primary }}>
+                    Sign In to Start
+                  </button>
+                  <p style={{
+                    fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
+                    marginTop: '8px', lineHeight: 1.5,
+                  }}>
+                    A free account lets us track your progress and issue your CE certificate.
+                  </p>
+                </form>
+              ) : null
+            }
+          />
+        </div>
+      </div>
     </div>
-  );
-}
-
-function MaterialLink({ material: m, accent }: { material: ResourceMaterial; accent: string }) {
-  // Most labels already name the kind ("Presentation Slides"); only append the
-  // kind when it adds something the label doesn't already say.
-  const kindLabel = MATERIAL_KIND_LABELS[m.kind as MaterialKind];
-  const suffix = kindLabel && kindLabel.toLowerCase() !== m.label.toLowerCase() ? kindLabel : null;
-
-  return (
-    <a
-      href={m.download_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
-        fontSize: '14px', color: accent, fontWeight: 600, textDecoration: 'none',
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2"
-        strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-      </svg>
-      <span>{m.label}</span>
-      {suffix && (
-        <span style={{ fontSize: '12px', fontWeight: 400, color: 'var(--text-muted)' }}>
-          ({suffix})
-        </span>
-      )}
-    </a>
   );
 }

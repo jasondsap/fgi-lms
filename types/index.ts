@@ -100,6 +100,11 @@ export interface Resource {
   event_date?: string | null;    // the date the webinar was actually delivered
   ceu_credits?: number | null;
   course_code?: string | null;
+  /** NAADAC skill groups printed on the webinar shell; Jennifer-supplied. */
+  naadac_skill_groups?: string[] | null;
+  /** True once a Moodle course backs this resource — drives "Start Webinar".
+      The course id itself is never sent to the client. */
+  has_moodle_course?: boolean;
   // s3_key is never exposed to the client — middleware issues a presigned URL
   download_url?: string;   // presigned URL, populated per-request for PDF resources
   attachment_url?: string; // same object, signed to force a save rather than render

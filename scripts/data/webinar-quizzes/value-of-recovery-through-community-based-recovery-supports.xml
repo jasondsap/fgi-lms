@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="multichoice">
+    <name><text>Q1</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the primary difference between treatment and recovery?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Treatment focuses on peer support while recovery focuses on medication.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Treatment is clinical and structured, while recovery is individualized and ongoing.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Treatment occurs in the community while recovery only occurs in hospitals.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>There is no difference between treatment and recovery.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q2</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Community-Based Recovery Support Services (CBRSS) are best described as:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Clinical treatment programs led by licensed therapists.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>A collection of peer-led services and practices that support sustained recovery.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Government-funded detoxification services.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Emergency crisis intervention programs.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q3</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presentation, recovery capital refers to:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>The financial resources available for treatment.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>The total resources and supports that help a person initiate and maintain recovery.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Medicaid funding for behavioral health services.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>The number of recovery meetings attended.</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q4</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which of the following was identified as a barrier to recovery capital?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Stable housing</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Strong social support</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Unmet service needs</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Community engagement</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q5</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Positive recovery capital includes which combination of supports?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Personal, social, and community capital</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Medical, legal, and financial capital</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Clinical, residential, and inpatient care</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Detoxification, medication, and hospitalization</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q6</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presenter, Community-Based Recovery Support Services occur primarily:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>In hospitals and residential treatment centers</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Within structured clinical environments</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>In community settings outside of clinical treatment</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Only in correctional facilities</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q7</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which of the following is an example of a Community-Based Recovery Support Service?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Recovery community centers</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Emergency departments</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Psychiatric inpatient units</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Detoxification facilities</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q8</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Recovery residences differ from transitional housing because they emphasize:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Luxury accommodations</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>The social model of recovery, peer leadership, and community support</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Court supervision only</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Medical detoxification services</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q9</text></name>
+    <questiontext format="html"><text><![CDATA[<p>When speaking with legislators or funding partners, Tara recommends emphasizing:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Personal opinions about recovery</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Emotional stories without supporting data</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Fiscal impact, return on investment (ROI), and measurable outcomes</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Only the number of people served</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q10</text></name>
+    <questiontext format="html"><text><![CDATA[<p>True or False: Tara emphasized that treatment and Community-Based Recovery Support Services should work together rather than compete with one another.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>True</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>False</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>

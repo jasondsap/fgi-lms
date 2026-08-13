@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import PdfViewer from '@/components/resource/PdfViewer';
-import FeedbackModal from '@/components/resource/FeedbackModal';
 import PresenterCard from '@/components/resource/PresenterCard';
+import ShellRail, { RAIL_BUTTON, RAIL_LABEL } from '@/components/resource/ShellRail';
 import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import { RESOURCE_TYPE_LABELS, type Resource, type ResourceType } from '@/types';
@@ -29,11 +29,6 @@ const TYPE_ILLUSTRATION: Record<string, string> = {
  * document column, a 46.5pt gutter and a 269pt rail = 1320px total. It lives in
  * `.pdf-shell-grid` in globals.css, where it can also carry a breakpoint.
  */
-
-const RAIL_LABEL = {
-  fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const,
-  letterSpacing: '0.1em', color: 'var(--text-muted)',
-};
 
 function formatMonth(value: string | Date | null | undefined): string | null {
   if (!value) return null;
@@ -150,113 +145,46 @@ export default async function PdfDetail(
             ))}
           </div>
 
-          {/* RIGHT — grey action rail */}
-          <aside style={{
-            background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
-            padding: '2rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',
-          }}>
-            {/* `attachment_url` is signed with an attachment disposition — a
-                plain `download` attribute is ignored on a cross-origin URL. */}
-            {(resource.attachment_url || resource.download_url) && (
-              <a
-                href={resource.attachment_url ?? resource.download_url}
-                style={{
-                  display: 'block', background: surface.primary, color: '#fff',
-                  textAlign: 'center', padding: '15px 12px', borderRadius: '999px',
-                  fontWeight: 700, fontSize: '20px', textDecoration: 'none',
-                }}
-              >
-                Download
-              </a>
-            )}
-
-            {resource.external_url && !resource.download_url && (
-              <a
-                href={resource.external_url} target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: 'block', background: surface.primary, color: '#fff',
-                  textAlign: 'center', padding: '15px 12px', borderRadius: '999px',
-                  fontWeight: 700, fontSize: '20px', textDecoration: 'none',
-                }}
-              >
-                Open Resource
-              </a>
-            )}
-
-            {materials.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={RAIL_LABEL}>Also included</div>
-                {materials.map((m) => (
-                  <a
-                    key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
-                    style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
-                  >
-                    {m.label}
-                  </a>
-                ))}
-              </div>
-            )}
-
-            {presenters.length > 0 && (
-              <div>
-                <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
-                  Presenter Information:
-                </div>
-                {presenters.map((p) => (
-                  <div key={p.id} style={{ fontSize: '17px', lineHeight: 1.5 }}>
-                    <div>{p.name}{p.credentials ? `, ${p.credentials}` : ''}</div>
-                    {p.org_url && (
-                      <a
-                        href={p.org_url} target="_blank" rel="noopener noreferrer"
-                        style={{ color: surface.primary, fontSize: '15px' }}
-                      >
-                        {p.org_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {related.length > 0 && (
-              <div style={{ borderTop: '1px solid #d8d8d8', paddingTop: '1.25rem' }}>
-                <div style={{ ...RAIL_LABEL, display: 'block', marginBottom: '12px' }}>
-                  You Might Also Be Interested In
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {related.map((r) => (
-                    <Link
-                      key={r.slug}
-                      href={`${surface.basePath}/resource/${r.slug}`}
-                      style={{ textDecoration: 'none', display: 'block' }}
+          <ShellRail
+            slug={resource.slug}
+            surface={surface}
+            presenters={presenters}
+            related={related}
+            action={
+              (resource.attachment_url || resource.download_url) ? (
+                // `attachment_url` is signed with an attachment disposition — a
+                // plain `download` attribute is ignored on a cross-origin URL.
+                <a
+                  href={resource.attachment_url ?? resource.download_url}
+                  style={{ ...RAIL_BUTTON, background: surface.primary }}
+                >
+                  Download
+                </a>
+              ) : resource.external_url ? (
+                <a
+                  href={resource.external_url} target="_blank" rel="noopener noreferrer"
+                  style={{ ...RAIL_BUTTON, background: surface.primary }}
+                >
+                  Open Resource
+                </a>
+              ) : null
+            }
+            extras={
+              materials.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={RAIL_LABEL}>Also included</div>
+                  {materials.map((m) => (
+                    <a
+                      key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
                     >
-                      <span style={{
-                        fontSize: '17px', lineHeight: 1.35, fontWeight: 600,
-                        color: surface.primary, display: 'block',
-                      }}>
-                        {r.title}
-                      </span>
-                      <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                        {RESOURCE_TYPE_LABELS[r.type] ?? r.type}
-                      </span>
-                    </Link>
+                      {m.label}
+                    </a>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* The Learning Center evaluation, in a modal. Same nine questions
-                Moodle asks on every course — see lib/evaluation.ts. */}
-            <FeedbackModal slug={resource.slug} surface={surface.key} accent={surface.primary} />
-
-            <Link href={surface.libraryHref} style={{
-              display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '999px',
-              border: `1.5px solid ${surface.primary}`, color: surface.primary,
-              fontWeight: 600, fontSize: '15px', textDecoration: 'none',
-            }}>
-              ← Back to Library
-            </Link>
-          </aside>
+              ) : null
+            }
+          />
         </div>
       </div>
     </div>

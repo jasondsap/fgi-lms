@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="multichoice">
+    <name><text>Q1</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to the presenters, the primary goal when addressing challenging behaviors in a recovery residence is to:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Remove residents as quickly as possible</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Help residents develop skills to self-correct and succeed beyond the recovery home</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Ensure every rule violation results in a consequence</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Avoid discussing difficult behaviors</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q2</text></name>
+    <questiontext format="html"><text><![CDATA[<p>When a resident becomes emotionally escalated, what was one simple de-escalation technique Alan Muia recommended?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Ask them to leave the room immediately</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Offer them a glass of water</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Require them to complete paperwork</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Call law enforcement</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q3</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the purpose of using a "bookmark" during a difficult conversation?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To avoid addressing the issue altogether</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>To postpone the discussion until emotions have settled while committing to revisit it</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To document policy violations</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To end the conversation permanently</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q4</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to Carmin Long, what should staff do when a resident presents a long list of frustrations?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Focus only on the most serious complaint</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Write down each concern and address them one at a time</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Tell the resident to submit everything in writing later</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Correct inaccurate statements immediately</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q5</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the primary purpose of the Self-Discovery Form?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To document rule violations for permanent records</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>To help residents identify their own behaviors, beliefs, and solutions</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To determine financial eligibility</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To decide whether someone should be discharged</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q6</text></name>
+    <questiontext format="html"><text><![CDATA[<p>Which question on the Self-Discovery Form helps residents recognize the broader impact of their behavior?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"What rule did you violate?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"Who witnessed the event?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>"How does this behavior affect you and others?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>"How long have you lived here?"</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q7</text></name>
+    <questiontext format="html"><text><![CDATA[<p>What is the purpose of exploring a "double bind" during the self-discovery process?</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To determine whether a resident should move out</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>To examine both the fears of changing and the consequences of not changing</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To compare two residents' behaviors</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>To establish legal responsibility</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q8</text></name>
+    <questiontext format="html"><text><![CDATA[<p>After completing the self-discovery process, residents are encouraged to develop:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>A list of house rules</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>A new personal plan with accountability and possible amends</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>A formal grievance</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>A discharge request</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q9</text></name>
+    <questiontext format="html"><text><![CDATA[<p>According to Carmin, an effective behavior contract should be:</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Open-ended and flexible</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Long-term with no end date</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>Specific, time-bound, and fair</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>Used immediately after the first disagreement</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+  <question type="multichoice">
+    <name><text>Q10</text></name>
+    <questiontext format="html"><text><![CDATA[<p>True or False: Alan recommended that recovery residences accept every applicant regardless of whether the home can provide the appropriate level of care.</p>]]></text></questiontext>
+    <generalfeedback format="html"><text></text></generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>abc</answernumbering>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p>True</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p>False</p>]]></text>
+      <feedback format="html"><text></text></feedback>
+    </answer>
+  </question>
+</quiz>
