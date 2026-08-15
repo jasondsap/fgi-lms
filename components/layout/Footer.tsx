@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Partners from './Partners';
 import ContactButton from './ContactButton';
+import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
+import { PODCAST_FALLBACK_URL, PODCAST_PLATFORMS } from '@/lib/podcast';
 
 /* Circular icon button used in the "Stay Connected" box. */
 function IconCircle({ href, label, children }: {
@@ -25,10 +27,12 @@ function IconCircle({ href, label, children }: {
 }
 
 /*
- * TODO (Jennifer): real Recovery Ecosystem Radio platform URLs. Until they
- * arrive every podcast icon points at the FGI podcast page.
+ * Recovery Ecosystem Radio platform URLs live in lib/podcast.ts (one edit
+ * updates the footer and the podcast shell together). Until Jennifer supplies
+ * a listing, its icon points at the podcast section of our own library.
  */
-const PODCAST_URL = 'https://www.fletchergroup.org';
+const podcastHref = (key: string) =>
+  PODCAST_PLATFORMS.find((p) => p.key === key)?.url ?? PODCAST_FALLBACK_URL;
 
 export default function Footer() {
   return (
@@ -121,33 +125,20 @@ export default function Footer() {
                   <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
                     Recovery Ecosystem Radio Podcast
                   </div>
+                  {/* Real brand marks from Jennifer's LMS Icons drop —
+                      shared with the podcast shell via BrandIcons.tsx. */}
                   <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <IconCircle href={PODCAST_URL} label="Listen — audio">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <rect x="4" y="9" width="2.5" height="6" rx="1.2" />
-                        <rect x="8.5" y="5" width="2.5" height="14" rx="1.2" />
-                        <rect x="13" y="7" width="2.5" height="10" rx="1.2" />
-                        <rect x="17.5" y="10" width="2.5" height="4" rx="1.2" />
-                      </svg>
+                    <IconCircle href={podcastHref('spotify')} label="Listen on Spotify">
+                      <SpotifyIcon size={22} />
                     </IconCircle>
-                    <IconCircle href={PODCAST_URL} label="Listen — podcast app">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M4 14v-2a8 8 0 0116 0v2" />
-                        <rect x="2.5" y="13.5" width="4" height="6.5" rx="2" fill="currentColor" stroke="none" />
-                        <rect x="17.5" y="13.5" width="4" height="6.5" rx="2" fill="currentColor" stroke="none" />
-                      </svg>
+                    <IconCircle href={podcastHref('apple')} label="Listen on Apple Podcasts">
+                      <AppleIcon size={22} />
                     </IconCircle>
-                    <IconCircle href={PODCAST_URL} label="Listen — music app">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 3l-9 2v10.2A3.5 3.5 0 108 18V8.2l9-2z" />
-                      </svg>
+                    <IconCircle href={podcastHref('amazon')} label="Listen on Amazon Music">
+                      <AmazonIcon size={22} />
                     </IconCircle>
-                    <IconCircle href={PODCAST_URL} label="Listen — streaming">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="9" />
-                        <circle cx="12" cy="12" r="5.5" />
-                        <circle cx="12" cy="12" r="2" fill="currentColor" />
-                      </svg>
+                    <IconCircle href={podcastHref('audible')} label="Listen on Audible">
+                      <AudibleIcon size={22} />
                     </IconCircle>
                   </div>
                 </div>

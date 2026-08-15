@@ -19,10 +19,14 @@ const EXPIRY  = parseInt(process.env.S3_PRESIGNED_URL_EXPIRY || '3600', 10);
  * Generate a time-limited presigned URL for a private S3 object.
  * Call this in API routes when returning a resource that has an s3_key.
  * Never expose s3_key directly to the client.
+ *
+ * `expiresIn` (seconds) overrides the default hour — podcast audio is signed
+ * for longer, because the browser range-requests the MP3 throughout playback
+ * and a 52-minute episode started late would 403 mid-listen.
  */
-export async function getPresignedUrl(s3Key: string): Promise<string> {
+export async function getPresignedUrl(s3Key: string, expiresIn = EXPIRY): Promise<string> {
   const command = new GetObjectCommand({ Bucket: BUCKET, Key: s3Key });
-  return getSignedUrl(s3, command, { expiresIn: EXPIRY });
+  return getSignedUrl(s3, command, { expiresIn });
 }
 
 /**

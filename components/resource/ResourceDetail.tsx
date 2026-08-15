@@ -6,6 +6,7 @@ import CategoryImage from '@/components/library/CategoryImage';
 import DetailFooter from '@/components/resource/DetailFooter';
 import PdfDetail from '@/components/resource/PdfDetail';
 import PdfViewer from '@/components/resource/PdfViewer';
+import PodcastDetail from '@/components/resource/PodcastDetail';
 import WebinarDetail from '@/components/resource/WebinarDetail';
 import { getResourceBySlug } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
@@ -54,6 +55,17 @@ export default async function ResourceDetail(
     return (
       <>
         <WebinarDetail resource={resource} surface={surface} />
+        <DetailFooter />
+      </>
+    );
+  }
+
+  // Podcast episodes get the Recovery Ecosystem Radio shell (8-12-26 mockup):
+  // show masthead, inline audio player, guest and host bands.
+  if (resource.type === 'podcast') {
+    return (
+      <>
+        <PodcastDetail resource={resource} surface={surface} />
         <DetailFooter />
       </>
     );

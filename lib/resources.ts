@@ -297,6 +297,32 @@ export async function getRelatedResources(
 }
 
 /**
+ * The other Recovery Ecosystem Radio episodes, for the podcast shell's "More
+ * Episodes" rail — newest first, same surface rules as everything else. One
+ * show today, so "every other podcast row" and "the rest of this series" are
+ * the same query; revisit if a second show ever lands.
+ */
+export async function getOtherEpisodes(
+  excludeId: string, tenantSlug: string, limit = 6,
+): Promise<Array<{ slug: string; title: string }>> {
+  const rows = await sql`
+    SELECT r.slug, r.title
+    FROM resources r
+    WHERE r.type = 'podcast'
+      AND r.published = TRUE
+      AND r.id <> ${excludeId}
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+      )
+    ORDER BY r.published_at DESC NULLS LAST, r.id DESC
+    LIMIT ${limit}
+  `;
+  return rows as unknown as Array<{ slug: string; title: string }>;
+}
+
+/**
  * The newest published webinar on the FGI surface — what the "FGI's Latest
  * Webinar" tile points at on the homepage and on both tenant landing pages.
  *
@@ -385,9 +411,13 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
       // Two signings of the same object: one that renders inline (the embedded
       // viewer) and one that forces a save (the Download button). Signing is
       // local crypto, so the second costs nothing over the wire.
+      // Podcast audio signs for 6 hours: the browser keeps range-requesting
+      // the MP3 for as long as playback runs, and a listener who opens the
+      // page, walks away and presses play later would hit an expired URL.
       const ext = resource.s3_key.split('.').pop() || 'pdf';
+      const expiry = resource.type === 'podcast' ? 6 * 3600 : undefined;
       [download_url, attachment_url] = await Promise.all([
-        getPresignedUrl(resource.s3_key),
+        getPresignedUrl(resource.s3_key, expiry),
         getPresignedDownloadUrl(resource.s3_key, `${resource.slug}.${ext}`),
       ]);
     } catch (e) {

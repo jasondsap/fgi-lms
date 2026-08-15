@@ -95,6 +95,12 @@ img { max-width: 100%; height: auto; display: block; }
   .pdf-shell-grid--body > aside { order: -1; }
 }
 
+/* Podcast shell "Find Us On" platform links — Jennifer's icon set ships each
+   brand mark as a gold default and a light-blue hover twin; inline styles
+   can't carry :hover, so the pair lives here. */
+.brand-icon-link { color: var(--fgi-gold); display: inline-flex; }
+.brand-icon-link:hover { color: #83c8e6; }
+
 /* Utility */
 .sr-only {
   position: absolute; width: 1px; height: 1px;
