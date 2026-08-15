@@ -3,9 +3,14 @@ import ResourceDetail from '@/components/resource/ResourceDetail';
 import { tenantSurface } from '@/lib/surface';
 
 export default function TenantResourcePage(
-  { params }: { params: { tenant: string; slug: string } },
+  { params, searchParams }: {
+    params: { tenant: string; slug: string };
+    // The podcast shell reads ?from= and ?autoplay= (Trailer round-trip);
+    // every other detail page ignores the query string.
+    searchParams?: Record<string, string | string[] | undefined>;
+  },
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
-  return <ResourceDetail slug={params.slug} surface={surface} />;
+  return <ResourceDetail slug={params.slug} surface={surface} searchParams={searchParams} />;
 }

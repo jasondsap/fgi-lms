@@ -42,7 +42,11 @@ const SHELL_CARD_IMAGE: Record<string, string> = {
  * in tenant chrome all the way to the course player.
  */
 export default async function ResourceDetail(
-  { slug, surface }: { slug: string; surface: Surface },
+  { slug, surface, searchParams }: {
+    slug: string;
+    surface: Surface;
+    searchParams?: Record<string, string | string[] | undefined>;
+  },
 ) {
   // Query the DB directly — a server component must never fetch its own API
   // route at runtime (see docs/CLAUDE.md architecture notes).
@@ -65,7 +69,7 @@ export default async function ResourceDetail(
   if (resource.type === 'podcast') {
     return (
       <>
-        <PodcastDetail resource={resource} surface={surface} />
+        <PodcastDetail resource={resource} surface={surface} searchParams={searchParams} />
         <DetailFooter />
       </>
     );

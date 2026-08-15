@@ -31,7 +31,9 @@ const ROUND = {
   fontFamily: 'inherit',
 };
 
-export default function AudioPlayer({ src, title }: { src: string; title: string }) {
+export default function AudioPlayer(
+  { src, title, autoplay = false }: { src: string; title: string; autoplay?: boolean },
+) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wrapRef  = useRef<HTMLDivElement>(null);
   const [playing,  setPlaying]  = useState(false);
@@ -47,6 +49,13 @@ export default function AudioPlayer({ src, title }: { src: string; title: string
     window.addEventListener(LISTEN_NOW_EVENT, onListenNow);
     return () => window.removeEventListener(LISTEN_NOW_EVENT, onListenNow);
   }, []);
+
+  // ?autoplay=1 — the Trailer button asks for playback on arrival. Best
+  // effort: a same-site click usually satisfies Chrome's autoplay policy, but
+  // when it doesn't, the rejection is swallowed and the player just sits ready.
+  useEffect(() => {
+    if (autoplay) audioRef.current?.play().catch(() => { /* blocked */ });
+  }, [autoplay]);
 
   const skip = (delta: number) => {
     const audio = audioRef.current;

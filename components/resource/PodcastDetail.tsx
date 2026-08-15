@@ -54,12 +54,26 @@ const PLATFORM_ICONS: Record<string, React.ReactNode> = {
  * (Jason, 8-15).
  */
 export default async function PodcastDetail(
-  { resource, surface }: { resource: Resource; surface: Surface },
+  { resource, surface, searchParams }: {
+    resource: Resource;
+    surface: Surface;
+    searchParams?: Record<string, string | string[] | undefined>;
+  },
 ) {
   const guests   = resource.presenters ?? [];
   const released = formatReleaseDate(resource.event_date ?? resource.published_at);
   const episodes = await getOtherEpisodes(resource.id, surface.key, 6);
   const platforms = PODCAST_PLATFORMS.filter((p) => p.url);
+
+  // The Trailer button sends ?from=<episode>&autoplay=1 so the trailer page
+  // can offer the way back and start playing on arrival. `from` is only ever
+  // used if it names another episode on this surface — anything else in the
+  // query string is ignored rather than trusted.
+  const fromParam = typeof searchParams?.from === 'string' ? searchParams.from : '';
+  const fromEpisode = episodes.find((e) => e.slug === fromParam) ?? null;
+  const autoplay = searchParams?.autoplay === '1';
+  // "Episode 1" / "Opening Episode" from the title's own label, for the button.
+  const fromLabel = fromEpisode?.title.match(/^(Episode \d+|Opening Episode)/)?.[1] ?? 'Episode';
 
   // The docx titles carry their own label ("Episode 1: Health, Housing and
   // Hope: …"), so the heading is simply the title.
@@ -117,9 +131,9 @@ export default async function PodcastDetail(
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={PODCAST_ILLUSTRATION} alt="" style={{ width: '150px', height: 'auto' }} />
-              {resource.slug !== TRAILER_SLUG && (
+              {resource.slug !== TRAILER_SLUG ? (
                 <Link
-                  href={`${surface.basePath}/resource/${TRAILER_SLUG}`}
+                  href={`${surface.basePath}/resource/${TRAILER_SLUG}?from=${resource.slug}&autoplay=1`}
                   style={{
                     background: 'var(--fgi-amber)', color: 'var(--fgi-navy)',
                     fontWeight: 700, fontStyle: 'italic', fontSize: '19px',
@@ -128,6 +142,20 @@ export default async function PodcastDetail(
                   }}
                 >
                   Trailer
+                </Link>
+              ) : fromEpisode && (
+                /* The way back to the episode the Trailer button was clicked
+                   on — same slot, same gold treatment. */
+                <Link
+                  href={`${surface.basePath}/resource/${fromEpisode.slug}`}
+                  style={{
+                    background: 'var(--fgi-amber)', color: 'var(--fgi-navy)',
+                    fontWeight: 700, fontStyle: 'italic', fontSize: '17px',
+                    borderRadius: 'var(--radius-md)', padding: '6px 18px',
+                    textDecoration: 'none', whiteSpace: 'nowrap',
+                  }}
+                >
+                  ← Back to {fromLabel}
                 </Link>
               )}
             </div>
@@ -167,7 +195,7 @@ export default async function PodcastDetail(
 
             {/* The episode itself. download_url is the presigned MP3. */}
             {resource.download_url && (
-              <AudioPlayer src={resource.download_url} title={resource.title} />
+              <AudioPlayer src={resource.download_url} title={resource.title} autoplay={autoplay} />
             )}
 
             {guests.map((p) => (
