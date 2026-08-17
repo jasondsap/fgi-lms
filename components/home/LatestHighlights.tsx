@@ -18,14 +18,16 @@ interface Props {
   /** Tile fill — cream on the Colorado portal, pale blue on FGI. */
   tileBg?: string;
   tileBorder?: string;
-  /** Colour of the rule beside the heading. */
+  tileBorderHover?: string;
+  /** Colour of the rule beside the heading (and the tile category labels). */
   accent?: string;
 }
 
 export default function LatestHighlights({
   tiles,
   tileBg = 'var(--fgi-tile)',
-  tileBorder = '#dcedf7',
+  tileBorder = 'rgba(37, 126, 164, 0.18)',
+  tileBorderHover = 'rgba(37, 126, 164, 0.28)',
   accent = 'var(--fgi-gold)',
 }: Props) {
   if (!tiles.length) return null;
@@ -66,27 +68,38 @@ export default function LatestHighlights({
             <Link
               key={tile.label}
               href={tile.href}
+              className="highlight-tile"
               style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
+                display: 'flex', alignItems: 'center', gap: '14px',
                 background: tileBg,
-                border: `1px solid ${tileBorder}`,
                 borderRadius: '10px',
-                padding: '10px 16px 10px 8px',
+                padding: '12px 16px',
                 textDecoration: 'none',
                 minHeight: '92px',
-              }}
+                '--tile-border': tileBorder,
+                '--tile-border-hover': tileBorderHover,
+              } as React.CSSProperties}
             >
-              <Image
-                src={tile.icon}
-                alt=""
-                width={800}
-                height={450}
-                style={{ width: '96px', height: 'auto', flexShrink: 0 }}
-              />
+              <div style={{
+                width: '64px', height: '64px', borderRadius: '16px',
+                background: 'rgba(255,255,255,0.75)',
+                boxShadow: '0 2px 6px rgba(30,70,90,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Image
+                  src={tile.icon}
+                  alt=""
+                  width={800}
+                  height={450}
+                  style={{ width: '54px', height: 'auto' }}
+                />
+              </div>
               <div style={{ minWidth: 0 }}>
                 <div style={{
-                  fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)',
-                  lineHeight: 1.25, marginBottom: '4px',
+                  fontSize: '12.5px', fontWeight: 600, color: accent,
+                  textTransform: 'uppercase', letterSpacing: '0.07em',
+                  lineHeight: 1.2, marginBottom: '4px',
                 }}>
                   {tile.label}
                 </div>

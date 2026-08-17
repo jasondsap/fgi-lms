@@ -101,6 +101,19 @@ img { max-width: 100%; height: auto; display: block; }
 .brand-icon-link { color: var(--fgi-gold); display: inline-flex; }
 .brand-icon-link:hover { color: #83c8e6; }
 
+/* Latest Highlights tiles — border/shadow live here (not inline) so the
+   :hover lift can restyle them; per-tenant colours arrive via custom props. */
+.highlight-tile {
+  border: 1px solid var(--tile-border, rgba(37, 126, 164, 0.18));
+  box-shadow: 0 4px 12px rgba(30, 70, 90, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.highlight-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(30, 70, 90, 0.12);
+  border-color: var(--tile-border-hover, rgba(37, 126, 164, 0.28));
+}
+
 /* Utility */
 .sr-only {
   position: absolute; width: 1px; height: 1px;

@@ -152,6 +152,7 @@ export default async function TenantLandingV2({ tenant, searchParams }: Props) {
         tiles={highlights}
         tileBg={v2.highlightTileBg}
         tileBorder="#e7e2cd"
+        tileBorderHover="#d8d0b2"
         accent={tenant.accent}
       />
 
