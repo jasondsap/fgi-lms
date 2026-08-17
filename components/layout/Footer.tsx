@@ -26,6 +26,43 @@ function IconCircle({ href, label, children }: {
   );
 }
 
+/* Small inline glyphs (web / location / email) — per Jennifer, these replace
+   the underlines that used to mark the contact details as links. */
+function InlineGlyph({ path, size = 16 }: { path: React.ReactNode; size?: number }) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0 }} aria-hidden="true"
+    >
+      {path}
+    </svg>
+  );
+}
+
+const GLOBE = (
+  <>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+  </>
+);
+
+const MAP_PIN = (
+  <>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </>
+);
+
+const MAIL = (
+  <>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </>
+);
+
 /*
  * Recovery Ecosystem Radio platform URLs live in lib/podcast.ts (one edit
  * updates the footer and the podcast shell together). Until Jennifer supplies
@@ -72,10 +109,12 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  color: '#ffffff', fontSize: '16px', textDecoration: 'underline',
-                  display: 'inline-block', marginTop: '1.25rem', marginBottom: '2rem',
+                  color: '#ffffff', fontSize: '16px', textDecoration: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  marginTop: '1.25rem', marginBottom: '2rem',
                 }}
               >
+                <InlineGlyph path={GLOBE} />
                 www.fletchergroup.org
               </Link>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
@@ -84,84 +123,92 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Col 2 — Stay Connected box */}
+            {/* Col 2 — Follow Us stacked over the podcast platforms; the
+                outline hugs the content per Jennifer's 8-17-26 feedback. */}
             <div style={{
               border: '1.5px solid #ffffff',
               borderRadius: 'var(--radius-lg)',
-              padding: '1rem 1.25rem 1.35rem',
+              padding: '1.25rem 1.75rem 1.35rem',
+              justifySelf: 'center',
+              display: 'flex', flexDirection: 'column', gap: '1.25rem',
+              alignItems: 'center',
             }}>
-              <div style={{
-                fontSize: '18px', fontWeight: 700, textAlign: 'center', marginBottom: '1rem',
-              }}>
-                Stay Connected
+              {/* Follow Us */}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
+                  Follow Us
+                </div>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <IconCircle href="https://www.facebook.com/FletcherGroupInc" label="Facebook">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+                    </svg>
+                  </IconCircle>
+                  <IconCircle href="https://www.linkedin.com/company/fletcher-group-inc" label="LinkedIn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+                      <circle cx="4" cy="4" r="2" />
+                    </svg>
+                  </IconCircle>
+                </div>
               </div>
 
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '1.75rem',
-                alignItems: 'start', justifyItems: 'center',
-              }}>
-                {/* Follow Us */}
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
-                    Follow Us
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <IconCircle href="https://www.facebook.com/FletcherGroupInc" label="Facebook">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
-                      </svg>
-                    </IconCircle>
-                    <IconCircle href="https://www.linkedin.com/company/fletcher-group-inc" label="LinkedIn">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-                        <circle cx="4" cy="4" r="2" />
-                      </svg>
-                    </IconCircle>
-                  </div>
+              {/* Recovery Ecosystem Radio */}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
+                  Recovery Ecosystem Radio Podcast
                 </div>
-
-                {/* Recovery Ecosystem Radio */}
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', whiteSpace: 'nowrap' }}>
-                    Recovery Ecosystem Radio Podcast
-                  </div>
-                  {/* Real brand marks from Jennifer's LMS Icons drop —
-                      shared with the podcast shell via BrandIcons.tsx. */}
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <IconCircle href={podcastHref('spotify')} label="Listen on Spotify">
-                      <SpotifyIcon size={22} />
-                    </IconCircle>
-                    <IconCircle href={podcastHref('apple')} label="Listen on Apple Podcasts">
-                      <AppleIcon size={22} />
-                    </IconCircle>
-                    <IconCircle href={podcastHref('amazon')} label="Listen on Amazon Music">
-                      <AmazonIcon size={22} />
-                    </IconCircle>
-                    <IconCircle href={podcastHref('audible')} label="Listen on Audible">
-                      <AudibleIcon size={22} />
-                    </IconCircle>
-                  </div>
+                {/* Real brand marks from Jennifer's LMS Icons drop —
+                    shared with the podcast shell via BrandIcons.tsx. */}
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <IconCircle href={podcastHref('spotify')} label="Listen on Spotify">
+                    <SpotifyIcon size={22} />
+                  </IconCircle>
+                  <IconCircle href={podcastHref('apple')} label="Listen on Apple Podcasts">
+                    <AppleIcon size={22} />
+                  </IconCircle>
+                  <IconCircle href={podcastHref('amazon')} label="Listen on Amazon Music">
+                    <AmazonIcon size={22} />
+                  </IconCircle>
+                  <IconCircle href={podcastHref('audible')} label="Listen on Audible">
+                    <AudibleIcon size={22} />
+                  </IconCircle>
                 </div>
               </div>
             </div>
 
             {/* Col 3 — office locations */}
-            <div style={{
-              fontSize: '16px', lineHeight: 1.7, justifySelf: 'end',
-              textDecoration: 'underline', textUnderlineOffset: '3px',
-            }}>
+            <div style={{ fontSize: '16px', lineHeight: 1.7, justifySelf: 'end' }}>
               <div style={{ marginBottom: '1.25rem' }}>
-                <div>Kentucky Location:</div>
-                <div>601 Meyers Baker Road, Suite 238</div>
-                <div>London, Kentucky 40741</div>
-                <a href="mailto:info@fletchergroup.org" style={{ color: '#ffffff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <InlineGlyph path={MAP_PIN} />
+                  <span>Kentucky Location:</span>
+                </div>
+                <div style={{ paddingLeft: '24px' }}>
+                  <div>601 Meyers Baker Road, Suite 238</div>
+                  <div>London, Kentucky 40741</div>
+                </div>
+                <a
+                  href="mailto:info@fletchergroup.org"
+                  style={{
+                    color: '#ffffff', textDecoration: 'none',
+                    display: 'inline-flex', alignItems: 'center', gap: '8px',
+                    marginTop: '2px',
+                  }}
+                >
+                  <InlineGlyph path={MAIL} />
                   info@fletchergroup.org
                 </a>
               </div>
               <div>
-                <div>Florida Location:</div>
-                <div>423 E Macewen Drive</div>
-                <div>Osprey, Florida 34229</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <InlineGlyph path={MAP_PIN} />
+                  <span>Florida Location:</span>
+                </div>
+                <div style={{ paddingLeft: '24px' }}>
+                  <div>423 E Macewen Drive</div>
+                  <div>Osprey, Florida 34229</div>
+                </div>
               </div>
             </div>
           </div>
@@ -187,8 +234,12 @@ export default function Footer() {
               href="https://www.hrsa.gov"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--text-primary)', fontSize: '18px', textDecoration: 'underline' }}
+              style={{
+                color: 'var(--text-primary)', fontSize: '18px', textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+              }}
             >
+              <InlineGlyph path={GLOBE} />
               www.hrsa.org
             </Link>
           </div>
