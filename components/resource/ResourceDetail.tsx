@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { authEnabled, getSession, signIn } from '@/auth';
 import CategoryImage from '@/components/library/CategoryImage';
+import CourseDetail from '@/components/resource/CourseDetail';
 import DetailFooter from '@/components/resource/DetailFooter';
 import PdfDetail from '@/components/resource/PdfDetail';
 import PdfViewer from '@/components/resource/PdfViewer';
@@ -70,6 +71,16 @@ export default async function ResourceDetail(
     return (
       <>
         <PodcastDetail resource={resource} surface={surface} searchParams={searchParams} />
+        <DetailFooter />
+      </>
+    );
+  }
+
+  // Courses get the 8-11-26 course shell — the launcher for the Moodle player.
+  if (resource.type === 'course' || resource.type === 'naadac_ce') {
+    return (
+      <>
+        <CourseDetail resource={resource} surface={surface} />
         <DetailFooter />
       </>
     );

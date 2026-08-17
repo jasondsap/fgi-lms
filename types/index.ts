@@ -110,6 +110,11 @@ export interface Resource {
   /** True once a Moodle course backs this resource — drives "Start Webinar".
       The course id itself is never sent to the client. */
   has_moodle_course?: boolean;
+  /** Course sponsor block (8-11-26 course shell) — e.g. the Marshall Health
+      employability series. Text is the "sponsored by" sentence. */
+  sponsor_text?: string | null;
+  sponsor_logo_url?: string | null;
+  sponsor_url?: string | null;
   // s3_key is never exposed to the client — middleware issues a presigned URL
   download_url?: string;   // presigned URL, populated per-request for PDF resources
   attachment_url?: string; // same object, signed to force a save rather than render
