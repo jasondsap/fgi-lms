@@ -213,10 +213,9 @@ export async function getRelatedWebinars(
  * generic course, and a type cap keeps the 76-course block from filling the
  * whole list.
  *
- * Jennifer's shell note asks for the companion Newsletter and webinar of the
- * month. That mapping isn't in the data — newsletters stop at March 2026 while
- * the briefs start in May — so it stays a manual curation to layer on later;
- * relevance is what can be derived honestly today.
+ * Curated companions come first: `related_resources` pins hand-picked pairs
+ * (each monthly webinar ↔ its same-month RCOE newsletter, seeded 8-16-26, both
+ * directions). Pinned rows take the top slots, then relevance fills the rest.
  */
 export interface RelatedItem { slug: string; title: string; type: ResourceType }
 
@@ -244,9 +243,28 @@ export async function getRelatedResources(
   tenantSlug: string,
   limit = 3,
 ): Promise<RelatedItem[]> {
+  // Hand-curated companions (e.g. a webinar's same-month newsletter) always
+  // lead the list, subject to the same published + surface rules as everything
+  // else on the page.
+  const pinned = await sql`
+    SELECT r.slug, r.title, r.type::text AS type
+    FROM related_resources rr
+    JOIN resources r ON r.id = rr.related_id
+    WHERE rr.resource_id = ${resource.id}
+      AND r.published = TRUE
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+      )
+    ORDER BY rr.position, r.published_at DESC NULLS LAST
+    LIMIT ${limit}
+  ` as unknown as RelatedItem[];
+  if (pinned.length >= limit) return pinned.slice(0, limit);
+
   const titleQuery = toOrQuery(resource.title, 12);
   const bodyQuery  = toOrQuery(resource.description ?? '', 30);
-  if (!titleQuery && !bodyQuery) return [];
+  if (!titleQuery && !bodyQuery) return pinned;
 
   // A resource matching only one of the two queries still has to be scored
   // against both, so an empty query has to be a legal tsquery: '' is not, and
@@ -285,9 +303,11 @@ export async function getRelatedResources(
   const MAX_PER_TYPE = 2;
 
   const perType = new Map<string, number>();
-  const picked: RelatedItem[] = [];
+  const picked: RelatedItem[] = [...pinned];
+  for (const pin of pinned) perType.set(pin.type, (perType.get(pin.type) ?? 0) + 1);
   for (const row of rows) {
     if (row.score < MIN_SCORE || picked.length >= limit) break;
+    if (picked.some((p) => p.slug === row.slug)) continue;
     const seen = perType.get(row.type) ?? 0;
     if (seen >= MAX_PER_TYPE) continue;
     perType.set(row.type, seen + 1);
