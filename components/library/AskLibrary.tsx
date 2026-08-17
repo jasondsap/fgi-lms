@@ -24,8 +24,11 @@ interface Props {
   basePath?: string;
   /** Surface key sent to the API so recommendations stay in-surface. */
   surface?: string;
-  /** Button / accent colour for this surface. */
+  /** Panel accent colour for this surface (header, bubbles, Ask button). */
   accent?: string;
+  /** Closed-pill colours — FGI gold per Jennifer 8-17-26; tenants pass their primary. */
+  pillBg?: string;
+  pillText?: string;
 }
 
 const STARTERS = [
@@ -41,7 +44,13 @@ const STARTERS = [
  * Links are built from server-validated slugs — the API drops anything not in
  * the catalog, so every card here points at a real resource.
  */
-export default function AskLibrary({ basePath = '', surface = 'fgi', accent = 'var(--fgi-blue)' }: Props) {
+export default function AskLibrary({
+  basePath = '',
+  surface = 'fgi',
+  accent = 'var(--fgi-blue)',
+  pillBg = 'var(--fgi-gold)',
+  pillText = 'var(--fgi-navy)',
+}: Props) {
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
@@ -95,7 +104,7 @@ export default function AskLibrary({ basePath = '', surface = 'fgi', accent = 'v
         aria-label="Ask the library"
         style={{
           position: 'fixed', bottom: '24px', right: '24px', zIndex: 200,
-          background: accent, color: '#fff', border: 'none',
+          background: pillBg, color: pillText, border: 'none',
           borderRadius: '999px', padding: '13px 22px',
           fontSize: '15px', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
           boxShadow: '0 4px 14px rgba(0,0,0,0.22)',

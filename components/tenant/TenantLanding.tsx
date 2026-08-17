@@ -205,7 +205,7 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
       </section>
 
       {/* Scoped to this tenant's catalog and chrome. */}
-      <AskLibrary basePath={home} surface={tenant.slug} accent={tenant.primary} />
+      <AskLibrary basePath={home} surface={tenant.slug} accent={tenant.primary} pillBg={tenant.primary} pillText="#fff" />
     </div>
   );
 }
