@@ -48,4 +48,4 @@ No Tailwind or CSS modules — components use inline `style` props referencing C
 
 ## Layout structure
 
-`app/layout.tsx` renders the Header globally. The `(main)` route group's layout adds Partners + Footer, so pages outside it (e.g. `app/resource/[slug]`) render without them.
+`app/layout.tsx` renders the Header globally. The `(main)` route group's layout adds Partners + Footer. Pages outside it (e.g. `app/resource/[slug]`, `app/course`) get the slim `ShellFooter` bar instead (8-11-26 webinar shell mockup); tenant resource/course pages render `TenantShellFooter` in their own colours.
