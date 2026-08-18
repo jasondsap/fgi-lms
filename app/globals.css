@@ -69,7 +69,8 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* Tenant portal rich-text blocks (dangerouslySetInnerHTML content) */
 .tenant-contact p { margin: 0 0 2px; }
-.tenant-contact a { color: #ffffff; text-decoration: underline; }
+/* No static underline — matches the 8-17 FGI footer treatment. */
+.tenant-contact a { color: #ffffff; text-decoration: none; }
 .tenant-prose p { margin: 0 0 0.9rem; }
 .tenant-prose p:last-child { margin-bottom: 0; }
 .tenant-prose a { color: inherit; text-decoration: underline; font-weight: 700; }
