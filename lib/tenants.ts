@@ -88,6 +88,14 @@ export interface TenantV2 {
   /** Header/footer logo treatment — Colorado boxes its mark on white. */
   logoOnWhite: boolean;
   /**
+   * 8-17-26 Colorado mockup: the black-bordered full-colour mark sits on a
+   * pale-yellow field at the left of the header/footers, and the brand-navy
+   * content bar gets a pill-rounded left cap sweeping around it. When set,
+   * the header and both footers use this treatment and `logo` below replaces
+   * the tenant's default mark in the chrome.
+   */
+  lobe?: { bg: string; logo: string };
+  /**
    * Footer mark. `displayWidth` is the rendered width; `width`/`height` are the
    * asset's intrinsic dimensions for next/image.
    */
@@ -233,6 +241,10 @@ const TENANTS: Record<string, TenantConfig> = {
         ring:  { cx: 209, cy: 178, d: 287 },
       },
       logoOnWhite: false,
+      // Pale yellow measured off "Rounded Yello colorado Logo.png" (8-17-26);
+      // deliberately lighter than the #ffd100 accent so the mark's own yellow
+      // house still separates from the field.
+      lobe: { bg: '#ffe673', logo: '/images/tenants/colorado/logo-bordered.webp' },
       footerLogo: {
         src: '/images/tenants/colorado/logo-white.webp',
         width: 600, height: 447, displayWidth: '230px',
