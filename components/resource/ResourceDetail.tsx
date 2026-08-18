@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { authEnabled, getSession, signIn } from '@/auth';
 import CategoryImage from '@/components/library/CategoryImage';
 import CourseDetail from '@/components/resource/CourseDetail';
-import DetailFooter from '@/components/resource/DetailFooter';
 import PdfDetail from '@/components/resource/PdfDetail';
 import PdfViewer from '@/components/resource/PdfViewer';
 import PodcastDetail from '@/components/resource/PodcastDetail';
@@ -60,7 +59,6 @@ export default async function ResourceDetail(
     return (
       <>
         <WebinarDetail resource={resource} surface={surface} />
-        <DetailFooter />
       </>
     );
   }
@@ -71,7 +69,6 @@ export default async function ResourceDetail(
     return (
       <>
         <PodcastDetail resource={resource} surface={surface} searchParams={searchParams} />
-        <DetailFooter />
       </>
     );
   }
@@ -81,7 +78,6 @@ export default async function ResourceDetail(
     return (
       <>
         <CourseDetail resource={resource} surface={surface} />
-        <DetailFooter />
       </>
     );
   }
@@ -112,7 +108,6 @@ export default async function ResourceDetail(
     return (
       <>
         <PdfDetail resource={resource} surface={surface} />
-        <DetailFooter />
       </>
     );
   }
@@ -334,7 +329,6 @@ export default async function ResourceDetail(
         </div>
       </div>
 
-      <DetailFooter />
     </div>
   );
 }

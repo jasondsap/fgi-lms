@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import CourseView from '@/components/course/CourseView';
+import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { tenantSurface } from '@/lib/surface';
 
 // Every request must re-check the learner's Moodle completion state
@@ -10,5 +11,10 @@ export default function TenantCoursePage(
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
-  return <CourseView slug={params.slug} surface={surface} />;
+  return (
+    <>
+      <CourseView slug={params.slug} surface={surface} />
+      <TenantShellFooter tenant={surface.tenant!} />
+    </>
+  );
 }

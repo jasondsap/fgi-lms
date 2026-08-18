@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import ResourceDetail from '@/components/resource/ResourceDetail';
+import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { tenantSurface } from '@/lib/surface';
 
 export default function TenantResourcePage(
@@ -12,5 +13,10 @@ export default function TenantResourcePage(
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
-  return <ResourceDetail slug={params.slug} surface={surface} searchParams={searchParams} />;
+  return (
+    <>
+      <ResourceDetail slug={params.slug} surface={surface} searchParams={searchParams} />
+      <TenantShellFooter tenant={surface.tenant!} />
+    </>
+  );
 }
