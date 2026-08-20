@@ -115,6 +115,16 @@ export async function getPublicResources(
   const isDefaultView = typeArr.length === 0 && !search && !duration
     && audienceArr.length === 0 && topicArr.length === 0;
 
+  // A video-only filter (the tenants' "Required Videos") is a certification
+  // sequence, not a feed: the CORR/SCARR series must list Part 1 → 7, and all
+  // fourteen parts share one bulk-load published_at, so newest-first would
+  // return them in arbitrary id order. The part number is parsed off the
+  // title; non-series videos sort after the parts. Hardcoded SQL fragment —
+  // no user input reaches it (see the DURATION_CLAUSES rule).
+  const videoSort = !isDefaultView && typeArr.length === 1 && typeArr[0] === 'video'
+    ? `(substring(title from '^Part ([0-9]+) of [0-9]+'))::int ASC NULLS LAST, title ASC, `
+    : '';
+
   const seedPh   = isDefaultView ? bind(dailySeed()) : null;
   const limitPh  = bind(per_page);
   const offsetPh = bind(offset);
@@ -156,7 +166,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY published_at DESC NULLS LAST, id DESC
+    ORDER BY ${videoSort}published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 
@@ -340,6 +350,46 @@ export async function getOtherEpisodes(
     LIMIT ${limit}
   `;
   return rows as unknown as Array<{ slug: string; title: string }>;
+}
+
+/**
+ * Sibling parts of a numbered video series, for the video shell's "This
+ * series" rail block. The 14 CORR/SCARR certification videos all share the
+ * exact same title ("Part N of 7: So You Want to Be an Owner or Operator"),
+ * so without this a viewer on Part 3 has no way to reach Part 4 short of the
+ * library. Series membership = same "of N" total + same title suffix + same
+ * surface (CORR is colorado-only and SCARR scarr-only, so the two recordings
+ * never mix). Returns [] for non-series videos or a series of one.
+ */
+export interface VideoSeriesItem { slug: string; title: string; part: number }
+
+const SERIES_TITLE = /^Part (\d+) of (\d+):\s*(.+)$/;
+
+export async function getVideoSeries(
+  title: string, tenantSlug: string,
+): Promise<VideoSeriesItem[]> {
+  const m = SERIES_TITLE.exec(title);
+  if (!m) return [];
+  const rows = await sql`
+    SELECT r.slug, r.title
+    FROM resources r
+    WHERE r.type = 'video'
+      AND r.published = TRUE
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+      )
+  `;
+  const items: VideoSeriesItem[] = [];
+  for (const r of rows as Array<{ slug: string; title: string }>) {
+    const mm = SERIES_TITLE.exec(r.title);
+    if (mm && mm[2] === m[2] && mm[3] === m[3]) {
+      items.push({ slug: r.slug, title: r.title, part: Number(mm[1]) });
+    }
+  }
+  items.sort((a, b) => a.part - b.part);
+  return items.length > 1 ? items : [];
 }
 
 /**
