@@ -43,3 +43,36 @@ export default function PresenterBio({ bio, accent }: { bio: string; accent: str
     </div>
   );
 }
+
+/**
+ * The podcast shell's "Your Host" treatment (8-18-26 mockup): the bio is not
+ * shown at all until "Read Bio" is clicked — unlike the clamp above, which
+ * always shows the first lines. Multi-paragraph, since Tony's bio is two.
+ */
+export function CollapsedBio({ paragraphs, accent }: { paragraphs: string[]; accent: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          padding: 0, border: 'none', background: 'none',
+          color: accent, fontWeight: 700, fontSize: '15px',
+          fontFamily: 'inherit', cursor: 'pointer',
+        }}
+      >
+        {open ? 'Close Bio' : 'Read Bio'}
+      </button>
+      {open && paragraphs.map((para, i) => (
+        <p key={i} style={{
+          fontSize: '14px', lineHeight: 1.65, color: 'var(--text-secondary)',
+          margin: '10px 0 0',
+        }}>
+          {para}
+        </p>
+      ))}
+    </div>
+  );
+}

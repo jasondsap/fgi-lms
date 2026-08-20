@@ -343,6 +343,29 @@ export async function getOtherEpisodes(
 }
 
 /**
+ * Presigned audio for one podcast row by slug — how an episode page gets the
+ * Trailer's MP3 so the Trailer button can play it in place (8-18-26 shell)
+ * instead of navigating. Same 6-hour signing rule as the episode's own audio,
+ * same invariant: the s3_key never leaves the server.
+ */
+export async function getPodcastAudioUrl(slug: string): Promise<string | null> {
+  const rows = await sql`
+    SELECT s3_key FROM resources
+    WHERE slug = ${slug} AND type = 'podcast'
+      AND published = TRUE AND s3_key IS NOT NULL
+    LIMIT 1
+  `;
+  const key = (rows[0] as { s3_key?: string } | undefined)?.s3_key;
+  if (!key) return null;
+  try {
+    return await getPresignedUrl(key, 6 * 3600);
+  } catch (e) {
+    console.error('Presigned URL error:', e);
+    return null;
+  }
+}
+
+/**
  * The newest published webinar on the FGI surface — what the "FGI's Latest
  * Webinar" tile points at on the homepage and on both tenant landing pages.
  *

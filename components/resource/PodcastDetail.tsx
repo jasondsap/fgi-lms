@@ -1,21 +1,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
-import AudioPlayer, { ListenNowButton } from '@/components/resource/AudioPlayer';
+import AudioPlayer, { ListenNowButton, TrailerButton } from '@/components/resource/AudioPlayer';
 import PodcastInfoModal from '@/components/resource/PodcastInfoModal';
+import { CollapsedBio } from '@/components/resource/PresenterBio';
 import PresenterCard from '@/components/resource/PresenterCard';
-import { getOtherEpisodes } from '@/lib/resources';
+import { getOtherEpisodes, getPodcastAudioUrl } from '@/lib/resources';
 import {
   ABOUT_THE_PODCAST, PODCAST_EMAIL, PODCAST_FEEDBACK_FORM_URL, PODCAST_HOST,
-  PODCAST_PLATFORMS, SHOW_TAGLINE_LINES, SHOW_TITLE, TRAILER_SLUG, WEBBERIZED,
-  WHAT_IS_A_RECOVERY_ECOSYSTEM, WHO_SHOULD_LISTEN,
+  PODCAST_PLATFORMS, SHOW_LOGO, SHOW_TAGLINE, SHOW_TITLE, TRAILER_SLUG, WEBBERIZED,
 } from '@/lib/podcast';
 import type { Surface } from '@/lib/surface';
 import type { Resource } from '@/types';
 
 /** Same drawing as the library card and the mockup's headphones-and-mic art. */
 const PODCAST_ILLUSTRATION = '/images/category-cards/podcast.webp';
-const COVER_ART = '/images/podcast/cover-art.webp';
 
 /**
  * Release dates come back as a Date on one driver path and 'YYYY-MM-DD…' on
@@ -44,36 +43,32 @@ const PLATFORM_ICONS: Record<string, React.ReactNode> = {
 };
 
 /**
- * Podcast episode page — Jennifer's 8-12-26 "Podcast shell".
+ * Podcast episode page — Jennifer's 8-18-26 "Podcast shell" (supersedes the
+ * 8-12 version). The masthead is the new RER banner logo instead of a text
+ * title + square cover art; the tagline is one line; and "About The Podcast"
+ * and "Trailer" sit side by side beneath it. The player stays hidden until
+ * the visitor asks to hear something — "or, Listen Now!" plays the episode
+ * and "Trailer" plays the trailer audio right here (it no longer links to
+ * the trailer's own page). Both behaviors are Jason's, 8-19.
  *
- * Show-level furniture (title, tagline, host, info modals, platform box,
+ * Show-level furniture (logo, tagline, host, About copy, platform box,
  * production credit) comes from lib/podcast.ts and is identical on every
  * episode; the episode itself supplies the heading, description, audio and
- * guest. The mockup has no player — its "Listen Now" is aspirational — but
- * the audio is ours and lives in S3, so the episode plays right on the page
- * (Jason, 8-15).
+ * guest.
  */
 export default async function PodcastDetail(
-  { resource, surface, searchParams }: {
-    resource: Resource;
-    surface: Surface;
-    searchParams?: Record<string, string | string[] | undefined>;
-  },
+  { resource, surface }: { resource: Resource; surface: Surface },
 ) {
-  const guests   = resource.presenters ?? [];
-  const released = formatReleaseDate(resource.event_date ?? resource.published_at);
-  const episodes = await getOtherEpisodes(resource.id, surface.key, 6);
+  const guests    = resource.presenters ?? [];
+  const released  = formatReleaseDate(resource.event_date ?? resource.published_at);
+  const isTrailer = resource.slug === TRAILER_SLUG;
+  const [episodes, trailerSrc] = await Promise.all([
+    getOtherEpisodes(resource.id, surface.key, 6),
+    // On the trailer's own page the episode audio IS the trailer, so there is
+    // no second track to fetch (and no Trailer button either).
+    isTrailer ? Promise.resolve(null) : getPodcastAudioUrl(TRAILER_SLUG),
+  ]);
   const platforms = PODCAST_PLATFORMS.filter((p) => p.url);
-
-  // The Trailer button sends ?from=<episode>&autoplay=1 so the trailer page
-  // can offer the way back and start playing on arrival. `from` is only ever
-  // used if it names another episode on this surface — anything else in the
-  // query string is ignored rather than trusted.
-  const fromParam = typeof searchParams?.from === 'string' ? searchParams.from : '';
-  const fromEpisode = episodes.find((e) => e.slug === fromParam) ?? null;
-  const autoplay = searchParams?.autoplay === '1';
-  // "Episode 1" / "Opening Episode" from the title's own label, for the button.
-  const fromLabel = fromEpisode?.title.match(/^(Episode \d+|Opening Episode)/)?.[1] ?? 'Episode';
 
   // The docx titles carry their own label ("Episode 1: Health, Housing and
   // Hope: …"), so the heading is simply the title.
@@ -91,87 +86,64 @@ export default async function PodcastDetail(
           <span>{resource.title}</span>
         </nav>
 
-        {/* ── Show masthead: title + tagline left, cover art + trailer right ── */}
+        {/* ── One grid: masthead + episode down the left; headphones art +
+            action rail stacked down the right, so the rail rides up level
+            with the masthead as in the mockup (Jason, 8-19 — two stacked
+            grids used to hold the rail below the whole masthead). ── */}
         <div className="pdf-shell-grid">
           <div>
-            <h1 style={{
-              fontSize: '45px', lineHeight: 1.1, fontWeight: 700,
-              fontStretch: '75%', color: 'var(--text-primary)',
-            }}>
-              {SHOW_TITLE}
-            </h1>
+            <Image
+              src={SHOW_LOGO}
+              alt={SHOW_TITLE}
+              width={852} height={432}
+              priority
+              style={{
+                width: '100%', maxWidth: '543px', height: 'auto',
+                borderRadius: 'var(--radius-lg)', display: 'block',
+              }}
+            />
 
             <p style={{
-              fontSize: '28px', lineHeight: 1.35, fontWeight: 700, fontStyle: 'italic',
+              fontSize: '29px', lineHeight: 1.25, fontWeight: 700, fontStyle: 'italic',
               fontStretch: '75%', color: 'var(--fgi-navy)',
-              margin: '1rem 0 1.25rem',
+              margin: '1.25rem 0 1.5rem', maxWidth: '640px',
             }}>
-              {SHOW_TAGLINE_LINES.map((line, i) => (
-                <span key={i} style={{ display: 'block' }}>{line}</span>
-              ))}
+              {SHOW_TAGLINE}
             </p>
 
-            <PodcastInfoModal
-              label="About The Podcast"
-              variant="amber"
-              sections={ABOUT_THE_PODCAST}
-            />
-          </div>
-
-          <div style={{
-            display: 'flex', gap: '1.5rem', alignItems: 'flex-start',
-            justifyContent: 'center',
-          }}>
-            <Image
-              src={COVER_ART}
-              alt="Recovery Ecosystem Radio cover art"
-              width={200} height={200}
-              style={{ width: '200px', height: '200px', borderRadius: 'var(--radius-md)' }}
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={PODCAST_ILLUSTRATION} alt="" style={{ width: '150px', height: 'auto' }} />
-              {resource.slug !== TRAILER_SLUG ? (
-                <Link
-                  href={`${surface.basePath}/resource/${TRAILER_SLUG}?from=${resource.slug}&autoplay=1`}
-                  style={{
-                    background: 'var(--fgi-amber)', color: 'var(--fgi-navy)',
-                    fontWeight: 700, fontStyle: 'italic', fontSize: '19px',
-                    borderRadius: 'var(--radius-md)', padding: '6px 26px',
-                    textDecoration: 'none',
-                  }}
-                >
-                  Trailer
-                </Link>
-              ) : fromEpisode && (
-                /* The way back to the episode the Trailer button was clicked
-                   on — same slot, same gold treatment. */
-                <Link
-                  href={`${surface.basePath}/resource/${fromEpisode.slug}`}
-                  style={{
-                    background: 'var(--fgi-amber)', color: 'var(--fgi-navy)',
-                    fontWeight: 700, fontStyle: 'italic', fontSize: '17px',
-                    borderRadius: 'var(--radius-md)', padding: '6px 18px',
-                    textDecoration: 'none', whiteSpace: 'nowrap',
-                  }}
-                >
-                  ← Back to {fromLabel}
-                </Link>
-              )}
+            <div style={{
+              display: 'flex', gap: '18px', alignItems: 'center',
+              justifyContent: 'center', maxWidth: '543px', flexWrap: 'wrap',
+            }}>
+              <PodcastInfoModal
+                label="About The Podcast"
+                variant="amber"
+                sections={ABOUT_THE_PODCAST}
+              />
+              {/* Plays the trailer audio in place — hidden on the trailer's
+                  own page, where Listen Now already plays it. */}
+              {!isTrailer && trailerSrc && <TrailerButton />}
             </div>
-          </div>
-        </div>
-
-        {/* ── Episode + action rail ── */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '2.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* ── The episode — continues the left column ── */}
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '1.5rem',
+              marginTop: '2.5rem',
+            }}>
             <div>
-              <h2 style={{
+              <h1 style={{
                 fontSize: '30px', lineHeight: 1.2, fontWeight: 700,
                 fontStretch: '75%', color: 'var(--text-primary)',
               }}>
                 {resource.title}
-              </h2>
+              </h1>
+
+              {/* The mockup's "ID: yk3232" is filler; no podcast row carries a
+                  course code today, so this renders only if one ever does. */}
+              {resource.course_code && (
+                <div style={{ fontSize: '15px', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                  ID: {resource.course_code}
+                </div>
+              )}
 
               {resource.description && (
                 <div style={{ marginTop: '1.25rem' }}>
@@ -193,21 +165,26 @@ export default async function PodcastDetail(
               )}
             </div>
 
-            {/* The episode itself. download_url is the presigned MP3. */}
-            {resource.download_url && (
-              <AudioPlayer src={resource.download_url} title={resource.title} autoplay={autoplay} />
-            )}
+            {/* The player — invisible until Listen Now or Trailer is clicked
+                (8-18-26 shell). download_url is the presigned episode MP3. */}
+            <AudioPlayer
+              episode={resource.download_url
+                ? { src: resource.download_url, title: resource.title }
+                : null}
+              trailer={trailerSrc ? { src: trailerSrc, title: 'Trailer' } : null}
+            />
 
             {guests.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
             ))}
 
-            {/* Your Host — identical on every episode, from lib/podcast.ts */}
+            {/* Your Host — identical on every episode, from lib/podcast.ts.
+                The 8-18 mockup hides the bio behind "Read Bio". */}
             <div style={{
               background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
               padding: '1.5rem 1.75rem',
             }}>
-              <div style={{ fontSize: '20px', fontWeight: 700, marginBottom: '1rem' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, marginBottom: '1rem' }}>
                 Your Host
               </div>
               <div style={{
@@ -220,33 +197,34 @@ export default async function PodcastDetail(
                   style={{ width: '150px', height: 'auto', borderRadius: 'var(--radius-sm)' }}
                 />
                 <div>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-body-dark)' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-body-dark)' }}>
                     {PODCAST_HOST.name}
                   </div>
                   <div style={{
-                    fontSize: '14px', fontWeight: 600, color: surface.primary,
-                    margin: '2px 0 10px',
+                    fontSize: '15px', fontWeight: 700, color: 'var(--text-body-dark)',
+                    margin: '2px 0 12px',
                   }}>
                     {PODCAST_HOST.title}
                   </div>
-                  {PODCAST_HOST.bio.map((para, i) => (
-                    <p key={i} style={{
-                      fontSize: '14px', lineHeight: 1.65, color: 'var(--text-secondary)',
-                      marginBottom: i < PODCAST_HOST.bio.length - 1 ? '0.75rem' : 0,
-                    }}>
-                      {para}
-                    </p>
-                  ))}
+                  <CollapsedBio paragraphs={PODCAST_HOST.bio} accent={surface.primary} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── Action rail ── */}
-          <aside style={{
-            background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
-            padding: '2rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',
-          }}>
+          </div>
+
+          {/* ── Right column: headphones art over the action rail ── */}
+          <aside style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={PODCAST_ILLUSTRATION} alt="" style={{ width: '100%', maxWidth: '320px', height: 'auto' }} />
+            </div>
+
+            <div style={{
+              background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
+              padding: '2rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',
+            }}>
             {/* Find Us On */}
             <div style={{
               background: 'var(--fgi-navy)', borderRadius: 'var(--radius-lg)',
@@ -281,14 +259,6 @@ export default async function PodcastDetail(
                 </div>
               )}
             </div>
-
-            <PodcastInfoModal
-              label="Who should listen"
-              title="Who Should Listen & Why"
-              variant="navy"
-              sections={WHO_SHOULD_LISTEN}
-              fullWidth
-            />
 
             {(resource.duration_minutes || released) && (
               <div style={{
@@ -335,16 +305,21 @@ export default async function PodcastDetail(
               </div>
             )}
 
-            {/* Share your thoughts — Tony's inbox and Jennifer's Monday form */}
+            {/* Share Your Feedback — the mockup's gold button opens Jennifer's
+                Monday form; Tony's inbox and the form link sit beneath it. */}
             <div>
-              <div style={{
-                ...RAIL_HEADING, display: 'inline', background: 'var(--fgi-amber)',
-                padding: '2px 6px', boxDecorationBreak: 'clone',
-                WebkitBoxDecorationBreak: 'clone',
-              }}>
-                Share your Thoughts &amp; Ideas with Tony:
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+              <a
+                href={PODCAST_FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: 'block', textAlign: 'center',
+                  background: 'var(--fgi-amber)', color: '#ffffff',
+                  fontWeight: 700, fontSize: '18px', textDecoration: 'none',
+                  borderRadius: 'var(--radius-md)', padding: '12px 16px',
+                }}
+              >
+                Share Your Feedback
+              </a>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
                 <a
                   href={`mailto:${PODCAST_EMAIL}`}
                   style={{
@@ -375,13 +350,6 @@ export default async function PodcastDetail(
                 </a>
               </div>
             </div>
-
-            <PodcastInfoModal
-              label="What is a Recovery Ecosystem?"
-              variant="sky"
-              sections={WHAT_IS_A_RECOVERY_ECOSYSTEM}
-              fullWidth
-            />
 
             {/* Not in the mockup, but the shell is one episode deep and the
                 library filter is the only other way between episodes. */}
@@ -439,6 +407,7 @@ export default async function PodcastDetail(
             }}>
               ← Back to Library
             </Link>
+            </div>
           </aside>
         </div>
       </div>

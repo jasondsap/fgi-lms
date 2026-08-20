@@ -4,18 +4,13 @@ import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { tenantSurface } from '@/lib/surface';
 
 export default function TenantResourcePage(
-  { params, searchParams }: {
-    params: { tenant: string; slug: string };
-    // The podcast shell reads ?from= and ?autoplay= (Trailer round-trip);
-    // every other detail page ignores the query string.
-    searchParams?: Record<string, string | string[] | undefined>;
-  },
+  { params }: { params: { tenant: string; slug: string } },
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
   return (
     <>
-      <ResourceDetail slug={params.slug} surface={surface} searchParams={searchParams} />
+      <ResourceDetail slug={params.slug} surface={surface} />
       <TenantShellFooter tenant={surface.tenant!} />
     </>
   );

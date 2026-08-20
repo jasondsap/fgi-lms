@@ -2,18 +2,28 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * The episode player on the podcast shell. The MP3 lives in the private S3
- * bucket and arrives as a presigned URL (signed for 6 hours in lib/resources.ts
+ * The episode player on the podcast shell. The MP3s live in the private S3
+ * bucket and arrive as presigned URLs (signed for 6 hours in lib/resources.ts
  * so a listener who walks away mid-episode can still finish it).
  *
- * The rail's "or, Listen Now!" button lives in a different grid cell, so the
- * two talk over a window event rather than through React state.
+ * 8-18-26 shell: the player renders NOTHING until the visitor asks to hear
+ * something — "or, Listen Now!" plays the episode, the masthead's "Trailer"
+ * button plays the trailer audio right here (it used to navigate to the
+ * trailer's own page). The buttons live in different grid cells from the
+ * player, so they talk over window events rather than through React state.
  */
 
-/** Fired by ListenNowButton; the player scrolls itself into view and plays. */
+/** Fired by ListenNowButton; the player reveals itself and plays the episode. */
 const LISTEN_NOW_EVENT = 'rer-listen-now';
+/** Fired by TrailerButton; the player reveals itself and plays the trailer. */
+const PLAY_TRAILER_EVENT = 'rer-play-trailer';
 
 const RATES = [1, 1.25, 1.5, 2];
+
+interface Track {
+  src: string;
+  title: string;
+}
 
 function fmt(seconds: number): string {
   if (!Number.isFinite(seconds)) return '0:00';
@@ -32,30 +42,52 @@ const ROUND = {
 };
 
 export default function AudioPlayer(
-  { src, title, autoplay = false }: { src: string; title: string; autoplay?: boolean },
+  { episode, trailer }: { episode: Track | null; trailer: Track | null },
 ) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wrapRef  = useRef<HTMLDivElement>(null);
+  // null = the player has not been asked for anything yet and stays hidden.
+  const [active,   setActive]   = useState<'episode' | 'trailer' | null>(null);
   const [playing,  setPlaying]  = useState(false);
   const [time,     setTime]     = useState(0);
   const [duration, setDuration] = useState(0);
   const [rate,     setRate]     = useState(1);
 
   useEffect(() => {
-    const onListenNow = () => {
-      wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      audioRef.current?.play().catch(() => { /* browser blocked autoplay */ });
+    const start = (which: 'episode' | 'trailer') => {
+      setActive((prev) => {
+        if (prev !== which) { setTime(0); setDuration(0); }
+        return which;
+      });
     };
+    const onListenNow = () => episode && start('episode');
+    const onTrailer   = () => trailer && start('trailer');
     window.addEventListener(LISTEN_NOW_EVENT, onListenNow);
-    return () => window.removeEventListener(LISTEN_NOW_EVENT, onListenNow);
-  }, []);
+    window.addEventListener(PLAY_TRAILER_EVENT, onTrailer);
+    return () => {
+      window.removeEventListener(LISTEN_NOW_EVENT, onListenNow);
+      window.removeEventListener(PLAY_TRAILER_EVENT, onTrailer);
+    };
+  }, [episode, trailer]);
 
-  // ?autoplay=1 — the Trailer button asks for playback on arrival. Best
-  // effort: a same-site click usually satisfies Chrome's autoplay policy, but
-  // when it doesn't, the rejection is swallowed and the player just sits ready.
+  // Runs after the reveal/switch has rendered, so the <audio> src is current.
+  // The play() came from a real click, so autoplay policy is satisfied; a
+  // rejection is swallowed and the player just sits ready.
   useEffect(() => {
-    if (autoplay) audioRef.current?.play().catch(() => { /* blocked */ });
-  }, [autoplay]);
+    if (!active) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.playbackRate = rate;
+    audio.play().catch(() => { /* browser blocked playback */ });
+    wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // rate is applied inline on track switches; cycleRate handles the rest.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  if (!active) return null;
+
+  const track = active === 'trailer' ? trailer : episode;
+  if (!track) return null;
 
   const skip = (delta: number) => {
     const audio = audioRef.current;
@@ -78,8 +110,9 @@ export default function AudioPlayer(
       }}
     >
       <audio
+        key={active}
         ref={audioRef}
-        src={src}
+        src={track.src}
         preload="metadata"
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
@@ -89,12 +122,23 @@ export default function AudioPlayer(
         onDurationChange={(e) => setDuration(e.currentTarget.duration)}
       />
 
+      {/* Which audio this is — matters once the Trailer plays on an episode
+          page, where two different tracks share this one panel. */}
+      {trailer && episode && (
+        <div style={{
+          fontSize: '13px', fontWeight: 700, letterSpacing: '0.06em',
+          textTransform: 'uppercase', color: 'var(--fgi-gold)', marginBottom: '10px',
+        }}>
+          {active === 'trailer' ? 'Trailer' : 'Now Playing'}
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
         {/* Play / pause */}
         <button
           type="button"
           onClick={() => (playing ? audioRef.current?.pause() : audioRef.current?.play())}
-          aria-label={playing ? `Pause ${title}` : `Play ${title}`}
+          aria-label={playing ? `Pause ${track.title}` : `Play ${track.title}`}
           style={{ ...ROUND, width: '58px', height: '58px', background: 'var(--fgi-gold)', color: 'var(--fgi-navy)' }}
         >
           {playing ? (
@@ -187,6 +231,28 @@ export function ListenNowButton() {
       }}
     >
       or, Listen Now!
+    </button>
+  );
+}
+
+/**
+ * "Trailer" — sits beside "About The Podcast" in the masthead (8-18-26).
+ * Plays the trailer audio in place; it no longer links to the trailer's page.
+ * Styled to match PodcastInfoModal's amber button so the pair reads as one row.
+ */
+export function TrailerButton() {
+  return (
+    <button
+      type="button"
+      onClick={() => window.dispatchEvent(new Event(PLAY_TRAILER_EVENT))}
+      style={{
+        background: 'var(--fgi-amber)', color: 'var(--fgi-navy)',
+        fontWeight: 700, fontStyle: 'italic', fontSize: '19px',
+        borderRadius: 'var(--radius-md)', padding: '8px 26px',
+        border: 'none', fontFamily: 'inherit',
+      }}
+    >
+      Trailer
     </button>
   );
 }
