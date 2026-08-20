@@ -177,9 +177,9 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Col 3 — office locations */}
+            {/* Col 3 — office location (Florida removed per Jason, 8-20-26) */}
             <div style={{ fontSize: '16px', lineHeight: 1.7, justifySelf: 'end' }}>
-              <div style={{ marginBottom: '1.25rem' }}>
+              <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <InlineGlyph path={MAP_PIN} />
                   <span>Kentucky Location:</span>
@@ -199,16 +199,6 @@ export default function Footer() {
                   <InlineGlyph path={MAIL} />
                   info@fletchergroup.org
                 </a>
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <InlineGlyph path={MAP_PIN} />
-                  <span>Florida Location:</span>
-                </div>
-                <div style={{ paddingLeft: '24px' }}>
-                  <div>423 E Macewen Drive</div>
-                  <div>Osprey, Florida 34229</div>
-                </div>
               </div>
             </div>
           </div>
