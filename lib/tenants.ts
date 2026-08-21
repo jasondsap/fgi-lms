@@ -427,9 +427,9 @@ const TENANTS: Record<string, TenantConfig> = {
         post: { label: 'Post-Certification Requirements' },
       },
       heroBg: '#f6f7f8',
-      // Generated dot-spray SVG — the mockup's own dots image bakes in the
-      // white card and its shadow, so it can't be reused as a background.
-      heroDots: '/images/tenants/scarr/hero-dots.svg',
+      // Jennifer's own halftone ring ("scarr - f5d300.png", filename is the
+      // hex), alpha-cropped so the CSS width IS the ring diameter.
+      heroDots: '/images/tenants/scarr/hero-ring.webp',
       highlightTileBg: '#fffdf4',
       supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact Us' },
       certBand: {

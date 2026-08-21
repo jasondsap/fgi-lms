@@ -133,12 +133,14 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 bubbles showing on BOTH sides of the card (Jennifer's mockup;
                 Jason, 8-21: card ~15% narrower, bubbles larger and left). */}
             <div style={{ position: 'relative', minHeight: '560px' }}>
+              {/* Ring centered behind the card — its open side sits upper-left
+                  and the dense arc lower-right, as in the mockup. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={v3.heroDots} alt=""
                 style={{
-                  position: 'absolute', top: '4px', left: '-70px',
-                  width: '620px', height: 'auto', pointerEvents: 'none',
+                  position: 'absolute', top: '-40px', left: '60px',
+                  width: '525px', height: 'auto', pointerEvents: 'none',
                 }}
               />
               <div style={{
