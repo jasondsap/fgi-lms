@@ -15,6 +15,9 @@ import {
   RespondToAuthChallengeCommand,
   ForgotPasswordCommand,
   ConfirmForgotPasswordCommand,
+  AdminCreateUserCommand,
+  AdminSetUserPasswordCommand,
+  AdminDeleteUserCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const REGION = process.env.AWS_REGION ?? 'us-east-2';
@@ -37,6 +40,24 @@ function secretHash(username: string): string {
   return crypto.createHmac('sha256', secret).update(username + clientId()).digest('base64');
 }
 
+/** The pool id lives inside COGNITO_ISSUER — no separate env var needed. */
+function poolId(): string {
+  const issuer = process.env.COGNITO_ISSUER;
+  const id = issuer?.split('/').pop();
+  if (!id) throw new Error('COGNITO_ISSUER is not set');
+  return id;
+}
+
+/**
+ * The pool's live password policy (checked 8-20-26): min 8, upper, lower,
+ * number, symbol. The regex mirrors it so weak passwords fail fast with a
+ * clear message instead of a Cognito round-trip.
+ */
+export const PASSWORD_RULES =
+  'At least 8 characters, with upper and lower case letters, a number, and a symbol.';
+export const PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 /** Machine-readable failure kinds the UI maps to friendly copy. */
 export type CognitoFailure =
   | 'BAD_CREDENTIALS'
@@ -44,6 +65,7 @@ export type CognitoFailure =
   | 'CODE_MISMATCH'
   | 'CODE_EXPIRED'
   | 'WEAK_PASSWORD'
+  | 'EMAIL_TAKEN'
   | 'RATE_LIMITED'
   | 'UNKNOWN';
 
@@ -57,6 +79,8 @@ export class CognitoAuthError extends Error {
 function mapError(e: unknown): CognitoAuthError {
   const name = (e as { name?: string })?.name ?? '';
   switch (name) {
+    case 'UsernameExistsException':
+      return new CognitoAuthError('EMAIL_TAKEN');
     case 'NotAuthorizedException':
     case 'UserNotFoundException':
       return new CognitoAuthError('BAD_CREDENTIALS');
@@ -135,6 +159,56 @@ export function decodeIdToken(idToken: string): {
     given_name: payload.given_name ?? null,
     family_name: payload.family_name ?? null,
   };
+}
+
+/**
+ * One-shot signup for the registration modal (phase 3): create the account
+ * already confirmed — no verification email, per Jason's 8-20 decision. Needs
+ * IAM cognito-idp Admin* permissions on the pool (unlike the sign-in calls).
+ *
+ * AdminCreateUser leaves the account in FORCE_CHANGE_PASSWORD, so
+ * AdminSetUserPassword(Permanent) immediately finishes it; if that second
+ * call fails the half-made account is deleted rather than left stranded.
+ */
+export async function createConfirmedUser(input: {
+  email: string; password: string; givenName: string; familyName: string;
+}): Promise<{ sub: string }> {
+  const { email, password, givenName, familyName } = input;
+  let created = false;
+  try {
+    const res = await client().send(new AdminCreateUserCommand({
+      UserPoolId: poolId(),
+      Username: email,
+      MessageAction: 'SUPPRESS',
+      UserAttributes: [
+        { Name: 'email', Value: email },
+        { Name: 'email_verified', Value: 'true' },
+        { Name: 'given_name', Value: givenName },
+        { Name: 'family_name', Value: familyName },
+      ],
+    }));
+    created = true;
+    const sub = res.User?.Attributes?.find((a) => a.Name === 'sub')?.Value;
+    if (!sub) throw new CognitoAuthError('UNKNOWN', 'no sub on created user');
+
+    await client().send(new AdminSetUserPasswordCommand({
+      UserPoolId: poolId(),
+      Username: email,
+      Password: password,
+      Permanent: true,
+    }));
+    return { sub };
+  } catch (e) {
+    if (created) {
+      try {
+        await client().send(new AdminDeleteUserCommand({
+          UserPoolId: poolId(), Username: email,
+        }));
+      } catch { /* best effort — an orphan here is visible in the pool */ }
+    }
+    if (e instanceof CognitoAuthError) throw e;
+    throw mapError(e);
+  }
 }
 
 /**

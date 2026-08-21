@@ -70,6 +70,61 @@ export interface RegistrationInput {
 }
 
 /**
+ * One-shot registration (8-20-26 rebuild, phase 3): the Cognito account was
+ * just created, so this writes the whole profile — including which surface
+ * the person registered from — and marks registration complete in a single
+ * insert. ON CONFLICT covers a retry after a mid-flight failure.
+ */
+export async function createRegisteredUser(input: {
+  cognitoSub: string;
+  email: string;
+  givenName: string;
+  familyName: string;
+  organization: string;
+  state: string;
+  zip: string;
+  county: string;
+  roles: UserRole[];
+  roleOther: string | null;
+  registeredSurface: string;
+}): Promise<AppUser> {
+  const rows = await sql`
+    INSERT INTO users (
+      cognito_sub, email, given_name, family_name,
+      organization, state, zip, county, role_other,
+      registered_surface, registration_completed_at
+    ) VALUES (
+      ${input.cognitoSub}, ${input.email}, ${input.givenName}, ${input.familyName},
+      ${input.organization}, ${input.state}, ${input.zip}, ${input.county}, ${input.roleOther},
+      ${input.registeredSurface}, now()
+    )
+    ON CONFLICT (cognito_sub) DO UPDATE SET
+      email                     = EXCLUDED.email,
+      given_name                = EXCLUDED.given_name,
+      family_name               = EXCLUDED.family_name,
+      organization              = EXCLUDED.organization,
+      state                     = EXCLUDED.state,
+      zip                       = EXCLUDED.zip,
+      county                    = EXCLUDED.county,
+      role_other                = EXCLUDED.role_other,
+      registered_surface        = COALESCE(users.registered_surface, EXCLUDED.registered_surface),
+      registration_completed_at = COALESCE(users.registration_completed_at, now()),
+      updated_at                = now()
+    RETURNING *
+  `;
+  const user = rows[0] as AppUser;
+
+  await sql`DELETE FROM user_roles WHERE user_id = ${user.id}`;
+  for (const role of input.roles) {
+    await sql`
+      INSERT INTO user_roles (user_id, role) VALUES (${user.id}, ${role})
+      ON CONFLICT DO NOTHING
+    `;
+  }
+  return user;
+}
+
+/**
  * Has this user completed registration? Called on every page load for a
  * signed-in user, so it stays a single indexed lookup by primary key.
  */

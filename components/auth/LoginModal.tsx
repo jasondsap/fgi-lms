@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import {
   confirmResetAction, loginAction, requestResetAction,
 } from '@/components/auth/login-actions';
+import RegisterForm from '@/components/auth/RegisterForm';
 
 /**
  * On-site login (8-20-26 auth rebuild, phase 2) — replaces the redirect to
@@ -16,7 +17,7 @@ import {
  * PodcastInfoModal.
  */
 
-type View = 'login' | 'forgot' | 'reset';
+type View = 'login' | 'register' | 'forgot' | 'reset';
 
 const FIELD = {
   width: '100%', padding: '10px 12px', fontSize: '15px', fontFamily: 'inherit',
@@ -35,7 +36,7 @@ const PRIMARY_BTN = {
 } as const;
 
 export default function LoginModal(
-  { color = '#ffffff' }: { color?: string },
+  { color = '#ffffff', surface = 'fgi' }: { color?: string; surface?: string },
 ) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -103,9 +104,17 @@ export default function LoginModal(
 
   const TITLES: Record<View, string> = {
     login: 'Log In',
+    register: 'Create Your Account',
     forgot: 'Reset Your Password',
     reset: 'Enter Your Reset Code',
   };
+
+  const TAB = (active: boolean) => ({
+    flex: 1, padding: '9px 8px', fontSize: '14px', fontWeight: 700,
+    fontFamily: 'inherit', cursor: 'pointer',
+    border: 'none', borderBottom: `3px solid ${active ? 'var(--fgi-blue)' : 'transparent'}`,
+    background: 'none', color: active ? 'var(--fgi-blue)' : 'var(--text-muted)',
+  } as const);
 
   return (
     <>
@@ -137,7 +146,8 @@ export default function LoginModal(
         >
           <div style={{
             background: 'var(--card-bg)', borderRadius: 'var(--radius-lg)',
-            width: '100%', maxWidth: '420px', marginTop: '6vh',
+            width: '100%', maxWidth: view === 'register' ? '480px' : '420px',
+            marginTop: view === 'register' ? '2vh' : '6vh',
             boxShadow: '0 12px 40px rgba(0,0,0,0.3)', overflow: 'hidden',
           }}>
             <div style={{
@@ -161,6 +171,17 @@ export default function LoginModal(
                 ×
               </button>
             </div>
+
+            {(view === 'login' || view === 'register') && (
+              <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
+                <button type="button" style={TAB(view === 'login')} onClick={() => reset('login')}>
+                  Log In
+                </button>
+                <button type="button" style={TAB(view === 'register')} onClick={() => reset('register')}>
+                  New? Create Account
+                </button>
+              </div>
+            )}
 
             <div style={{ padding: '1.5rem 1.75rem 1.75rem' }}>
               {notice && (
@@ -207,6 +228,14 @@ export default function LoginModal(
                 </form>
               )}
 
+              {view === 'register' && (
+                <RegisterForm
+                  surface={surface}
+                  onSuccess={() => { setOpen(false); router.refresh(); }}
+                  switchToLogin={() => reset('login')}
+                />
+              )}
+
               {view === 'forgot' && (
                 <form onSubmit={(e) => { e.preventDefault(); submitForgot(); }}>
                   <p style={{ fontSize: '14px', lineHeight: 1.55, color: 'var(--text-secondary)', marginBottom: '1rem' }}>
@@ -243,7 +272,7 @@ export default function LoginModal(
                       value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={FIELD}
                     />
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                      At least 8 characters, with upper and lower case letters and a number.
+                      At least 8 characters, with upper and lower case letters, a number, and a symbol.
                     </div>
                   </div>
                   {error && <ErrorLine text={error} />}
