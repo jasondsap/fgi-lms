@@ -60,6 +60,21 @@ export default function RegisterForm({
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
+      {/* The old post-login registration modal's welcome — kept per Jason
+          (8-21) so the combined form leads with the same message. */}
+      <div style={{ marginBottom: '1.1rem' }}>
+        <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)' }}>
+          Tell Us a Little About Yourself
+        </div>
+        <p style={{
+          fontSize: '13px', lineHeight: 1.55, color: 'var(--text-secondary)',
+          margin: '4px 0 0',
+        }}>
+          This helps us understand our community so we can keep improving the
+          Learning Resource Center. All fields are required.
+        </p>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 12px' }}>
         <div style={ROW}>
           <label style={LABEL} htmlFor="reg-first">First Name</label>
