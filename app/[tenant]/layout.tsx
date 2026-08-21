@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import AuthNav from '@/components/layout/AuthNav';
 import TenantHeader from '@/components/tenant/TenantHeader';
 import TenantHeaderV2 from '@/components/tenant/v2/Header';
+import TenantHeaderV3 from '@/components/tenant/v3/Header';
 import { getTenantConfig } from '@/lib/tenants';
 
 /**
@@ -22,16 +23,18 @@ export default function TenantLayout({
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
 
-  // Tenants carrying a `v2` block use the 8-11-26 portal design; the rest keep
-  // the original chrome untouched. AuthNav is an async server component, so it
-  // is passed into the (client) v2 header as a slot.
+  // v3 (8-19-26) wins over v2 (8-11-26); tenants with neither keep the
+  // original chrome. AuthNav is an async server component, so it is passed
+  // into the (client) headers as a slot.
+  const authNav = (
+    <AuthNav color="#ffffff" signOutRedirect={`/${tenant.slug}`} surface={tenant.slug} />
+  );
   return (
     <>
-      {tenant.v2 ? (
-        <TenantHeaderV2
-          tenant={tenant}
-          authNav={<AuthNav color="#ffffff" signOutRedirect={`/${tenant.slug}`} />}
-        />
+      {tenant.v3 ? (
+        <TenantHeaderV3 tenant={tenant} authNav={authNav} />
+      ) : tenant.v2 ? (
+        <TenantHeaderV2 tenant={tenant} authNav={authNav} />
       ) : (
         <TenantHeader tenant={tenant} />
       )}

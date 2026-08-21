@@ -4,6 +4,8 @@ import TenantFooter from '@/components/tenant/TenantFooter';
 import TenantLanding from '@/components/tenant/TenantLanding';
 import TenantFooterV2 from '@/components/tenant/v2/Footer';
 import TenantLandingV2 from '@/components/tenant/v2/Landing';
+import TenantFooterV3 from '@/components/tenant/v3/Footer';
+import TenantLandingV3 from '@/components/tenant/v3/Landing';
 import { getTenantConfig } from '@/lib/tenants';
 
 interface PageProps {
@@ -26,6 +28,14 @@ export function generateMetadata({ params }: PageProps): Metadata {
 export default function TenantPage({ params, searchParams }: PageProps) {
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
+  if (tenant.v3) {
+    return (
+      <>
+        <TenantLandingV3 tenant={tenant} searchParams={searchParams} />
+        <TenantFooterV3 tenant={tenant} />
+      </>
+    );
+  }
   if (tenant.v2) {
     return (
       <>

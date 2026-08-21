@@ -1,0 +1,310 @@
+import { Suspense } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import AskLibrary from '@/components/library/AskLibrary';
+import FilterSidebar from '@/components/library/FilterSidebar';
+import ResourceGrid from '@/components/library/ResourceGrid';
+import SearchBar from '@/components/library/SearchBar';
+import { getLatestByType, getPublicResources } from '@/lib/resources';
+import { filterQuery } from '@/lib/query';
+import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
+import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
+
+function normalizeType(v: string | string[] | undefined) {
+  if (!v) return undefined;
+  return (Array.isArray(v) ? v : [v]) as ResourceType[];
+}
+
+interface Props {
+  tenant: TenantConfig;
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+/*
+ * v3 tenant landing (8-19-26 SCARR mockup). Light hero with the welcome copy
+ * on the left and the Latest Highlights CARD over a gold halftone spray on
+ * the right (no hero video), then the full-bleed navy certification band
+ * (white copy box + photo card), the grey support bar, and the unchanged
+ * curated library. Header carries the certification buttons; the footer is
+ * components/tenant/v3/Footer.tsx.
+ */
+export default async function TenantLandingV3({ tenant, searchParams }: Props) {
+  const home = `/${tenant.slug}`;
+  const v3 = tenant.v3!;
+
+  const params: ResourceListParams = {
+    type:     normalizeType(searchParams.type),
+    duration: (searchParams.duration as any)           || undefined,
+    search:   (searchParams.search   as string)        || undefined,
+    match:    (searchParams.match    as 'any' | 'all') || 'any',
+    tenant:   tenant.slug,
+    page:     parseInt((searchParams.page as string)   || '1', 10),
+    per_page: 12,
+  };
+  if (searchParams.audience) {
+    params.audience = (Array.isArray(searchParams.audience) ? searchParams.audience : [searchParams.audience]) as AudienceTag[];
+  }
+  if (searchParams.topic) {
+    params.topic = (Array.isArray(searchParams.topic) ? searchParams.topic : [searchParams.topic]) as TopicTag[];
+  }
+
+  const data = await getPublicResources(params);
+
+  // Highlights are FGI's newest items and point at the FGI site — they are
+  // FGI-only resources, not in the tenant's own library.
+  const [latestPodcast, latestWebinar, latestBrief] = await Promise.all([
+    getLatestByType('podcast'),
+    getLatestByType('webinar'),
+    getLatestByType('toolkit'),
+  ]);
+  const highlights = [
+    latestPodcast && {
+      label: 'Podcast', title: latestPodcast.title,
+      href: `${tenant.fgiSiteUrl}/resource/${latestPodcast.slug}`,
+      icon: '/images/category-cards/podcast.webp',
+    },
+    latestWebinar && {
+      label: 'Webinar', title: latestWebinar.title,
+      href: `${tenant.fgiSiteUrl}/resource/${latestWebinar.slug}`,
+      icon: '/images/category-cards/webinar.webp',
+    },
+    latestBrief && {
+      label: 'Learning Brief', title: latestBrief.title,
+      href: `${tenant.fgiSiteUrl}/resource/${latestBrief.slug}`,
+      icon: '/images/category-cards/learning.webp',
+    },
+  ].filter(Boolean) as Array<{ label: string; title: string; href: string; icon: string }>;
+
+  const linkQuery = filterQuery(searchParams);
+  const apiQuery = filterQuery(searchParams, { tenant: tenant.slug });
+
+  return (
+    <div>
+      {/* ── Hero: copy left, Latest Highlights card over the dot spray right ── */}
+      <section style={{ background: tenant.primary }}>
+        <div style={{
+          background: v3.heroBg,
+          borderBottomRightRadius: '60px',
+          padding: '0 2rem',
+        }}>
+          <div style={{
+            maxWidth: 'var(--max-width)', margin: '0 auto',
+            display: 'grid', gridTemplateColumns: '1fr 560px', gap: '2.5rem',
+            alignItems: 'start',
+          }}>
+            <div style={{ maxWidth: '530px', padding: '3.25rem 0 3rem' }}>
+              <div style={{ fontSize: '24px', color: tenant.primary, lineHeight: 1.2, marginBottom: '2px' }}>
+                Learning Resource Center
+              </div>
+              <h1 style={{
+                fontSize: '52px', fontWeight: 700, color: tenant.primary,
+                margin: '0 0 1.9rem', lineHeight: 1.1,
+                textShadow: '3px 3px 0 rgba(0,25,112,0.13)',
+              }}>
+                Welcome!
+              </h1>
+
+              {tenant.heroParagraphs.map((html, i) => (
+                <p
+                  key={i}
+                  style={{
+                    marginBottom: i === tenant.heroParagraphs.length - 1 ? '1.9rem' : '1.4rem',
+                    fontSize: '17px', lineHeight: 1.65, color: tenant.primary,
+                  }}
+                  dangerouslySetInnerHTML={{ __html: html }}
+                />
+              ))}
+
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                borderLeft: `4px solid ${tenant.accent}`, paddingLeft: '16px',
+                fontSize: '22px', fontWeight: 700, color: tenant.primary,
+              }}>
+                <span>Explore</span>
+                <span aria-hidden style={{ width: '9px', height: '9px', borderRadius: '50%', background: tenant.accent, flexShrink: 0 }} />
+                <span>learn</span>
+                <span aria-hidden style={{ width: '9px', height: '9px', borderRadius: '50%', background: tenant.accent, flexShrink: 0 }} />
+                <span>Grow</span>
+              </div>
+            </div>
+
+            {/* Right: the highlights card floats on the halftone spray. */}
+            <div style={{ position: 'relative', minHeight: '560px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={v3.heroDots} alt=""
+                style={{
+                  position: 'absolute', top: '20px', right: '-30px',
+                  width: '470px', height: 'auto', pointerEvents: 'none',
+                }}
+              />
+              <div style={{
+                position: 'relative', background: '#ffffff',
+                borderRadius: '22px', boxShadow: '0 10px 34px rgba(4,30,66,0.18)',
+                width: '400px', margin: '3.4rem 4.5rem 0 auto',
+                padding: '1.4rem 1.5rem 1.6rem',
+              }}>
+                <div style={{
+                  fontSize: '23px', fontWeight: 700, fontStyle: 'italic',
+                  fontStretch: '75%', color: '#111111',
+                  borderLeft: `5px solid ${tenant.accent}`, paddingLeft: '10px',
+                  marginBottom: '1.1rem',
+                }}>
+                  Latest Highlights
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {highlights.map((tile) => (
+                    <a
+                      key={tile.label}
+                      href={tile.href}
+                      style={{
+                        display: 'grid', gridTemplateColumns: '108px 1fr',
+                        gap: '14px', alignItems: 'center',
+                        background: v3.highlightTileBg,
+                        border: '1px solid #ece7d2', borderRadius: '10px',
+                        padding: '12px 14px', textDecoration: 'none',
+                        boxShadow: '0 2px 8px rgba(4,30,66,0.08)',
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={tile.icon} alt="" style={{ width: '108px', height: 'auto' }} />
+                      <span>
+                        <span style={{
+                          display: 'block', fontSize: '17px', fontWeight: 700,
+                          fontStretch: '75%', color: '#111111',
+                        }}>
+                          {tile.label}
+                        </span>
+                        <span style={{
+                          display: 'block', fontSize: '15px', fontStretch: '75%',
+                          color: '#222222', marginTop: '3px', lineHeight: 1.3,
+                        }}>
+                          {tile.title}
+                        </span>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              {/* The lone navy accent dot at the spray's right edge. */}
+              <span aria-hidden style={{
+                position: 'absolute', right: '-14px', top: '390px',
+                width: '38px', height: '38px', borderRadius: '50%',
+                background: tenant.primary,
+              }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Certification band (full-bleed navy) ── */}
+      <section style={{ background: tenant.primary, padding: '2.5rem 2rem' }}>
+        <div style={{
+          maxWidth: 'var(--max-width)', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: '1fr 460px', gap: '1.5rem',
+          alignItems: 'stretch',
+        }}>
+          <div style={{
+            background: '#ffffff', borderRadius: '10px',
+            padding: '1.9rem 2.1rem',
+          }}>
+            <h2 style={{
+              fontSize: '20px', fontWeight: 700, color: '#111111', marginBottom: '1.1rem',
+            }}>
+              {v3.certBand.heading}
+            </h2>
+            {v3.certBand.paragraphsHtml.map((html, i) => (
+              <p
+                key={i}
+                className="tenant-prose"
+                style={{
+                  fontSize: '16px', lineHeight: 1.6, color: '#111111',
+                  marginBottom: i < v3.certBand.paragraphsHtml.length - 1 ? '1.1rem' : 0,
+                }}
+                dangerouslySetInnerHTML={{ __html: html }}
+              />
+            ))}
+          </div>
+
+          {/* Photo card — grey mat with the composited photo at its base. */}
+          <div style={{
+            background: '#a9aeb6', borderRadius: '6px', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          }}>
+            <Image
+              src={v3.certBand.photo}
+              alt={v3.certBand.photoAlt}
+              width={736} height={302}
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Support bar ── */}
+      <section style={{
+        background: v3.supportBar.bg, color: v3.supportBar.fg,
+        padding: '1.25rem 2rem',
+      }}>
+        <div style={{
+          maxWidth: 'var(--max-width)', margin: '0 auto',
+          display: 'grid', gridTemplateColumns: 'auto auto 1fr', gap: '2rem', alignItems: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '18px', fontWeight: 700 }}>Need Platform Help?</span>
+            <a
+              href="mailto:LC@fletchergroup.org"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '9px',
+                background: tenant.primary, color: '#ffffff', fontSize: '16px',
+                textDecoration: 'none', padding: '9px 22px', borderRadius: '999px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M2.5 11.1 20.6 3.3c.8-.3 1.5.4 1.2 1.2l-7.8 18.1c-.3.8-1.5.8-1.7-.1l-1.9-7-7-1.9c-.9-.2-.9-1.4-.1-1.7z" />
+              </svg>
+              {v3.supportBar.buttonLabel}
+            </a>
+          </div>
+
+          <Image
+            src="/images/logos/fgi-logo-dark.webp"
+            alt="Fletcher Group"
+            width={900}
+            height={236}
+            style={{ objectFit: 'contain', width: 'auto', maxHeight: '46px' }}
+          />
+
+          <div style={{ fontSize: '15px', lineHeight: 1.5 }}>{TENANT_HOSTED_TEXT}</div>
+        </div>
+      </section>
+
+      {/* ── Curated library (unchanged per Jason, 8-21) ── */}
+      <section id="library" style={{ background: '#ffffff', padding: '2.25rem 2rem 4rem', scrollMarginTop: '90px' }}>
+        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+          <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
+            <FilterSidebar total={data.total} targetPath={home} isTenant />
+          </Suspense>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <SearchBar defaultValue={params.search} targetPath={home} />
+            <ResourceGrid
+              key={linkQuery}
+              initial={data.resources}
+              startPage={params.page ?? 1}
+              totalPages={data.total_pages}
+              perPage={params.per_page!}
+              apiQuery={apiQuery}
+              fallbackBase={home}
+              fallbackQuery={linkQuery}
+              total={data.total}
+              basePath={home}
+            />
+          </div>
+        </div>
+      </section>
+
+      <AskLibrary basePath={home} surface={tenant.slug} accent={tenant.primary} pillBg={tenant.primary} pillText="#fff" />
+    </div>
+  );
+}

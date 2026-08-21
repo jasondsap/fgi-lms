@@ -119,6 +119,50 @@ export interface TenantV2 {
   footerSupport: { label: string; href: string; buttonLabel: string };
 }
 
+/*
+ * Third-generation tenant portal (Jennifer's 8-19-26 SCARR mockup): navy
+ * header carrying the gold logo directly (no lobe) plus the two certification
+ * buttons, a light hero whose right side is the Latest Highlights CARD over a
+ * gold halftone spray (no video), a full-bleed navy certification band with a
+ * white copy box and photo card, the grey support bar, the unchanged library,
+ * and a rebuilt navy footer. A tenant opts in with a `v3` block, which wins
+ * over `v2`; SCARR is first, Colorado follows once Jennifer confirms.
+ */
+export interface TenantV3 {
+  orgSiteLabel: string;
+  orgSiteUrl: string;
+  /** Header certification buttons. `post` with no href renders a placeholder. */
+  certButtons: {
+    pre: { label: string; href: string };
+    post?: { label: string; href?: string };
+  };
+  heroBg: string;
+  /** Gold halftone dot spray behind the Latest Highlights card. */
+  heroDots: string;
+  highlightTileBg: string;
+  supportBar: { bg: string; fg: string; buttonLabel: string };
+  certBand: {
+    heading: string;
+    /** Trusted author HTML paragraphs (apply link, contact email). */
+    paragraphsHtml: string[];
+    photo: string;
+    photoAlt: string;
+  };
+  footer: {
+    lockup: { src: string; width: number; height: number; displayWidth: string };
+    siteLabel: string;
+    siteUrl: string;
+    email: string;
+    contactUrl: string;
+    addressLines: string[];
+    phone: string;
+    socials: TenantSocial[];
+    supportLabel: string;
+    supportHref: string;
+    supportButtonLabel: string;
+  };
+}
+
 export interface TenantConfig {
   slug: string;
   name: string;
@@ -148,6 +192,8 @@ export interface TenantConfig {
   };
   /** Present only on tenants moved to the 8-11-26 portal design. */
   v2?: TenantV2;
+  /** Present only on tenants moved to the 8-19-26 portal design (wins over v2). */
+  v3?: TenantV3;
 }
 
 // Shared first hero paragraph (tenant pages drop "research," vs FGI).
@@ -365,6 +411,64 @@ const TENANTS: Record<string, TenantConfig> = {
         label: 'Learning Center Support',
         href: 'mailto:LC@fletchergroup.org',
         buttonLabel: 'Contact',
+      },
+    },
+    // 8-19-26 SCARR mockup (docs/New Tenent PAges). Copy is verbatim from
+    // "tenant page white box language 8-19-26.docx".
+    v3: {
+      orgSiteLabel: 'SCARR Web',
+      orgSiteUrl: 'https://scarronline.org',
+      certButtons: {
+        pre: {
+          label: 'Pre-Certification Requirements',
+          href: '/scarr/course/scarr-pre-certification-requirements',
+        },
+        // Placeholder — Jason is confirming the destination (8-21).
+        post: { label: 'Post-Certification Requirements' },
+      },
+      heroBg: '#f6f7f8',
+      // Generated dot-spray SVG — the mockup's own dots image bakes in the
+      // white card and its shadow, so it can't be reused as a background.
+      heroDots: '/images/tenants/scarr/hero-dots.svg',
+      highlightTileBg: '#fffdf4',
+      supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact Us' },
+      certBand: {
+        heading: 'Becoming a SCARR Certified Residence',
+        paragraphsHtml: [
+          'Before starting your application, click the &ldquo;Pre-Certification ' +
+          'Requirements&rdquo; button at the top of the screen. Here you will watch ' +
+          'all seven videos in our &ldquo;So You Want to Be a Recovery Residence ' +
+          'Owner or Operator&rdquo; series, review all Certification documents, ' +
+          'complete a brief survey and download your completion certificate.',
+          'To proceed with certification, visit <a href="https://scarronline.org" ' +
+          'target="_blank" rel="noopener noreferrer">our website</a> to apply. ' +
+          'Your certificate of completion will be required.',
+          'Once you have completed the video series and reviewed the certification ' +
+          'documents, if you would like to schedule a meeting with our team, email ' +
+          '<a href="mailto:info@scarronline.org">info@scarronline.org</a> with your ' +
+          'completion certificate attached.',
+        ],
+        photo: '/images/tenants/scarr/cert-photo.webp',
+        photoAlt: 'Recovery is home — find yours today',
+      },
+      footer: {
+        lockup: {
+          src: '/images/tenants/scarr/footer-lockup-v3.webp',
+          width: 372, height: 101, displayWidth: '340px',
+        },
+        siteLabel: 'www.scarronline.org',
+        siteUrl: 'https://scarronline.org',
+        email: 'info@Scarronline.org',
+        contactUrl: 'https://scarronline.org/contact/',
+        addressLines: ['4711 Forest Drive, Suite 3 #226', 'Columbia, SC 29206'],
+        phone: '(803)430-6451',
+        socials: [
+          { platform: 'facebook', href: 'https://www.facebook.com/screcoveryresidences/' },
+          { platform: 'linkedin', href: 'https://www.linkedin.com/company/south-carolina-alliance-for-recovery-residences/' },
+        ],
+        supportLabel: 'Learning Center Support',
+        supportHref: 'mailto:LC@fletchergroup.org',
+        supportButtonLabel: 'Contact',
       },
     },
   },
