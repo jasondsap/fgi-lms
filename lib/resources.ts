@@ -122,7 +122,7 @@ export async function getPublicResources(
   // title; non-series videos sort after the parts. Hardcoded SQL fragment —
   // no user input reaches it (see the DURATION_CLAUSES rule).
   const videoSort = !isDefaultView && typeArr.length === 1 && typeArr[0] === 'video'
-    ? `(substring(title from '^Part ([0-9]+) of [0-9]+'))::int ASC NULLS LAST, title ASC, `
+    ? `(substring(title from '^Part ([0-9]+)'))::int ASC NULLS LAST, title ASC, `
     : '';
 
   const seedPh   = isDefaultView ? bind(dailySeed()) : null;
@@ -354,22 +354,41 @@ export async function getOtherEpisodes(
 
 /**
  * Sibling parts of a numbered video series, for the video shell's "This
- * series" rail block. The 14 CORR/SCARR certification videos all share the
- * exact same title ("Part N of 7: So You Want to Be an Owner or Operator"),
- * so without this a viewer on Part 3 has no way to reach Part 4 short of the
- * library. Series membership = same "of N" total + same title suffix + same
- * surface (CORR is colorado-only and SCARR scarr-only, so the two recordings
- * never mix). Returns [] for non-series videos or a series of one.
+ * series" rail block — the only in-page path between the 14 CORR/SCARR
+ * certification parts. Title format since 8-21-26:
+ * "Part N: <topic> - <series name>"; series membership = same series name
+ * (the text after the final " - ") + same surface (CORR is colorado-only
+ * and SCARR scarr-only, so the two recordings never mix). A title with no
+ * " - " groups on its full remainder, which also covered the older
+ * "Part N of 7: <shared name>" format. Returns [] for non-series videos
+ * or a series of one.
  */
-export interface VideoSeriesItem { slug: string; title: string; part: number }
+export interface VideoSeriesItem {
+  slug: string;
+  title: string;
+  part: number;
+  /** The rail label — the title without the repeated series suffix. */
+  label: string;
+}
 
-const SERIES_TITLE = /^Part (\d+) of (\d+):\s*(.+)$/;
+const SERIES_TITLE = /^Part (\d+)(?: of \d+)?:\s*(.+)$/;
+
+function seriesKey(remainder: string): string {
+  const i = remainder.lastIndexOf(' - ');
+  return i >= 0 ? remainder.slice(i + 3) : remainder;
+}
+
+function seriesLabel(title: string): string {
+  const i = title.lastIndexOf(' - ');
+  return i >= 0 ? title.slice(0, i) : title;
+}
 
 export async function getVideoSeries(
   title: string, tenantSlug: string,
 ): Promise<VideoSeriesItem[]> {
   const m = SERIES_TITLE.exec(title);
   if (!m) return [];
+  const key = seriesKey(m[2]);
   const rows = await sql`
     SELECT r.slug, r.title
     FROM resources r
@@ -384,8 +403,11 @@ export async function getVideoSeries(
   const items: VideoSeriesItem[] = [];
   for (const r of rows as Array<{ slug: string; title: string }>) {
     const mm = SERIES_TITLE.exec(r.title);
-    if (mm && mm[2] === m[2] && mm[3] === m[3]) {
-      items.push({ slug: r.slug, title: r.title, part: Number(mm[1]) });
+    if (mm && seriesKey(mm[2]) === key) {
+      items.push({
+        slug: r.slug, title: r.title,
+        part: Number(mm[1]), label: seriesLabel(r.title),
+      });
     }
   }
   items.sort((a, b) => a.part - b.part);

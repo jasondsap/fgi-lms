@@ -154,17 +154,17 @@ export default async function VideoDetail(
                   {series.map((item) =>
                     item.slug === resource.slug ? (
                       <span key={item.slug} style={{
-                        fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
+                        fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)',
                       }}>
-                        Part {item.part} — Now Playing
+                        {item.label} — Now Playing
                       </span>
                     ) : (
                       <Link
                         key={item.slug}
                         href={`${surface.basePath}/resource/${item.slug}`}
-                        style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
+                        style={{ fontSize: '16px', color: surface.primary, fontWeight: 600 }}
                       >
-                        Part {item.part}
+                        {item.label}
                       </Link>
                     ),
                   )}
