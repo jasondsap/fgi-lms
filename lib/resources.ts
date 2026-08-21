@@ -393,6 +393,29 @@ export async function getVideoSeries(
 }
 
 /**
+ * The card-level facts about one resource, for the signed-out content gate
+ * (8-20-26 auth rebuild, phase 4). Deliberately light: no presigned URLs, no
+ * presenters/materials — nothing a signed-out visitor shouldn't receive is
+ * even generated. Everything here is already public on the library cards.
+ */
+export interface ResourceTeaser {
+  title: string;
+  slug: string;
+  type: string;
+  description: string;
+}
+
+export async function getResourceTeaser(slug: string): Promise<ResourceTeaser | null> {
+  const rows = await sql`
+    SELECT title, slug, type, description
+    FROM resources
+    WHERE slug = ${slug} AND published = TRUE
+    LIMIT 1
+  `;
+  return (rows[0] as ResourceTeaser) ?? null;
+}
+
+/**
  * Presigned audio for one podcast row by slug — how an episode page gets the
  * Trailer's MP3 so the Trailer button can play it in place (8-18-26 shell)
  * instead of navigating. Same 6-hour signing rule as the episode's own audio,

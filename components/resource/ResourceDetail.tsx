@@ -1,10 +1,12 @@
 import { notFound } from 'next/navigation';
+import { authEnabled, getSession } from '@/auth';
 import CourseDetail from '@/components/resource/CourseDetail';
 import PdfDetail from '@/components/resource/PdfDetail';
 import PodcastDetail from '@/components/resource/PodcastDetail';
+import ResourceGate from '@/components/resource/ResourceGate';
 import VideoDetail from '@/components/resource/VideoDetail';
 import WebinarDetail from '@/components/resource/WebinarDetail';
-import { getResourceBySlug } from '@/lib/resources';
+import { getResourceBySlug, getResourceTeaser } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 
 /**
@@ -24,6 +26,16 @@ import type { Surface } from '@/lib/surface';
 export default async function ResourceDetail(
   { slug, surface }: { slug: string; surface: Surface },
 ) {
+  // Content gate (8-20-26 auth rebuild, phase 4): browsing the library is
+  // free, opening a resource requires an account. Signed out, only the
+  // card-level teaser is fetched — the full row (and its presigned URLs) is
+  // never touched. No-op while auth is unconfigured (authEnabled flag).
+  if (authEnabled && !(await getSession())?.user) {
+    const teaser = await getResourceTeaser(slug);
+    if (!teaser) notFound();
+    return <ResourceGate resource={teaser} surface={surface} />;
+  }
+
   // Query the DB directly — a server component must never fetch its own API
   // route at runtime (see docs/CLAUDE.md architecture notes).
   const resource = await getResourceBySlug(slug);

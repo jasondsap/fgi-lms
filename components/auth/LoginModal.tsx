@@ -36,11 +36,30 @@ const PRIMARY_BTN = {
 } as const;
 
 export default function LoginModal(
-  { color = '#ffffff', surface = 'fgi' }: { color?: string; surface?: string },
+  {
+    color = '#ffffff',
+    surface = 'fgi',
+    initialView = 'login',
+    autoOpen = false,
+    trigger = 'pill',
+    triggerLabel,
+    accent = 'var(--fgi-blue)',
+  }: {
+    color?: string;
+    surface?: string;
+    /** Which tab the modal opens on — the content gate opens on 'register'. */
+    initialView?: 'login' | 'register';
+    /** Open immediately on mount (the content gate does this). */
+    autoOpen?: boolean;
+    /** 'pill' = the header outline button; 'cta' = filled button; 'none' = headless. */
+    trigger?: 'pill' | 'cta' | 'none';
+    triggerLabel?: string;
+    accent?: string;
+  },
 ) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [view, setView] = useState<View>('login');
+  const [open, setOpen] = useState(autoOpen);
+  const [view, setView] = useState<View>(initialView);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
@@ -118,18 +137,34 @@ export default function LoginModal(
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => { setOpen(true); reset('login'); }}
-        style={{
-          background: 'transparent', color, border: `1.5px solid ${color}`,
-          borderRadius: '20px', padding: '7px 20px', fontSize: '14px',
-          fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        Log In
-      </button>
+      {trigger === 'pill' && (
+        <button
+          type="button"
+          onClick={() => { setOpen(true); reset(initialView); }}
+          style={{
+            background: 'transparent', color, border: `1.5px solid ${color}`,
+            borderRadius: '20px', padding: '7px 20px', fontSize: '14px',
+            fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {triggerLabel ?? 'Log In'}
+        </button>
+      )}
+      {trigger === 'cta' && (
+        <button
+          type="button"
+          onClick={() => { setOpen(true); reset(initialView); }}
+          style={{
+            background: accent, color: '#ffffff', border: 'none',
+            borderRadius: '999px', padding: '13px 30px', fontSize: '16px',
+            fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {triggerLabel ?? 'Create a Free Account'}
+        </button>
+      )}
 
       {open && (
         <div
