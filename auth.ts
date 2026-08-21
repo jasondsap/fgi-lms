@@ -8,6 +8,7 @@
 // =============================================================================
 import NextAuth from 'next-auth';
 import Cognito from 'next-auth/providers/cognito';
+import Credentials from 'next-auth/providers/credentials';
 import { upsertUser } from '@/lib/users';
 
 export const authEnabled = Boolean(
@@ -19,6 +20,8 @@ export const authEnabled = Boolean(
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: authEnabled
     ? [
+        // Hosted-UI OAuth — kept as a fallback while the on-site modal beds
+        // in; the course-gate buttons still route through it (phase 4 unifies).
         Cognito({
           clientId: process.env.COGNITO_CLIENT_ID,
           clientSecret: process.env.COGNITO_CLIENT_SECRET,
@@ -26,6 +29,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // All three scopes must be enabled on the Cognito app client
           // (profile carries given_name/family_name for CE certificates)
           authorization: { params: { scope: 'openid email profile' } },
+        }),
+        // On-site email + password login (8-20-26 auth rebuild, phase 2):
+        // the modal posts here; lib/cognito.ts does the actual Cognito call.
+        Credentials({
+          credentials: { email: {}, password: {} },
+          async authorize(credentials) {
+            const email = String(credentials?.email ?? '').trim().toLowerCase();
+            const password = String(credentials?.password ?? '');
+            if (!email || !password) return null;
+            // Lazy import keeps the AWS SDK out of edge/middleware bundles.
+            const { signInWithPassword, decodeIdToken } = await import('@/lib/cognito');
+            try {
+              const { idToken } = await signInWithPassword(email, password);
+              const claims = decodeIdToken(idToken);
+              const user = await upsertUser({
+                cognitoSub: claims.sub,
+                email: claims.email ?? email,
+                givenName: claims.given_name,
+                familyName: claims.family_name,
+              });
+              return {
+                id: user.id,
+                email: user.email,
+                userId: user.id,
+                givenName: user.given_name,
+                moodleUserId: user.moodle_user_id,
+                role: user.role,
+              };
+            } catch {
+              return null; // surfaces to the caller as CredentialsSignin
+            }
+          },
         }),
       ]
     : [],
@@ -35,18 +70,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, account, profile }) {
-      // First sign-in only: mirror the Cognito user into the Neon users table
-      if (account && profile?.sub && profile.email) {
-        const user = await upsertUser({
+    async jwt({ token, account, profile, user }) {
+      // Hosted-UI first sign-in: mirror the Cognito user into Neon.
+      if (account?.provider === 'cognito' && profile?.sub && profile.email) {
+        const dbUser = await upsertUser({
           cognitoSub: profile.sub,
           email: profile.email,
           givenName: (profile.given_name as string | undefined) ?? null,
           familyName: (profile.family_name as string | undefined) ?? null,
         });
-        token.userId = user.id;
-        token.givenName = user.given_name;
-        token.moodleUserId = user.moodle_user_id;
+        token.userId = dbUser.id;
+        token.givenName = dbUser.given_name;
+        token.moodleUserId = dbUser.moodle_user_id;
+        token.role = dbUser.role;
+      }
+      // Credentials sign-in: authorize() already upserted; its return value
+      // arrives here as `user`.
+      if (account?.provider === 'credentials' && user) {
+        const u = user as {
+          userId?: string; givenName?: string | null;
+          moodleUserId?: number | null; role?: string;
+        };
+        token.userId = u.userId;
+        token.givenName = u.givenName ?? null;
+        token.moodleUserId = u.moodleUserId ?? null;
+        token.role = u.role ?? 'learner';
       }
       return token;
     },
@@ -55,6 +103,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.userId;
         session.user.givenName = token.givenName ?? null;
         session.user.moodleUserId = token.moodleUserId ?? null;
+        session.user.role = token.role ?? 'learner';
       }
       return session;
     },

@@ -20,6 +20,10 @@ export interface AppUser {
   county: string | null;
   role_other: string | null;
   registration_completed_at: string | null;
+  /** Access level: learner (default) | staff | admin. */
+  role: string;
+  /** Surface the account registered from: fgi | colorado | scarr. */
+  registered_surface: string | null;
 }
 
 export async function upsertUser(input: {

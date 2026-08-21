@@ -1,4 +1,5 @@
-import { authEnabled, getSession, signIn } from '@/auth';
+import { authEnabled, getSession } from '@/auth';
+import LoginModal from '@/components/auth/LoginModal';
 import { signOutAction } from './auth-actions';
 
 // Header account area. Renders nothing until the Cognito env vars are
@@ -13,32 +14,8 @@ export default async function AuthNav({
   const session = await getSession();
 
   if (!session?.user) {
-    return (
-      <form
-        action={async () => {
-          'use server';
-          await signIn('cognito');
-        }}
-      >
-        <button
-          type="submit"
-          style={{
-            background: 'transparent',
-            color,
-            border: `1.5px solid ${color}`,
-            borderRadius: '20px',
-            padding: '7px 20px',
-            fontSize: '14px',
-            fontWeight: 600,
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          Log In
-        </button>
-      </form>
-    );
+    // On-site login modal (8-20-26 auth rebuild) — no more hosted-UI redirect.
+    return <LoginModal color={color} />;
   }
 
   const displayName =
