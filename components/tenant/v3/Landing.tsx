@@ -141,6 +141,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 style={{
                   position: 'absolute', top: '-40px', left: '60px',
                   width: '525px', height: 'auto', pointerEvents: 'none',
+                  opacity: 0.5,
                 }}
               />
               <div style={{
