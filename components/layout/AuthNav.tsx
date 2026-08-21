@@ -9,13 +9,15 @@ import { signOutAction } from './auth-actions';
 export default async function AuthNav({
   color = '#ffffff',
   signOutRedirect = '/',
-}: { color?: string; signOutRedirect?: string } = {}) {
+  surface = 'fgi',
+}: { color?: string; signOutRedirect?: string; surface?: string } = {}) {
   if (!authEnabled) return null;
   const session = await getSession();
 
   if (!session?.user) {
     // On-site login modal (8-20-26 auth rebuild) — no more hosted-UI redirect.
-    return <LoginModal color={color} />;
+    // `surface` stamps users.registered_surface when someone registers here.
+    return <LoginModal color={color} surface={surface} />;
   }
 
   const displayName =

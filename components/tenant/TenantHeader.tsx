@@ -69,7 +69,7 @@ export default function TenantHeader({ tenant }: { tenant: TenantConfig }) {
         </nav>
 
         <div style={{ flexShrink: 0 }}>
-          <AuthNav color={tenant.primary} signOutRedirect={home} />
+          <AuthNav color={tenant.primary} signOutRedirect={home} surface={tenant.slug} />
         </div>
       </div>
     </header>
