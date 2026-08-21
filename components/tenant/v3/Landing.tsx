@@ -86,6 +86,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           background: v3.heroBg,
           borderBottomRightRadius: '60px',
           padding: '0 2rem',
+          overflow: 'hidden',
         }}>
           <div style={{
             maxWidth: 'var(--max-width)', margin: '0 auto',
@@ -128,21 +129,23 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               </div>
             </div>
 
-            {/* Right: the highlights card floats on the halftone spray. */}
+            {/* Right: the highlights card floats on the halftone spray, with
+                bubbles showing on BOTH sides of the card (Jennifer's mockup;
+                Jason, 8-21: card ~15% narrower, bubbles larger and left). */}
             <div style={{ position: 'relative', minHeight: '560px' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={v3.heroDots} alt=""
                 style={{
-                  position: 'absolute', top: '20px', right: '-30px',
-                  width: '470px', height: 'auto', pointerEvents: 'none',
+                  position: 'absolute', top: '4px', left: '-70px',
+                  width: '620px', height: 'auto', pointerEvents: 'none',
                 }}
               />
               <div style={{
                 position: 'relative', background: '#ffffff',
                 borderRadius: '22px', boxShadow: '0 10px 34px rgba(4,30,66,0.18)',
-                width: '400px', margin: '3.4rem 4.5rem 0 auto',
-                padding: '1.4rem 1.5rem 1.6rem',
+                width: '340px', margin: '3.4rem 4.2rem 0 auto',
+                padding: '1.3rem 1.35rem 1.5rem',
               }}>
                 <div style={{
                   fontSize: '23px', fontWeight: 700, fontStyle: 'italic',
@@ -158,8 +161,8 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                       key={tile.label}
                       href={tile.href}
                       style={{
-                        display: 'grid', gridTemplateColumns: '108px 1fr',
-                        gap: '14px', alignItems: 'center',
+                        display: 'grid', gridTemplateColumns: '90px 1fr',
+                        gap: '12px', alignItems: 'center',
                         background: v3.highlightTileBg,
                         border: '1px solid #ece7d2', borderRadius: '10px',
                         padding: '12px 14px', textDecoration: 'none',
@@ -167,7 +170,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                       }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={tile.icon} alt="" style={{ width: '108px', height: 'auto' }} />
+                      <img src={tile.icon} alt="" style={{ width: '90px', height: 'auto' }} />
                       <span>
                         <span style={{
                           display: 'block', fontSize: '17px', fontWeight: 700,
