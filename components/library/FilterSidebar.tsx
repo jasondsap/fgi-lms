@@ -86,10 +86,12 @@ export default function FilterSidebar({ total, targetPath, isTenant = false }: P
       [...current, value].forEach(v => params.append(key, v));
     }
     params.set('page', '1');
-    router.push(`${dest}?${params.toString()}`);
+    // scroll: false keeps the visitor where they are in the library instead
+    // of snapping to the top of the page on every filter change.
+    router.push(`${dest}?${params.toString()}`, { scroll: false });
   }, [router, dest, searchParams]);
 
-  const clearAll = useCallback(() => { router.push(dest); }, [router, dest]);
+  const clearAll = useCallback(() => { router.push(dest, { scroll: false }); }, [router, dest]);
 
   const active: Record<string, string[]> = {
     type:     searchParams.getAll('type'),
