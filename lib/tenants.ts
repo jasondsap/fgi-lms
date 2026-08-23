@@ -131,9 +131,11 @@ export interface TenantV2 {
 export interface TenantV3 {
   orgSiteLabel: string;
   orgSiteUrl: string;
-  /** Header certification buttons. `post` with no href renders a placeholder. */
+  /** Logo mark sitting directly on the navy header bar (no lobe, no box). */
+  headerLogo: { src: string; width: number; height: number; displayWidth: string };
+  /** Header certification buttons. A button with no href renders a placeholder. */
   certButtons: {
-    pre: { label: string; href: string };
+    pre: { label: string; href?: string };
     post?: { label: string; href?: string };
   };
   heroBg: string;
@@ -153,7 +155,8 @@ export interface TenantV3 {
     siteLabel: string;
     siteUrl: string;
     email: string;
-    contactUrl: string;
+    /** Optional contact-page link line (SCARR has one; Colorado does not). */
+    contactUrl?: string;
     addressLines: string[];
     phone: string;
     socials: TenantSocial[];
@@ -317,6 +320,66 @@ const TENANTS: Record<string, TenantConfig> = {
         buttonLabel: 'Contact',
       },
     },
+    // 8-22-26: Colorado moved to the v3 layout "the same way we did SCARR"
+    // (Jason). Copy is verbatim from the Colorado section of "tenant page
+    // white box language 8-19-26.docx"; the hero ring is the SCARR asset
+    // recoloured to CO yellow (#ffd100). NB the docx says
+    // info@corecoveryhousing.com while every other CO contact uses .org —
+    // kept verbatim; flagged for Jennifer.
+    v3: {
+      orgSiteLabel: 'ORH-CO Web',
+      orgSiteUrl: 'https://www.corecoveryhousing.org',
+      headerLogo: {
+        src: '/images/tenants/colorado/logo-white.webp',
+        width: 600, height: 447, displayWidth: '110px',
+      },
+      certButtons: {
+        // Both placeholders: unlike SCARR (course 127), Colorado has no
+        // pre-certification course yet — wire the href when it lands.
+        pre: { label: 'Pre-Certification Requirements' },
+        post: { label: 'Post-Certification Requirements' },
+      },
+      heroBg: '#f6f6fa',
+      heroDots: '/images/tenants/colorado/hero-ring.webp',
+      highlightTileBg: '#fffdf4',
+      supportBar: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact FGI' },
+      certBand: {
+        heading: 'Are you wanting to open a Recovery Residence?',
+        paragraphsHtml: [
+          'Before starting your application, click the &ldquo;Pre-Certification ' +
+          'Requirements&rdquo; button at the top of the screen. Here you will watch ' +
+          'all seven videos in our &ldquo;So You Want to Be a Recovery Residence ' +
+          'Owner or Operator&rdquo; series, review all Certification documents, ' +
+          'complete two brief surveys, and download your completion certificate.',
+          'To proceed with certification, visit <a href="https://www.corecoveryhousing.org" ' +
+          'target="_blank" rel="noopener noreferrer">our website</a> to apply. ' +
+          'Your certificate of completion will be required.',
+          'Once you have completed the video series and reviewed the certification ' +
+          'documents, if you would like to schedule a meeting with our team, email ' +
+          '<a href="mailto:info@corecoveryhousing.com">info@corecoveryhousing.com</a> ' +
+          'with your completion certificate attached.',
+        ],
+        photo: '/images/tenants/colorado/hero-photo.webp',
+        photoAlt: 'A snowy Colorado mountain town main street',
+      },
+      footer: {
+        lockup: {
+          src: '/images/tenants/colorado/logo-white.webp',
+          width: 600, height: 447, displayWidth: '230px',
+        },
+        siteLabel: 'www.corecoveryhousing.org',
+        siteUrl: 'https://www.corecoveryhousing.org',
+        email: 'info@corecoveryhousing.org',
+        addressLines: ['8200 Shaffer Parkway', 'P.O. Box 271673', 'Littleton, CO 80127'],
+        phone: '(720) 782-0989',
+        socials: [
+          { platform: 'facebook', href: 'https://www.facebook.com/share/192NHyvUsz/?mibextid=wwXIfr' },
+        ],
+        supportLabel: 'Learning Center Support',
+        supportHref: 'mailto:LC@fletchergroup.org',
+        supportButtonLabel: 'Contact',
+      },
+    },
   },
 
   scarr: {
@@ -418,6 +481,10 @@ const TENANTS: Record<string, TenantConfig> = {
     v3: {
       orgSiteLabel: 'SCARR Web',
       orgSiteUrl: 'https://scarronline.org',
+      headerLogo: {
+        src: '/images/tenants/scarr/logo-gold.webp',
+        width: 600, height: 600, displayWidth: '84px',
+      },
       certButtons: {
         pre: {
           label: 'Pre-Certification Requirements',

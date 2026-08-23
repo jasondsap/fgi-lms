@@ -58,7 +58,7 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
             <a
               href={f.supportHref}
               style={{
-                background: tenant.accent, color: '#041e42', fontWeight: 600,
+                background: tenant.accent, color: tenant.primary, fontWeight: 600,
                 borderRadius: '999px', padding: '7px 26px', fontSize: '14px',
                 textDecoration: 'none',
               }}
@@ -71,11 +71,13 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
         {/* Right: contact block + Follow Us */}
         <div style={{ fontSize: '15px', lineHeight: 1.6, textAlign: 'left' }}>
           <div>Email: <a href={`mailto:${f.email}`} style={link}>{f.email}</a></div>
-          <div>
-            <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
-              {f.contactUrl.replace(/^https?:\/\//, 'https://')}
-            </a>
-          </div>
+          {f.contactUrl && (
+            <div>
+              <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
+                {f.contactUrl.replace(/^https?:\/\//, 'https://')}
+              </a>
+            </div>
+          )}
           <div style={{ marginTop: '1rem' }}>
             {f.addressLines.map((line) => <div key={line}>{line}</div>)}
           </div>

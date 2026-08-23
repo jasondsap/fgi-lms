@@ -41,11 +41,11 @@ export default function TenantHeaderV3({
       }}>
         <Link href={home} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <Image
-            src="/images/tenants/scarr/logo-gold.webp"
+            src={v3.headerLogo.src}
             alt={tenant.logoAlt}
-            width={600} height={600}
+            width={v3.headerLogo.width} height={v3.headerLogo.height}
             priority
-            style={{ width: '84px', height: '84px', objectFit: 'contain' }}
+            style={{ width: v3.headerLogo.displayWidth, height: 'auto', objectFit: 'contain' }}
           />
         </Link>
 
@@ -74,12 +74,23 @@ export default function TenantHeaderV3({
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <Link
-            href={v3.certButtons.pre.href}
-            style={{ ...pillBase, background: tenant.accent, color: '#000000' }}
-          >
-            {v3.certButtons.pre.label}
-          </Link>
+          {v3.certButtons.pre.href ? (
+            <Link
+              href={v3.certButtons.pre.href}
+              style={{ ...pillBase, background: tenant.accent, color: '#000000' }}
+            >
+              {v3.certButtons.pre.label}
+            </Link>
+          ) : (
+            /* Placeholder — Colorado's pre-certification course isn't built yet. */
+            <span
+              aria-disabled="true"
+              title="Coming soon"
+              style={{ ...pillBase, background: tenant.accent, color: '#000000', cursor: 'default' }}
+            >
+              {v3.certButtons.pre.label}
+            </span>
+          )}
           {v3.certButtons.post && (
             v3.certButtons.post.href ? (
               <Link
