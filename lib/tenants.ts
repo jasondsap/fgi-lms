@@ -345,10 +345,11 @@ const TENANTS: Record<string, TenantConfig> = {
       // header/footer match the content pages' lobed shell (Jason, 8-23).
       lobe: { bg: '#ffe673', logo: '/images/tenants/colorado/logo-bordered.webp' },
       certButtons: {
-        // Both placeholders: unlike SCARR (course 127), Colorado has no
-        // pre-certification course yet — wire the href when it lands.
-        pre: { label: 'Pre-Certification Requirements' },
-        post: { label: 'Post-Certification Requirements' },
+        pre: {
+          label: 'Pre-Certification Requirements',
+          href: '/colorado/course/co-pre-certification-requirements',
+        },
+        // No Post-Certification button for Colorado (Jason, 8-23).
       },
       heroBg: '#f6f6fa',
       heroDots: '/images/tenants/colorado/hero-ring.webp',
