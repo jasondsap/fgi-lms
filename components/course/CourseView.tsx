@@ -46,6 +46,8 @@ function decodeEntities(s: string): string {
 const LESSON_MODNAMES = new Set(['scorm', 'page', 'videotime', 'lesson', 'book']);
 /** Assessment — pulled out of the flow into its own trailing group. */
 const EVALUATION_MODNAMES = new Set(['quiz', 'assign', 'feedback', 'questionnaire']);
+/** The completion certificate — its own group after the evaluation. */
+const CERTIFICATE_MODNAMES = new Set(['customcert']);
 
 /**
  * Turn Moodle's flat module list into lesson groups.
@@ -58,9 +60,14 @@ const EVALUATION_MODNAMES = new Set(['quiz', 'assign', 'feedback', 'questionnair
 function groupModules(modules: PlayerModule[]): PlayerGroup[] {
   const groups: PlayerGroup[] = [];
   const evaluation: PlayerModule[] = [];
+  const certificates: PlayerModule[] = [];
   let current: PlayerGroup | null = null;
 
   for (const m of modules) {
+    if (CERTIFICATE_MODNAMES.has(m.modname)) {
+      certificates.push(m);
+      continue;
+    }
     if (EVALUATION_MODNAMES.has(m.modname)) {
       evaluation.push(m);
       continue;
@@ -81,6 +88,9 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
 
   if (evaluation.length) {
     groups.push({ key: 'evaluation', kind: 'evaluation', lead: null, label: 'Evaluation', items: evaluation });
+  }
+  if (certificates.length) {
+    groups.push({ key: 'certificate', kind: 'certificate', lead: null, label: 'Certificate', items: certificates });
   }
   return groups;
 }
@@ -153,6 +163,9 @@ export default async function CourseView(
             url: getActivityEmbedUrl(m) ?? m.url!,
             // 0 incomplete, 1 complete, 2 complete-pass, 3 complete-fail
             state: completionByCmid.get(m.id) ?? 0,
+            // 0 none, 1 manual, 2 automatic — untracked modules stay out of
+            // the progress figure and the certificate gate.
+            completion: m.completion ?? 0,
           }),
         );
       return {
@@ -162,6 +175,17 @@ export default async function CourseView(
       };
     })
     .filter((s) => s.groups.length > 0);
+
+  // The certificate is availability-gated in Moodle on completing every
+  // tracked activity; the contents fetch runs under the service token, so
+  // that gate has to be mirrored here from the learner's own states.
+  const everyModule = playerSections.flatMap((s) => s.groups).flatMap((g) => (g.lead ? [g.lead, ...g.items] : g.items));
+  const gatesDone = everyModule
+    .filter((m) => m.modname !== 'customcert' && m.completion > 0)
+    .every((m) => m.state === 1 || m.state === 2);
+  for (const m of everyModule) {
+    if (m.modname === 'customcert') m.locked = !gatesDone;
+  }
 
   // Open on the first lesson in course order. The evaluation group is moved to
   // the end of its section, so this can never land on the quiz.

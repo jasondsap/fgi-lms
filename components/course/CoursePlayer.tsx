@@ -9,6 +9,11 @@ export interface PlayerModule {
   modname: string; // 'scorm' | 'quiz' | 'page' | ...
   url: string;
   state: number; // 0 incomplete, 1 complete, 2 complete-pass, 3 complete-fail
+  /** Moodle completion tracking: 0 none, 1 manual, 2 automatic. Untracked
+      modules (certificates, reference links) stay out of the progress bar. */
+  completion: number;
+  /** Certificate not yet earned — rendered locked, not clickable. */
+  locked?: boolean;
 }
 
 /**
@@ -18,7 +23,7 @@ export interface PlayerModule {
  */
 export interface PlayerGroup {
   key: string;
-  kind: 'lesson' | 'evaluation' | 'resources';
+  kind: 'lesson' | 'evaluation' | 'resources' | 'certificate';
   lead: PlayerModule | null;
   label: string | null;
   items: PlayerModule[];
@@ -47,6 +52,7 @@ const MODNAME_LABELS: Record<string, string> = {
   videotime: 'Video',
   url: 'Link',
   resource: 'Resource',
+  customcert: 'Certificate',
 };
 
 const groupModules = (g: PlayerGroup): PlayerModule[] =>
@@ -65,8 +71,11 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
 
   const allGroups = sections.flatMap((s) => s.groups);
   const allModules = allGroups.flatMap(groupModules);
-  const completed = allModules.filter((m) => m.state === 1 || m.state === 2).length;
-  const pct = allModules.length ? Math.round((completed / allModules.length) * 100) : 0;
+  // Only completion-tracked modules count toward progress — a certificate or
+  // reference link with no tracking would otherwise hold the bar under 100%.
+  const trackedModules = allModules.filter((m) => m.completion > 0);
+  const completed = trackedModules.filter((m) => m.state === 1 || m.state === 2).length;
+  const pct = trackedModules.length ? Math.round((completed / trackedModules.length) * 100) : 0;
 
   // A single-activity course gets no headers — wrapping one item in a
   // collapsible block is pure noise.
@@ -112,9 +121,12 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
   const ModuleRow = ({ m, nested }: { m: PlayerModule; nested?: boolean }) => {
     const isActive = m.cmid === activeCmid;
     const isDone = m.state === 1 || m.state === 2;
+    const locked = !!m.locked;
     return (
       <button
-        onClick={() => openModule(m)}
+        onClick={locked ? undefined : () => openModule(m)}
+        disabled={locked}
+        title={locked ? 'Complete every item above to unlock your certificate' : undefined}
         style={{
           display: 'flex', alignItems: 'center', gap: nested ? '10px' : '12px',
           width: '100%', textAlign: 'left',
@@ -122,11 +134,20 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
           background: isActive ? 'var(--fgi-blue-light)' : 'transparent',
           border: 'none',
           borderLeft: isActive && !nested ? '3px solid var(--fgi-blue)' : '3px solid transparent',
-          cursor: 'pointer',
+          cursor: locked ? 'default' : 'pointer',
+          opacity: locked ? 0.55 : 1,
           fontFamily: 'inherit',
         }}
       >
-        <StatusCircle done={isDone} small={nested} />
+        {locked ? (
+          <span aria-hidden style={{
+            width: nested ? '16px' : '22px', height: nested ? '16px' : '22px',
+            flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: nested ? '11px' : '14px',
+          }}>🔒</span>
+        ) : (
+          <StatusCircle done={isDone} small={nested} />
+        )}
         <span>
           <span style={{
             display: 'block',
@@ -143,6 +164,7 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
           }}>
             {MODNAME_LABELS[m.modname] ?? m.modname}
             {m.state === 3 ? ' · not yet passed' : ''}
+            {locked ? ' · complete all items to unlock' : ''}
           </span>
         </span>
       </button>
