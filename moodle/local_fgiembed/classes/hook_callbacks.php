@@ -37,6 +37,33 @@ class hook_callbacks {
             return;
         }
         $hook->add_html('<style id="fgiembed">' . self::css() . '</style>');
+        $hook->add_html('<script id="fgiembed-pdf">' . self::pdfjs() . '</script>');
+    }
+
+    /**
+     * Hide the browser PDF viewer's own toolbar (highlight, rotate, etc.) on
+     * embedded PDFs, matching the site's PdfViewer. The toolbar is
+     * all-or-nothing — individual buttons cannot be removed — and the
+     * open-parameter fragment is honoured by Chrome/Edge and ignored
+     * harmlessly by Firefox/Safari (Jason, 8-23).
+     */
+    private static function pdfjs(): string {
+        return <<<'JS'
+document.addEventListener('DOMContentLoaded', function() {
+    var frag = '#toolbar=0&navpanes=0&view=FitH';
+    var els = document.querySelectorAll(
+        'object[type="application/pdf"], embed[type="application/pdf"], ' +
+        'object[data*=".pdf"], iframe[src*=".pdf"]'
+    );
+    els.forEach(function(el) {
+        var attr = el.tagName === 'OBJECT' ? 'data' : 'src';
+        var url = el.getAttribute(attr);
+        if (url && url.indexOf('#') === -1) {
+            el.setAttribute(attr, url + frag);
+        }
+    });
+});
+JS;
     }
 
     private static function css(): string {
