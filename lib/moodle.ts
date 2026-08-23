@@ -47,6 +47,26 @@ export class MoodleApiError extends Error {
   }
 }
 
+/**
+ * Per-attempt timeout. The first course-contents request after a Moodle cache
+ * purge (every content-load operation ends with one) rebuilds course caches
+ * and can run several seconds; anything past this is treated as a transient
+ * failure and retried rather than hanging the Vercel function.
+ */
+const ATTEMPT_TIMEOUT_MS = 7000;
+const RETRY_DELAY_MS = 300;
+
+/**
+ * Only pure reads are retried. A write whose *response* was lost may have
+ * been applied server-side — retrying user-create or enrol could double-apply
+ * or surface a duplicate error, so those keep single-shot semantics.
+ */
+function isRetryable(wsfunction: string): boolean {
+  // The SSO call is also safe: each call mints a fresh one-time key, and a
+  // key whose response was lost is simply never used.
+  return wsfunction.includes('_get_') || wsfunction === 'auth_userkey_request_login_url';
+}
+
 export async function moodleCall<T>(
   wsfunction: string,
   params: Record<string, unknown> = {},
@@ -61,21 +81,44 @@ export async function moodleCall<T>(
   });
   flattenParams(params, '', body);
 
-  const res = await fetch(`${BASE_URL}/webservice/rest/server.php`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new MoodleApiError(wsfunction, `http_${res.status}`, res.statusText);
+  const attempts = isRetryable(wsfunction) ? 2 : 1;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    if (attempt > 0) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+    }
+    try {
+      const res = await fetch(`${BASE_URL}/webservice/rest/server.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        cache: 'no-store',
+        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+      });
+      if (!res.ok) {
+        // 5xx is transient (proxy hiccup, Moodle restarting) — retryable.
+        // 4xx is deterministic and retrying would just repeat it.
+        const err = new MoodleApiError(wsfunction, `http_${res.status}`, res.statusText);
+        if (res.status >= 500) {
+          lastError = err;
+          continue;
+        }
+        throw err;
+      }
+      const data = await res.json();
+      // Moodle returns HTTP 200 with an exception payload on failure —
+      // an application-level error, deterministic, never retried.
+      if (data && typeof data === 'object' && 'exception' in data) {
+        throw new MoodleApiError(wsfunction, data.errorcode ?? 'unknown', data.message ?? 'unknown');
+      }
+      return data as T;
+    } catch (e) {
+      if (e instanceof MoodleApiError) throw e;
+      // Network failure or attempt timeout — transient, retry if allowed.
+      lastError = e;
+    }
   }
-  const data = await res.json();
-  // Moodle returns HTTP 200 with an exception payload on failure
-  if (data && typeof data === 'object' && 'exception' in data) {
-    throw new MoodleApiError(wsfunction, data.errorcode ?? 'unknown', data.message ?? 'unknown');
-  }
-  return data as T;
+  throw lastError;
 }
 
 // ---------------------------------------------------------------------------

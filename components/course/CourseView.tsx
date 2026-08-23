@@ -106,20 +106,32 @@ export default async function CourseView(
 
   const courseId = resource.moodle_course_id;
 
-  // Mirror into Moodle on first course access, then make sure they're enrolled
-  const moodleUserId = await ensureMoodleUser(user);
+  // Everything from here talks to Moodle live. A transient failure (slow
+  // cache rebuild after a purge, box restart, network blip) used to escape as
+  // a bare server exception — the generic digest page. moodleCall now retries
+  // reads once, and anything that still fails lands on a retry panel instead.
+  let sections: Awaited<ReturnType<typeof getCourseContents>>;
+  let completion: Awaited<ReturnType<typeof getActivitiesCompletion>>;
+  let moodleUserId: number;
   try {
-    await enrolUser(courseId, moodleUserId);
-  } catch (e) {
-    // Enrolment is best-effort here — an already-enrolled user must not
-    // block the player from loading.
-    console.error('Moodle enrol error:', e);
-  }
+    // Mirror into Moodle on first course access, then make sure they're enrolled
+    moodleUserId = await ensureMoodleUser(user);
+    try {
+      await enrolUser(courseId, moodleUserId);
+    } catch (e) {
+      // Enrolment is best-effort here — an already-enrolled user must not
+      // block the player from loading.
+      console.error('Moodle enrol error:', e);
+    }
 
-  const [sections, completion] = await Promise.all([
-    getCourseContents(courseId),
-    getActivitiesCompletion(courseId, moodleUserId).catch(() => []),
-  ]);
+    [sections, completion] = await Promise.all([
+      getCourseContents(courseId),
+      getActivitiesCompletion(courseId, moodleUserId).catch(() => []),
+    ]);
+  } catch (e) {
+    console.error(`Moodle course load failed (course ${courseId}, ${slug}):`, e);
+    return <CourseLoadError href={`${surface.basePath}/course/${slug}`} />;
+  }
 
   const completionByCmid = new Map(completion.map((c) => [c.cmid, c.state]));
 
@@ -159,7 +171,13 @@ export default async function CourseView(
 
   // One-time SSO URL establishes the Moodle session inside the iframe and
   // lands on the first activity; later module clicks reuse that session.
-  const initialSrc = await getUserKeyLoginUrl(user.email, firstModule.url);
+  let initialSrc: string;
+  try {
+    initialSrc = await getUserKeyLoginUrl(user.email, firstModule.url);
+  } catch (e) {
+    console.error(`Moodle SSO URL failed (course ${courseId}, ${slug}):`, e);
+    return <CourseLoadError href={`${surface.basePath}/course/${slug}`} />;
+  }
 
   return (
     <CoursePlayer
@@ -170,5 +188,44 @@ export default async function CourseView(
       initialSrc={initialSrc}
       initialCmid={firstModule.cmid}
     />
+  );
+}
+
+/**
+ * Shown when the learning platform doesn't answer in time — a transient
+ * condition, so the message asks for a retry instead of surfacing Next.js's
+ * generic server-exception page. The link is a plain full reload on purpose:
+ * the page is force-dynamic, so following it re-runs the whole fetch.
+ */
+function CourseLoadError({ href }: { href: string }) {
+  return (
+    <div style={{
+      minHeight: '55vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '2rem',
+    }}>
+      <div style={{
+        maxWidth: '460px', textAlign: 'center', background: '#ffffff',
+        border: '1px solid #dfe5ea', borderRadius: '12px', padding: '2.25rem 2rem',
+        boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
+      }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '0.6rem', color: '#16232c' }}>
+          The course is taking longer than usual to load
+        </h1>
+        <p style={{ fontSize: '15px', lineHeight: 1.6, color: '#4d616f', marginBottom: '1.4rem' }}>
+          Our learning platform didn&rsquo;t respond in time. This is usually
+          momentary &mdash; trying again almost always works.
+        </p>
+        <a
+          href={href}
+          style={{
+            display: 'inline-block', background: 'var(--fgi-blue, #0e72a2)', color: '#ffffff',
+            borderRadius: '999px', padding: '10px 28px', fontSize: '15px',
+            fontWeight: 600, textDecoration: 'none',
+          }}
+        >
+          Try again
+        </a>
+      </div>
+    </div>
   );
 }
