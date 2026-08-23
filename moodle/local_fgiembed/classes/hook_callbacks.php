@@ -41,15 +41,17 @@ class hook_callbacks {
     }
 
     /**
-     * Hide the browser PDF viewer's own toolbar (highlight, rotate, etc.) on
-     * embedded PDFs, matching the site's PdfViewer. The toolbar is
-     * all-or-nothing — individual buttons cannot be removed — and the
-     * open-parameter fragment is honoured by Chrome/Edge and ignored
-     * harmlessly by Firefox/Safari (Jason, 8-23).
+     * Route embedded PDFs through our bundled PDF.js viewer
+     * (local/fgiembed/pdfjs/, toolbar trimmed in its viewer.html): learners
+     * get zoom, page nav, search, print and download, but no annotation
+     * tools, rotate, or open-file (Jason, 8-23). Only same-origin URLs are
+     * rewritten — PDF.js refuses cross-origin file= anyway — and anything
+     * else falls back to the browser viewer with its toolbar hidden.
      */
     private static function pdfjs(): string {
         return <<<'JS'
 document.addEventListener('DOMContentLoaded', function() {
+    var viewer = location.origin + '/local/fgiembed/pdfjs/web/viewer.html?file=';
     var frag = '#toolbar=0&navpanes=0&view=FitH';
     var els = document.querySelectorAll(
         'object[type="application/pdf"], embed[type="application/pdf"], ' +
@@ -58,9 +60,31 @@ document.addEventListener('DOMContentLoaded', function() {
     els.forEach(function(el) {
         var attr = el.tagName === 'OBJECT' ? 'data' : 'src';
         var url = el.getAttribute(attr);
-        if (url && url.indexOf('#') === -1) {
-            el.setAttribute(attr, url + frag);
+        if (!url || url.indexOf('/pdfjs/web/viewer.html') !== -1) {
+            return;
         }
+        var abs;
+        try { abs = new URL(url, location.href); } catch (e) { return; }
+        if (abs.origin !== location.origin) {
+            if (url.indexOf('#') === -1) el.setAttribute(attr, url + frag);
+            return;
+        }
+        var src = viewer + encodeURIComponent(abs.href);
+        if (el.tagName === 'IFRAME') {
+            el.setAttribute('src', src);
+            return;
+        }
+        // object/embed render PDFs natively; swap in an iframe of the same
+        // footprint so the PDF.js viewer (an HTML page) fills it instead.
+        var frame = document.createElement('iframe');
+        frame.src = src;
+        frame.style.border = 'none';
+        frame.style.width = el.getAttribute('width') || el.style.width || '100%';
+        var h = el.getAttribute('height') || el.style.height ||
+            (el.clientHeight > 200 ? el.clientHeight + 'px' : '80vh');
+        frame.style.height = h;
+        if (el.id) frame.id = el.id;
+        el.parentNode.replaceChild(frame, el);
     });
 });
 JS;

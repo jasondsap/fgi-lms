@@ -1,0 +1,7 @@
+/* FGI (local_fgiembed): keep zoom / page nav / search / print / download;
+   hide the annotation editors, rotate, open-file, and bookmark link. */
+#editorModeButtons, #editorModeSeparator,
+#pageRotateCw, #pageRotateCcw,
+#secondaryOpenFile, #openFile,
+#viewBookmark, #viewBookmarkSeparator,
+#imageAltTextSettings, #imageAltTextSettingsSeparator { display: none !important; }
