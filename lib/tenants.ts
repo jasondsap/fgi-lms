@@ -133,6 +133,14 @@ export interface TenantV3 {
   orgSiteUrl: string;
   /** Logo mark sitting directly on the navy header bar (no lobe, no box). */
   headerLogo: { src: string; width: number; height: number; displayWidth: string };
+  /**
+   * 8-17-26 Colorado lobe treatment, carried into v3 (Jason, 8-23): the
+   * black-bordered full-colour mark sits on a pale-yellow field at the left
+   * of the header and the navy bar gets a pill-rounded left cap around it;
+   * the footer swaps its lockup for the same mark in a rounded yellow box.
+   * When set, `headerLogo` above is unused.
+   */
+  lobe?: { bg: string; logo: string };
   /** Header certification buttons. A button with no href renders a placeholder. */
   certButtons: {
     pre: { label: string; href?: string };
@@ -333,6 +341,9 @@ const TENANTS: Record<string, TenantConfig> = {
         src: '/images/tenants/colorado/logo-white.webp',
         width: 600, height: 447, displayWidth: '110px',
       },
+      // Same pale yellow + bordered mark as the v2 chrome, so the landing
+      // header/footer match the content pages' lobed shell (Jason, 8-23).
+      lobe: { bg: '#ffe673', logo: '/images/tenants/colorado/logo-bordered.webp' },
       certButtons: {
         // Both placeholders: unlike SCARR (course 127), Colorado has no
         // pre-certification course yet — wire the href when it lands.

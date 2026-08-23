@@ -25,6 +25,7 @@ const SOCIAL_PATHS: Record<TenantSocialPlatform, React.ReactNode> = {
  */
 export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
   const f = tenant.v3!.footer;
+  const lobe = tenant.v3!.lobe;
   const link = { color: '#ffffff', textDecoration: 'underline' } as const;
 
   return (
@@ -34,15 +35,31 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
         display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
         alignItems: 'start',
       }}>
-        {/* Left: lockup, site link, support pill */}
+        {/* Left: lockup, site link, support pill. With `lobe` (8-17-26
+            Colorado treatment) the lockup is swapped for the black-bordered
+            mark in a rounded box on its pale-yellow field. */}
         <div>
-          <Image
-            src={f.lockup.src}
-            alt={tenant.logoAlt}
-            width={f.lockup.width}
-            height={f.lockup.height}
-            style={{ width: f.lockup.displayWidth, height: 'auto' }}
-          />
+          {lobe ? (
+            <div style={{
+              background: lobe.bg, display: 'inline-flex',
+              padding: '16px 26px', borderRadius: '16px',
+            }}>
+              <Image
+                src={lobe.logo}
+                alt={tenant.logoAlt}
+                width={300} height={300}
+                style={{ width: '160px', height: 'auto' }}
+              />
+            </div>
+          ) : (
+            <Image
+              src={f.lockup.src}
+              alt={tenant.logoAlt}
+              width={f.lockup.width}
+              height={f.lockup.height}
+              style={{ width: f.lockup.displayWidth, height: 'auto' }}
+            />
+          )}
           <a
             href={f.siteUrl} target="_blank" rel="noopener noreferrer"
             style={{ ...link, display: 'inline-block', fontSize: '15px', margin: '1.4rem 0 0 4px' }}
