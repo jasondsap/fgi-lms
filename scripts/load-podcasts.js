@@ -67,7 +67,20 @@ const GUESTS = {
     name: 'Dona Dmitrovic',
     credentials: null,
     title: "Acting Director, Office of Recovery, SAMHSA",
-    bio: null,
+    // Bio supplied by Jennifer 8-22; keep in sync with the presenters row.
+    bio: 'Dona Dmitrovic is currently serving as the Acting Director of the ' +
+      'Office of Recovery. She is an accomplished behavioral health leader ' +
+      'with more than 39 years of experience in the substance use prevention, ' +
+      'treatment, and recovery field. Prior to her current role, Ms. ' +
+      'Dmitrovic served as Senior Advisor for Recovery, where she advanced ' +
+      'recovery initiatives across the agency. She also served as Director ' +
+      'of the Center for Substance Abuse Prevention (CSAP), providing ' +
+      'executive leadership for federal efforts to strengthen the nation\'s ' +
+      'behavioral health through evidence-based prevention strategies. ' +
+      'Throughout her career, Ms. Dmitrovic has played a key role in ' +
+      'developing and implementing programs that support individuals with ' +
+      'substance use and mental health conditions and advance ' +
+      'recovery-centered systems of care.',
     photo_url: '/images/presenters/dona-dmitrovic.webp',
     org_name: "SAMHSA Office of Recovery",
     org_logo_url: null,
