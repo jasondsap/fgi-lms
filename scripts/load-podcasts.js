@@ -36,18 +36,6 @@ const DIR = path.join(__dirname, '..', 'docs', 'final build', 'Podcast', 'Podcas
 const dry = process.argv.includes('--dry');
 
 const GUESTS = {
-  // Org-as-presenter: the opening episode features no person, but carries the
-  // FGI mark and website in the presenter card (Jason, 8-23).
-  fgi: {
-    name: 'Fletcher Group, Inc.',
-    credentials: null,
-    title: null,
-    bio: null,
-    photo_url: '/images/logos/fgi-flag.png',
-    org_name: 'Fletcher Group, Inc.',
-    org_logo_url: '/images/logos/fgi-logo-tagline.png',
-    org_url: 'https://www.fletchergroup.org',
-  },
   ernie: {
     name: 'Ernie Fletcher',
     credentials: 'MD',
@@ -133,9 +121,7 @@ const EPISODES = [
     file: 'Opening Episode Introducing Recovery Ecosystem Radio/00 Recovery Ecosystem Podcast - Ep1 1st EDIT (1) _opening launch.mp3',
     duration: 15, released: '2026-07-15',
     tags: ['recovery_ecosystems', 'social_model', 'recovery_support'],
-    // Jason 8-23: the opening episode carries the FGI logo + website in the
-    // guest slot (an org-as-presenter row; no person is featured).
-    guest: 'fgi',
+    guest: null,
     description:
       'In this opening episode, host Tony White shares part of his own recovery ' +
       'journey and introduces the heart of the podcast: what it takes for whole ' +

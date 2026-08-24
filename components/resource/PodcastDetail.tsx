@@ -188,7 +188,7 @@ export default async function PodcastDetail(
                 Your Host
               </div>
               <div style={{
-                display: 'grid', gridTemplateColumns: '150px 1fr',
+                display: 'grid', gridTemplateColumns: '150px 1fr 180px',
                 gap: '1.75rem', alignItems: 'start',
               }}>
                 <Image
@@ -207,6 +207,22 @@ export default async function PodcastDetail(
                     {PODCAST_HOST.title}
                   </div>
                   <CollapsedBio paragraphs={PODCAST_HOST.bio} accent={surface.primary} />
+                </div>
+                {/* FGI logo + site in the same slot the guest cards give their
+                    organization (Jason, 8-23). */}
+                <div style={{ textAlign: 'center' }}>
+                  <Image
+                    src="/images/logos/fgi-logo-tagline.png"
+                    alt="Fletcher Group, Inc."
+                    width={360} height={120}
+                    style={{ width: '100%', maxWidth: '180px', height: 'auto', objectFit: 'contain' }}
+                  />
+                  <a
+                    href="https://www.fletchergroup.org" target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'block', marginTop: '8px', fontSize: '13px', color: surface.primary }}
+                  >
+                    www.fletchergroup.org
+                  </a>
                 </div>
               </div>
             </div>
