@@ -57,10 +57,20 @@ const GUESTS = {
     credentials: 'PhD',
     title: 'Elizabeth R. Spallin Professor of Psychiatry in Addiction Medicine, ' +
            'Harvard Medical School; Founder and Director, Recovery Research Institute',
-    bio: null,
+    // Bio + RRI logo supplied by Jennifer 8-22; keep in sync with the
+    // presenters row.
+    bio: 'Dr. Kelly is the Elizabeth R. Spallin Professor of Psychiatry in ' +
+      'Addiction Medicine at Harvard Medical School — the first endowed ' +
+      'professor in addiction medicine at Harvard — and Founder and Director ' +
+      'of the Recovery Research Institute at Massachusetts General Hospital. ' +
+      'A leading figure in addiction psychology, he has published over 300 ' +
+      'peer-reviewed works, contributed to the U.S. Surgeon General\'s Report ' +
+      'on Alcohol, Drugs, and Health, and received numerous lifetime ' +
+      'achievement awards for his research on addiction treatment, recovery, ' +
+      'and reducing stigma.',
     photo_url: '/images/presenters/john-kelly.webp',
     org_name: 'Recovery Research Institute',
-    org_logo_url: null,
+    org_logo_url: '/images/presenters/recovery-research-institute.webp',
     org_url: 'https://www.recoveryanswers.org',
   },
   dona: {
