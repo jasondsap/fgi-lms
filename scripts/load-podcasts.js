@@ -103,7 +103,7 @@ const GUESTS = {
 const EPISODES = [
   {
     slug: 'recovery-ecosystem-radio-trailer',
-    title: 'Introducing Recovery Ecosystem Radio, an FGI Podcast',
+    title: 'Trailer: Introducing Recovery Ecosystem Radio, an FGI Podcast',
     file: 'Trailer/Podcast Trailer.MP3',
     duration: 2, released: '2026-07-15',
     tags: ['recovery_ecosystems'],
