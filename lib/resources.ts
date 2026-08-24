@@ -125,6 +125,16 @@ export async function getPublicResources(
     ? `(substring(title from '^Part ([0-9]+)'))::int ASC NULLS LAST, title ASC, `
     : '';
 
+  // Podcasts read as a series too: Trailer, then the Opening Episode, then
+  // numbered episodes in order (Jason, 8-23). Same hardcoded-fragment rule as
+  // videoSort — no user input reaches this string.
+  const podcastSort = !isDefaultView && typeArr.length === 1 && typeArr[0] === 'podcast'
+    ? `CASE WHEN title ILIKE 'Trailer:%' THEN 0
+            WHEN title ILIKE 'Opening Episode%' THEN 1
+            ELSE 2 END ASC,
+       (substring(title from '^Episode ([0-9]+)'))::int ASC NULLS LAST, `
+    : '';
+
   const seedPh   = isDefaultView ? bind(dailySeed()) : null;
   const limitPh  = bind(per_page);
   const offsetPh = bind(offset);
@@ -166,7 +176,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY ${videoSort}published_at DESC NULLS LAST, id DESC
+    ORDER BY ${videoSort}${podcastSort}published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 
