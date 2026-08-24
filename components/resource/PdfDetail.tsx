@@ -114,10 +114,17 @@ export default async function PdfDetail(
             </h1>
 
             {/* Where the mockup puts "Course ID: yk3232". Documents have no
-                course code, so the slot carries what a reader can use. */}
+                course code, so the slot carries what a reader can use. Only a
+                course is a "Course ID" — a handbook's code is just an ID, and
+                handbooks show no date at all (Jennifer, 8-22: cert documents
+                aren't dated artifacts the way newsletters and papers are). */}
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
-              {resource.course_code ? `Course ID: ${resource.course_code}` : typeLabel}
-              {dateLabel && <span style={{ color: 'var(--text-muted)' }}> · {dateLabel}</span>}
+              {resource.course_code
+                ? `${type === 'course' || type === 'naadac_ce' ? 'Course ID' : 'ID'}: ${resource.course_code}`
+                : typeLabel}
+              {dateLabel && type !== 'handbook' && (
+                <span style={{ color: 'var(--text-muted)' }}> · {dateLabel}</span>
+              )}
             </div>
 
             {/* The citation sits between the title and the ID line, indented,
