@@ -4,8 +4,11 @@
 // For each: switch format -> topics (the sweep lives in the format), move the
 // orphaned modules into section 0 after the existing ones, unhide them.
 //
-// Skips: course 9 (carr-standards, admin-only) and 17 (hipaa-42-cfr, eval
-// hidden on Jennifer's 8-22 instruction). Course 19 already fixed.
+// Skips: course 9 (carr-standards, admin-only). Course 19 already fixed.
+// 8-24: course 17 (hipaa-42-cfr) REMOVED from the skip list — it had been
+// skipped as "hidden on Jennifer's 8-22 instruction" but no such instruction
+// exists; it is a normal published fgi+colorado course and Jason reported
+// its eval missing.
 //
 //   sudo -u daemon php /tmp/fixsweep.php --dry     # report only
 //   sudo -u daemon php /tmp/fixsweep.php           # apply
@@ -15,7 +18,7 @@ require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
 $dry = in_array('--dry', $argv);
-$SKIP = [9, 17];
+$SKIP = [9];
 
 $admin = get_admin();
 \core\session\manager::set_user($admin);
