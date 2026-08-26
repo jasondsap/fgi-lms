@@ -155,6 +155,11 @@ export interface TenantV3 {
    */
   collections?: Record<string, { label: string; slugs: string[] }>;
   heroBg: string;
+  /**
+   * Optional smaller-print paragraph between the hero copy and the
+   * Explore · learn · Grow line (Colorado's CARR provenance note, 8-26).
+   */
+  heroNote?: string;
   /** Gold halftone dot spray behind the Latest Highlights card. */
   heroDots: string;
   highlightTileBg: string;
@@ -254,8 +259,8 @@ const TENANTS: Record<string, TenantConfig> = {
     // Colorado-specific paragraphs; it loses the CARR provenance note.
     heroParagraphs: [
       'Your one-stop, no-cost library for building stronger recovery housing and ' +
-      'support programs — <strong>courses, guides, webinars, podcasts, NAADAC CE ' +
-      'opportunities, research, and more.</strong>',
+      'support programs — <strong>certification information, courses, guides, ' +
+      'webinars, podcasts, NAADAC CE opportunities, research, and more.</strong>',
       'Whether you’re opening your first recovery home, leading an established ' +
       'program, working as a peer or recovery support provider, or a community ' +
       'partner, there’s something here for you.',
@@ -375,9 +380,17 @@ const TENANTS: Record<string, TenantConfig> = {
         },
       },
       heroBg: '#f6f6fa',
+      // Jennifer, 8-26 (Changes for Colorado.xlsx row 27), verbatim.
+      heroNote:
+        'Some content may still reference the Colorado Agency for Recovery ' +
+        'Residences (CARR) or the 2025 Guidebook. While we have updated these ' +
+        'references wherever possible, any remaining content continues to provide ' +
+        'relevant, valuable information for certified recovery residences in ' +
+        'Colorado. For the most current requirements or questions, please refer to ' +
+        'the certification documents in the library or visit our website.',
       heroDots: '/images/tenants/colorado/hero-ring.webp',
       highlightTileBg: '#fffdf4',
-      supportBar: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact FGI' },
+      supportBar: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
       certBand: {
         heading: 'Are you wanting to open a Recovery Residence?',
         paragraphsHtml: [

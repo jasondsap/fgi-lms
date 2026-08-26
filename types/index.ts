@@ -301,7 +301,7 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     ],
     // Tenant portals keep only what the tenants actually publish
     // (Jennifer's SCARR page changes, 8-25): webinars, guides, videos.
-    excludeOnTenant: ['podcast', 'toolkit', 'newsletter', 'paper', 'infographic', 'success_story', 'non_fgi'],
+    excludeOnTenant: ['podcast', 'toolkit', 'guidebook', 'newsletter', 'paper', 'infographic', 'success_story', 'non_fgi'],
   },
   {
     title: 'I Am A…',

@@ -59,7 +59,8 @@ function ContactLine({ icon, children }: { icon: keyof typeof CONTACT_ICONS; chi
 }
 
 /*
- * v3 tenant footer. Jennifer's 8-25-26 SCARR revisions to the 8-19 mockup:
+ * v3 tenant footer. Jennifer's 8-25-26 SCARR revisions to the 8-19 mockup
+ * (Colorado shares them, plus the lobe treatment below, 8-26):
  * the lockup sits at the top-left with the contact lines (email, location,
  * phone, web — each with a small icon) aligned beneath it; the outlined
  * Follow Us box sits on the right in line with the lockup, with the Learning
@@ -71,6 +72,116 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
   const lobe = tenant.v3!.lobe;
   const link = { color: '#ffffff', textDecoration: 'underline' } as const;
 
+  const contact = (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: '9px',
+      fontSize: '15px', lineHeight: 1.5,
+    }}>
+      <ContactLine icon="email">
+        <a href={`mailto:${f.email}`} style={link}>{f.email}</a>
+      </ContactLine>
+      <ContactLine icon="location">
+        {f.addressLines.map((line, i) => (
+          <span key={line}>{i > 0 && <br />}{line}</span>
+        ))}
+      </ContactLine>
+      <ContactLine icon="phone">{f.phone}</ContactLine>
+      <ContactLine icon="web">
+        <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" style={link}>
+          {f.siteLabel}
+        </a>
+        {f.contactUrl && (
+          <>
+            <br />
+            <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
+              {f.contactUrl.replace(/^https?:\/\//, 'https://')}
+            </a>
+          </>
+        )}
+      </ContactLine>
+    </div>
+  );
+
+  const right = (
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+      gap: '1.4rem', paddingBottom: '64px', paddingRight: '0.5rem',
+    }}>
+      <div style={{
+        display: 'inline-block', border: '2px solid #ffffff', borderRadius: '14px',
+        padding: '0.8rem 1.4rem 1rem', textAlign: 'center',
+      }}>
+        <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px' }}>Follow Us</div>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          {f.socials.map((s) => (
+            <a
+              key={s.platform}
+              href={s.href} target="_blank" rel="noopener noreferrer"
+              aria-label={s.platform}
+              style={{
+                width: '38px', height: '38px', borderRadius: '50%',
+                background: tenant.accent, color: tenant.primary,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+                {SOCIAL_PATHS[s.platform]}
+              </svg>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '15px' }}>
+        <span>{f.supportLabel}</span>
+        <a
+          href={f.supportHref}
+          style={{
+            background: tenant.accent, color: tenant.primary, fontWeight: 600,
+            borderRadius: '999px', padding: '7px 26px', fontSize: '14px',
+            textDecoration: 'none',
+          }}
+        >
+          {f.supportButtonLabel}
+        </a>
+      </div>
+    </div>
+  );
+
+  if (lobe) {
+    // Colorado (Jason, 8-26): the footer mirrors the header's lobe — the
+    // bordered mark on its pale-yellow field at the left, and the navy body
+    // sweeping around it with a pill-rounded left cap. The mark is a touch
+    // smaller than the header's (Jennifer: "could even be a bit smaller").
+    const edgePad = 'max(2rem, calc((100vw - var(--max-width)) / 2))';
+    return (
+      <footer style={{ background: lobe.bg, color: '#ffffff' }}>
+        <div style={{ display: 'flex', alignItems: 'stretch', paddingLeft: edgePad }}>
+          <div style={{ display: 'flex', alignItems: 'center', paddingRight: '26px', flexShrink: 0 }}>
+            <Image
+              src={lobe.logo}
+              alt={tenant.logoAlt}
+              width={300} height={300}
+              style={{ width: '120px', height: 'auto' }}
+            />
+          </div>
+          <div style={{
+            flex: 1, minWidth: 0,
+            background: tenant.primary,
+            borderRadius: '999px 0 0 999px',
+            padding: '2.25rem 0 2rem 4.5rem',
+            paddingRight: edgePad,
+            display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
+            alignItems: 'start',
+          }}>
+            {contact}
+            {right}
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer style={{ background: tenant.primary, color: '#ffffff', padding: '2.25rem 2rem 2rem' }}>
       <div style={{
@@ -78,106 +189,21 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
         display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
         alignItems: 'start',
       }}>
-        {/* Left: lockup, then the contact block aligned under it. With `lobe`
-            (8-17-26 Colorado treatment) the lockup is swapped for the
-            black-bordered mark in a rounded box on its pale-yellow field. */}
+        {/* Left: lockup, then the contact block aligned under it. */}
         <div>
-          {lobe ? (
-            <div style={{
-              background: lobe.bg, display: 'inline-flex',
-              padding: '16px 26px', borderRadius: '16px',
-            }}>
-              <Image
-                src={lobe.logo}
-                alt={tenant.logoAlt}
-                width={300} height={300}
-                style={{ width: '160px', height: 'auto' }}
-              />
-            </div>
-          ) : (
-            <Image
-              src={f.lockup.src}
-              alt={tenant.logoAlt}
-              width={f.lockup.width}
-              height={f.lockup.height}
-              style={{ width: f.lockup.displayWidth, height: 'auto', display: 'block' }}
-            />
-          )}
-
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '9px',
-            marginTop: '1.4rem', marginLeft: '4px', fontSize: '15px', lineHeight: 1.5,
-          }}>
-            <ContactLine icon="email">
-              <a href={`mailto:${f.email}`} style={link}>{f.email}</a>
-            </ContactLine>
-            <ContactLine icon="location">
-              {f.addressLines.map((line, i) => (
-                <span key={line}>{i > 0 && <br />}{line}</span>
-              ))}
-            </ContactLine>
-            <ContactLine icon="phone">{f.phone}</ContactLine>
-            <ContactLine icon="web">
-              <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" style={link}>
-                {f.siteLabel}
-              </a>
-              {f.contactUrl && (
-                <>
-                  <br />
-                  <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
-                    {f.contactUrl.replace(/^https?:\/\//, 'https://')}
-                  </a>
-                </>
-              )}
-            </ContactLine>
-          </div>
+          <Image
+            src={f.lockup.src}
+            alt={tenant.logoAlt}
+            width={f.lockup.width}
+            height={f.lockup.height}
+            style={{ width: f.lockup.displayWidth, height: 'auto', display: 'block' }}
+          />
+          <div style={{ marginTop: '1.4rem', marginLeft: '4px' }}>{contact}</div>
         </div>
 
         {/* Right: Follow Us in line with the lockup, support line beneath.
             Bottom padding keeps it clear of the fixed Ask-the-library pill. */}
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
-          gap: '1.4rem', paddingBottom: '64px', paddingRight: '0.5rem',
-        }}>
-          <div style={{
-            display: 'inline-block', border: '2px solid #ffffff', borderRadius: '14px',
-            padding: '0.8rem 1.4rem 1rem', textAlign: 'center',
-          }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px' }}>Follow Us</div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              {f.socials.map((s) => (
-                <a
-                  key={s.platform}
-                  href={s.href} target="_blank" rel="noopener noreferrer"
-                  aria-label={s.platform}
-                  style={{
-                    width: '38px', height: '38px', borderRadius: '50%',
-                    background: tenant.accent, color: tenant.primary,
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
-                    {SOCIAL_PATHS[s.platform]}
-                  </svg>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '15px' }}>
-            <span>{f.supportLabel}</span>
-            <a
-              href={f.supportHref}
-              style={{
-                background: tenant.accent, color: tenant.primary, fontWeight: 600,
-                borderRadius: '999px', padding: '7px 26px', fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              {f.supportButtonLabel}
-            </a>
-          </div>
-        </div>
+        {right}
       </div>
     </footer>
   );

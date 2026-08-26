@@ -127,6 +127,15 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 />
               ))}
 
+              {v3.heroNote && (
+                <p style={{
+                  margin: '-0.6rem 0 1.6rem', fontSize: '14px', lineHeight: 1.55,
+                  color: tenant.primary, opacity: 0.85,
+                }}>
+                  {v3.heroNote}
+                </p>
+              )}
+
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 borderLeft: `4px solid ${tenant.accent}`, paddingLeft: '16px',
