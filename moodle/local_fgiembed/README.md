@@ -30,6 +30,29 @@ navigation block** with it. Hiding chrome in CSS leaves question navigation
 working. For the same reason only the left (course index) drawer is hidden — the
 right-hand block drawer is deliberately left alone.
 
+## Video watch gate (1.1.0, August 2026)
+
+A second script, `fgiembed-watchgate`, is injected on **every** request (not
+just embedded ones). It activates only on a page that has BOTH a manual
+completion toggle (`[data-action="toggle-manual-completion"]`, i.e. the
+activity's completion is set to *manual*) AND a Vimeo `<iframe>`. On such a
+page it:
+
+- hides Moodle's "Mark as done" control — the script owns completion;
+- attaches Vimeo's player API to the existing iframe and accumulates *played*
+  seconds from `timeupdate` deltas (a jump larger than 2 s is a seek and is
+  not counted), persisting partial progress in `localStorage` per cmid;
+- shows a status line under the video ("Watched 42% — this lesson is marked
+  complete once you have watched 90% of the video.");
+- at `THRESHOLD` (0.9) calls `core_completion_update_activity_completion_status_manually`
+  via `core/ajax`, which sets the learner's completion exactly as the manual
+  button would.
+
+Opt an activity in by switching its completion from automatic-on-view to
+manual (`scripts/moodle/watchgate825.php` does this for the SCARR and
+Colorado pre-certification video pages). Pages with automatic completion are
+untouched. Chosen over Video Time Pro (paid, €229+/yr) on 8-25-26.
+
 ## Deploying
 
 ```bash
