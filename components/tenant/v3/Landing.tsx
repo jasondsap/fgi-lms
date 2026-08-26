@@ -152,13 +152,23 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 style={{
                   position: 'absolute', top: '-40px', left: '60px',
                   width: '525px', height: 'auto', pointerEvents: 'none',
-                  opacity: 0.5,
+                  opacity: 0.38,
                 }}
               />
+              {/* The two gold outlier dots from the mockup — one above-right of
+                  the card, one out at the right edge (Jennifer, 8-25). */}
+              <span aria-hidden style={{
+                position: 'absolute', right: '30px', top: '58px',
+                width: '22px', height: '22px', borderRadius: '50%', background: tenant.accent,
+              }} />
+              <span aria-hidden style={{
+                position: 'absolute', right: '-6px', top: '190px',
+                width: '15px', height: '15px', borderRadius: '50%', background: tenant.accent,
+              }} />
               <div style={{
                 position: 'relative', background: '#ffffff',
                 borderRadius: '22px', boxShadow: '0 10px 34px rgba(4,30,66,0.18)',
-                width: '340px', margin: '3.4rem 4.2rem 0 auto',
+                width: '340px', margin: '3.4rem 5.6rem 0 auto',
                 padding: '1.3rem 1.35rem 1.5rem',
               }}>
                 <div style={{
@@ -175,7 +185,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                       key={tile.label}
                       href={tile.href}
                       style={{
-                        display: 'grid', gridTemplateColumns: '90px 1fr',
+                        display: 'grid', gridTemplateColumns: '96px 1fr',
                         gap: '12px', alignItems: 'center',
                         background: v3.highlightTileBg,
                         border: '1px solid #ece7d2', borderRadius: '10px',
@@ -183,8 +193,14 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                         boxShadow: '0 2px 8px rgba(4,30,66,0.08)',
                       }}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={tile.icon} alt="" style={{ width: '90px', height: 'auto' }} />
+                      <span style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '96px', height: '84px', borderRadius: '12px',
+                        background: '#ffffff', border: '1px solid #f0ead0',
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={tile.icon} alt="" style={{ width: '92px', height: 'auto' }} />
+                      </span>
                       <span>
                         <span style={{
                           display: 'block', fontSize: '17px', fontWeight: 700,
@@ -246,7 +262,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           {/* Photo card — grey mat with the composited photo at its base. */}
           <div style={{
             background: '#a9aeb6', borderRadius: '6px', overflow: 'hidden',
-            display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
             <Image
               src={v3.certBand.photo}
@@ -268,7 +284,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           display: 'grid', gridTemplateColumns: 'auto auto 1fr', gap: '2rem', alignItems: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '18px', fontWeight: 700 }}>Need Platform Help?</span>
+            <span style={{ fontSize: '18px', fontWeight: 700 }}>{v3.supportBar.heading ?? 'Need Platform Help?'}</span>
             <a
               href="mailto:LC@fletchergroup.org"
               style={{
@@ -301,7 +317,10 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
       <section id="library" style={{ background: '#ffffff', padding: '2.25rem 2rem 4rem', scrollMarginTop: '90px' }}>
         <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
-            <FilterSidebar total={data.total} targetPath={home} isTenant />
+            <FilterSidebar
+              total={data.total} targetPath={home} isTenant
+              fgiLibraryHref={`${tenant.fgiSiteUrl}/library`}
+            />
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath={home} />

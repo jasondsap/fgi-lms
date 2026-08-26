@@ -10,6 +10,11 @@ interface Props {
   targetPath?: string;
   /** True on a tenant portal — controls the Certification Info group. */
   isTenant?: boolean;
+  /**
+   * Tenant portals: link to the FGI main library, rendered as an
+   * "Other Libraries" block at the foot of the sidebar (Jennifer, 8-25).
+   */
+  fgiLibraryHref?: string;
 }
 
 const LABEL_MAPS: Record<string, Record<string, string>> = {
@@ -70,7 +75,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
-export default function FilterSidebar({ total, targetPath, isTenant = false }: Props) {
+export default function FilterSidebar({ total, targetPath, isTenant = false, fgiLibraryHref }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -78,12 +83,18 @@ export default function FilterSidebar({ total, targetPath, isTenant = false }: P
 
   const toggle = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    const current = params.getAll(key);
-    params.delete(key);
-    if (current.includes(value)) {
-      current.filter(v => v !== value).forEach(v => params.append(key, v));
+    if (key === 'collection') {
+      // A collection is a single curated view, not a multi-select facet.
+      if (params.get('collection') === value) params.delete('collection');
+      else params.set('collection', value);
     } else {
-      [...current, value].forEach(v => params.append(key, v));
+      const current = params.getAll(key);
+      params.delete(key);
+      if (current.includes(value)) {
+        current.filter(v => v !== value).forEach(v => params.append(key, v));
+      } else {
+        [...current, value].forEach(v => params.append(key, v));
+      }
     }
     params.set('page', '1');
     // scroll: false keeps the visitor where they are in the library instead
@@ -94,19 +105,30 @@ export default function FilterSidebar({ total, targetPath, isTenant = false }: P
   const clearAll = useCallback(() => { router.push(dest, { scroll: false }); }, [router, dest]);
 
   const active: Record<string, string[]> = {
-    type:     searchParams.getAll('type'),
-    audience: searchParams.getAll('audience'),
-    topic:    searchParams.getAll('topic'),
+    type:       searchParams.getAll('type'),
+    audience:   searchParams.getAll('audience'),
+    topic:      searchParams.getAll('topic'),
+    collection: searchParams.getAll('collection'),
   };
   const hasFilters = active.type.length || active.audience.length || active.topic.length
-    || searchParams.get('duration');
+    || active.collection.length || searchParams.get('duration');
 
+  // Normalise every item to {param, value, label} so a group can mix its own
+  // facet with a collection checkbox (the tenants' "Required Videos").
   const groups = FILTER_GROUPS
-    .filter(g => !g.tenantOnly || isTenant)
-    .map(g => ({
-      ...g,
-      items: isTenant ? g.items.filter(i => !g.excludeOnTenant?.includes(i)) : g.items,
-    }))
+    .filter(g => (!g.tenantOnly || isTenant) && !(g.hideOnTenant && isTenant))
+    .map(g => {
+      const labels = LABEL_MAPS[g.param];
+      const items = g.items
+        .map(i => (typeof i === 'string'
+          ? {
+              param: g.param, value: i,
+              label: (isTenant && g.tenantLabels?.[i]) || g.labels?.[i] || labels[i] || i,
+            }
+          : i))
+        .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)));
+      return { title: g.title, items };
+    })
     .filter(g => g.items.length > 0);
 
   return (
@@ -132,26 +154,36 @@ export default function FilterSidebar({ total, targetPath, isTenant = false }: P
         ) : null}
       </div>
 
-      {groups.map(group => {
-        const labels = LABEL_MAPS[group.param];
-        const selected = active[group.param];
-        return (
-          <FilterGroup
-            key={group.title}
-            title={group.title}
-            defaultOpen={group.items.some(i => selected.includes(i))}
+      {groups.map(group => (
+        <FilterGroup
+          key={group.title}
+          title={group.title}
+          defaultOpen={group.items.some(i => active[i.param].includes(i.value))}
+        >
+          {group.items.map(item => (
+            <CheckItem
+              key={`${item.param}:${item.value}`}
+              label={item.label}
+              checked={active[item.param].includes(item.value)}
+              onChange={() => toggle(item.param, item.value)}
+            />
+          ))}
+        </FilterGroup>
+      ))}
+
+      {isTenant && fgiLibraryHref && (
+        <div style={{ paddingTop: '14px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+            Other Libraries
+          </div>
+          <a
+            href={fgiLibraryHref}
+            style={{ fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'underline' }}
           >
-            {group.items.map(item => (
-              <CheckItem
-                key={item}
-                label={group.labels?.[item] ?? labels[item] ?? item}
-                checked={selected.includes(item)}
-                onChange={() => toggle(group.param, item)}
-              />
-            ))}
-          </FilterGroup>
-        );
-      })}
+            FGI Learning Resource Center library
+          </a>
+        </div>
+      )}
     </aside>
   );
 }

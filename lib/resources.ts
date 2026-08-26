@@ -67,7 +67,16 @@ export async function getPublicResources(
     // A resource has exactly one type, so multiple selections are always OR —
     // the any/all "Match Categories" toggle applies to audience and topic only.
     // Cast to text because the column is the resource_type enum.
-    conditions.push(`type::text = ANY(${bind(typeArr)}::text[])`);
+    //
+    // `naadac_ce` is a filter option, not a stored type: CE courses are
+    // `course` rows with is_naadac_ce = TRUE. Fold it into the OR so the
+    // "NAADAC CE" checkbox matches them (it matched nothing before 8-25).
+    const wantsNaadac = typeArr.includes('naadac_ce' as ResourceType);
+    const storedTypes = typeArr.filter((t) => t !== 'naadac_ce');
+    const typeClauses: string[] = [];
+    if (storedTypes.length > 0) typeClauses.push(`type::text = ANY(${bind(storedTypes)}::text[])`);
+    if (wantsNaadac) typeClauses.push('is_naadac_ce = TRUE');
+    conditions.push(`(${typeClauses.join(' OR ')})`);
   }
 
   if (search) {

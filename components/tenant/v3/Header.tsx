@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import type { TenantConfig } from '@/lib/tenants';
 
 /*
@@ -26,9 +27,21 @@ export default function TenantHeaderV3({
   const home = `/${tenant.slug}`;
   const pathname = usePathname();
 
+  // "Library" is a hash link on the landing page; usePathname can't see the
+  // hash, so track it ourselves so the tab goes gold once the visitor is in
+  // the library (Jennifer, 8-25).
+  const [hash, setHash] = useState('');
+  useEffect(() => {
+    const read = () => setHash(window.location.hash);
+    read();
+    window.addEventListener('hashchange', read);
+    return () => window.removeEventListener('hashchange', read);
+  }, [pathname]);
+  const inLibrary = pathname === home && hash === '#library';
+
   const links = [
-    { label: 'Home', href: home, active: pathname === home },
-    { label: 'Library', href: `${home}#library`, active: false },
+    { label: 'Home', href: home, active: pathname === home && !inLibrary },
+    { label: 'Library', href: `${home}#library`, active: inLibrary },
   ];
 
   const pillBase = {
@@ -65,7 +78,9 @@ export default function TenantHeaderV3({
         </ul>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      {/* Certification pills sit centred in the space between the nav and the
+          org-site link (Jennifer, 8-25). */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
         {v3.certButtons.pre.href ? (
           <Link
             href={v3.certButtons.pre.href}
@@ -105,7 +120,7 @@ export default function TenantHeaderV3({
       </div>
 
       <div style={{
-        marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1.5rem',
+        display: 'flex', alignItems: 'center', gap: '1.5rem',
       }}>
         <a
           href={v3.orgSiteUrl} target="_blank" rel="noopener noreferrer"

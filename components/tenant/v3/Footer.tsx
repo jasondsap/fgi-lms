@@ -18,10 +18,53 @@ const SOCIAL_PATHS: Record<TenantSocialPlatform, React.ReactNode> = {
   ),
 };
 
+/** Small line icons for the contact block (stroke = currentColor). */
+const CONTACT_ICONS = {
+  email: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </>
+  ),
+  location: (
+    <>
+      <path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </>
+  ),
+  phone: (
+    <path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 006.5 6.5L17 13l4 1.5v3a2 2 0 01-2 2A16 16 0 014.5 5a2 2 0 012-2z" />
+  ),
+  web: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
+    </>
+  ),
+};
+
+function ContactLine({ icon, children }: { icon: keyof typeof CONTACT_ICONS; children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+      <svg
+        width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden
+        style={{ flexShrink: 0, marginTop: '3px' }}
+      >
+        {CONTACT_ICONS[icon]}
+      </svg>
+      <span>{children}</span>
+    </div>
+  );
+}
+
 /*
- * v3 tenant footer (8-19-26 SCARR mockup): brand navy; the horizontal lockup
- * and site link on the left with the Learning Center Support pill beneath,
- * the contact block and the outlined Follow Us box on the right.
+ * v3 tenant footer. Jennifer's 8-25-26 SCARR revisions to the 8-19 mockup:
+ * the lockup sits at the top-left with the contact lines (email, location,
+ * phone, web — each with a small icon) aligned beneath it; the outlined
+ * Follow Us box sits on the right in line with the lockup, with the Learning
+ * Center Support line under it. The right column stops well above the
+ * bottom edge so it never collides with the fixed "Ask the library" pill.
  */
 export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
   const f = tenant.v3!.footer;
@@ -29,15 +72,15 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
   const link = { color: '#ffffff', textDecoration: 'underline' } as const;
 
   return (
-    <footer style={{ background: tenant.primary, color: '#ffffff', padding: '2.5rem 2rem 2.25rem' }}>
+    <footer style={{ background: tenant.primary, color: '#ffffff', padding: '2.25rem 2rem 2rem' }}>
       <div style={{
         maxWidth: 'var(--max-width)', margin: '0 auto',
         display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
         alignItems: 'start',
       }}>
-        {/* Left: lockup, site link, support pill. With `lobe` (8-17-26
-            Colorado treatment) the lockup is swapped for the black-bordered
-            mark in a rounded box on its pale-yellow field. */}
+        {/* Left: lockup, then the contact block aligned under it. With `lobe`
+            (8-17-26 Colorado treatment) the lockup is swapped for the
+            black-bordered mark in a rounded box on its pale-yellow field. */}
         <div>
           {lobe ? (
             <div style={{
@@ -57,52 +100,48 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
               alt={tenant.logoAlt}
               width={f.lockup.width}
               height={f.lockup.height}
-              style={{ width: f.lockup.displayWidth, height: 'auto' }}
+              style={{ width: f.lockup.displayWidth, height: 'auto', display: 'block' }}
             />
           )}
-          <a
-            href={f.siteUrl} target="_blank" rel="noopener noreferrer"
-            style={{ ...link, display: 'inline-block', fontSize: '15px', margin: '1.4rem 0 0 4px' }}
-          >
-            {f.siteLabel}
-          </a>
 
           <div style={{
-            display: 'flex', alignItems: 'center', gap: '14px',
-            marginTop: '3.4rem', fontSize: '15px',
+            display: 'flex', flexDirection: 'column', gap: '9px',
+            marginTop: '1.4rem', marginLeft: '4px', fontSize: '15px', lineHeight: 1.5,
           }}>
-            <span>{f.supportLabel}</span>
-            <a
-              href={f.supportHref}
-              style={{
-                background: tenant.accent, color: tenant.primary, fontWeight: 600,
-                borderRadius: '999px', padding: '7px 26px', fontSize: '14px',
-                textDecoration: 'none',
-              }}
-            >
-              {f.supportButtonLabel}
-            </a>
+            <ContactLine icon="email">
+              <a href={`mailto:${f.email}`} style={link}>{f.email}</a>
+            </ContactLine>
+            <ContactLine icon="location">
+              {f.addressLines.map((line, i) => (
+                <span key={line}>{i > 0 && <br />}{line}</span>
+              ))}
+            </ContactLine>
+            <ContactLine icon="phone">{f.phone}</ContactLine>
+            <ContactLine icon="web">
+              <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" style={link}>
+                {f.siteLabel}
+              </a>
+              {f.contactUrl && (
+                <>
+                  <br />
+                  <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
+                    {f.contactUrl.replace(/^https?:\/\//, 'https://')}
+                  </a>
+                </>
+              )}
+            </ContactLine>
           </div>
         </div>
 
-        {/* Right: contact block + Follow Us */}
-        <div style={{ fontSize: '15px', lineHeight: 1.6, textAlign: 'left' }}>
-          <div>Email: <a href={`mailto:${f.email}`} style={link}>{f.email}</a></div>
-          {f.contactUrl && (
-            <div>
-              <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
-                {f.contactUrl.replace(/^https?:\/\//, 'https://')}
-              </a>
-            </div>
-          )}
-          <div style={{ marginTop: '1rem' }}>
-            {f.addressLines.map((line) => <div key={line}>{line}</div>)}
-          </div>
-          <div style={{ marginTop: '1rem' }}>{f.phone}</div>
-
+        {/* Right: Follow Us in line with the lockup, support line beneath.
+            Bottom padding keeps it clear of the fixed Ask-the-library pill. */}
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
+          gap: '1.4rem', paddingBottom: '64px', paddingRight: '0.5rem',
+        }}>
           <div style={{
             display: 'inline-block', border: '2px solid #ffffff', borderRadius: '14px',
-            padding: '0.8rem 1.4rem 1rem', marginTop: '1.5rem', textAlign: 'center',
+            padding: '0.8rem 1.4rem 1rem', textAlign: 'center',
           }}>
             <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px' }}>Follow Us</div>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
@@ -123,6 +162,20 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
                 </a>
               ))}
             </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '15px' }}>
+            <span>{f.supportLabel}</span>
+            <a
+              href={f.supportHref}
+              style={{
+                background: tenant.accent, color: tenant.primary, fontWeight: 600,
+                borderRadius: '999px', padding: '7px 26px', fontSize: '14px',
+                textDecoration: 'none',
+              }}
+            >
+              {f.supportButtonLabel}
+            </a>
           </div>
         </div>
       </div>

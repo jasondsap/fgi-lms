@@ -158,7 +158,8 @@ export interface TenantV3 {
   /** Gold halftone dot spray behind the Latest Highlights card. */
   heroDots: string;
   highlightTileBg: string;
-  supportBar: { bg: string; fg: string; buttonLabel: string };
+  /** `heading` defaults to "Need Platform Help?" (SCARR: "Learning Center Support"). */
+  supportBar: { bg: string; fg: string; buttonLabel: string; heading?: string };
   certBand: {
     heading: string;
     /** Trusted author HTML paragraphs (apply link, contact email). */
@@ -359,6 +360,20 @@ const TENANTS: Record<string, TenantConfig> = {
         },
         // No Post-Certification button for Colorado (Jason, 8-23).
       },
+      collections: {
+        'required-videos': {
+          label: 'Required Videos',
+          slugs: [
+            'corr-part-1-intro-to-recovery-residences',
+            'corr-part-2-levels-of-recovery-residences',
+            'corr-part-3-administrative-and-operations',
+            'corr-part-4-budgeting-basics',
+            'corr-part-5-staffing-and-leadership',
+            'corr-part-6-recovery-oriented-culture',
+            'corr-part-7-physical-property',
+          ],
+        },
+      },
       heroBg: '#f6f6fa',
       heroDots: '/images/tenants/colorado/hero-ring.webp',
       highlightTileBg: '#fffdf4',
@@ -414,8 +429,8 @@ const TENANTS: Record<string, TenantConfig> = {
     // 8-11-26 mockup uses FGI's generic wording verbatim, as Colorado's does.
     heroParagraphs: [
       'Your one-stop, no-cost library for building stronger recovery housing and ' +
-      'support programs — <strong>courses, guides, webinars, podcasts, NAADAC CE ' +
-      'opportunities, research, and more.</strong>',
+      'support programs — <strong>certification information, courses, guides, ' +
+      'webinars, podcasts, NAADAC CE opportunities, research, and more.</strong>',
       'Whether you’re opening your first recovery home, leading an established ' +
       'program, working as a peer or recovery support provider, or a community ' +
       'partner, there’s something here for you.',
@@ -521,6 +536,18 @@ const TENANTS: Record<string, TenantConfig> = {
       // no SCARR visibility row is silently absent from the page — keep this
       // list and resource_visibility in step.
       collections: {
+        'required-videos': {
+          label: 'Required Videos',
+          slugs: [
+            'scarr-part-1-intro-to-recovery-residences',
+            'scarr-part-2-levels-of-recovery-residences',
+            'scarr-part-3-administrative-and-operations',
+            'scarr-part-4-budgeting-basics',
+            'scarr-part-5-staffing-and-leadership',
+            'scarr-part-6-recovery-oriented-culture',
+            'scarr-part-7-physical-property',
+          ],
+        },
         'post-certification': {
           label: 'Post-Certification Requirements',
           slugs: [
@@ -554,7 +581,7 @@ const TENANTS: Record<string, TenantConfig> = {
       // hex), alpha-cropped so the CSS width IS the ring diameter.
       heroDots: '/images/tenants/scarr/hero-ring.webp',
       highlightTileBg: '#fffdf4',
-      supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact Us' },
+      supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
       certBand: {
         heading: 'Becoming a SCARR Certified Residence',
         paragraphsHtml: [
@@ -584,7 +611,7 @@ const TENANTS: Record<string, TenantConfig> = {
         email: 'info@Scarronline.org',
         contactUrl: 'https://scarronline.org/contact/',
         addressLines: ['4711 Forest Drive, Suite 3 #226', 'Columbia, SC 29206'],
-        phone: '(803)430-6451',
+        phone: '(803) 430-6451',
         socials: [
           { platform: 'facebook', href: 'https://www.facebook.com/screcoveryresidences/' },
           { platform: 'linkedin', href: 'https://www.linkedin.com/company/south-carolina-alliance-for-recovery-residences/' },

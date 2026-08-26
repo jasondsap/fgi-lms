@@ -239,16 +239,31 @@ export const TOPIC_TAG_LABELS: Record<TopicTag, string> = {
 // everything else is self-paced). The `duration` and `match` query params
 // still work in lib/resources.ts, so restoring Length is a UI-only change.
 
+/**
+ * A checkbox that writes to a different query key than its group — used for
+ * the tenants' "Required Videos", which is a curated collection
+ * (`?collection=required-videos`) rather than a resource type.
+ */
+export interface FilterItemSpec {
+  param: 'type' | 'audience' | 'topic' | 'collection';
+  value: string;
+  label: string;
+}
+
 export interface FilterGroupSpec {
   title: string;
   /** Query-string key the group's checkboxes write to. */
   param: 'type' | 'audience' | 'topic';
   /** Keys into the matching label map, in display order. */
-  items: string[];
+  items: Array<string | FilterItemSpec>;
   /** Per-group label overrides — the same type reads differently here. */
   labels?: Record<string, string>;
+  /** Label overrides that apply on tenant portals only (Jennifer, 8-25). */
+  tenantLabels?: Record<string, string>;
   /** Render only on a tenant portal (Colorado / SCARR). */
   tenantOnly?: boolean;
+  /** Never render on a tenant portal. */
+  hideOnTenant?: boolean;
   /** Items to drop when rendering on a tenant portal. */
   excludeOnTenant?: string[];
 }
@@ -260,13 +275,21 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     // series and `handbook` is the certification paperwork.
     title: 'Certification Info',
     param: 'type',
-    items: ['video', 'handbook'],
-    labels: { video: 'Required Videos', handbook: 'Cert. Documents' },
+    // "Required Videos" is the tenant's seven-part series only — a curated
+    // collection (lib/tenants.ts), not every `video` row (Jennifer, 8-25:
+    // Clarifying Language is a video but not a requirement).
+    items: [
+      { param: 'collection', value: 'required-videos', label: 'Required Videos' },
+      'handbook',
+    ],
+    labels: { handbook: 'Cert. Documents' },
     tenantOnly: true,
   },
   {
     title: 'Courses',
     param: 'type',
+    // `naadac_ce` is not a stored type — getPublicResources maps it onto the
+    // is_naadac_ce flag.
     items: ['naadac_ce', 'course'],
   },
   {
@@ -276,16 +299,16 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
       'webinar', 'podcast', 'toolkit', 'guidebook', 'newsletter',
       'video', 'paper', 'infographic', 'success_story', 'non_fgi',
     ],
-    // Video is already the tenant's "Required Videos" above; listing it twice
-    // would offer the same rows under two names.
-    excludeOnTenant: ['video'],
+    // Tenant portals keep only what the tenants actually publish
+    // (Jennifer's SCARR page changes, 8-25): webinars, guides, videos.
+    excludeOnTenant: ['podcast', 'toolkit', 'newsletter', 'paper', 'infographic', 'success_story', 'non_fgi'],
   },
   {
-    // Unchanged — the only group Jennifer's doc leaves alone.
     title: 'I Am A…',
     param: 'audience',
     items: ['house_owner', 'peer_support', 'community', 'criminal_justice',
             'clinical', 'medical', 'workforce'],
+    excludeOnTenant: ['criminal_justice', 'clinical', 'medical', 'workforce'],
   },
   {
     title: 'I Want To Learn About…',
@@ -295,11 +318,14 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
       'social_model', 'workforce', 'research', 'reentry', 'funding',
       'self_care', 'mental_health', 'recovery_ecosystems',
     ],
+    excludeOnTenant: ['workforce', 'reentry', 'funding', 'mental_health'],
+    tenantLabels: { research: 'Research & Data' },
   },
   {
     title: 'Recovery House Models',
     param: 'topic',
     items: ['rhoar_model', 'recovery_ky_model'],
+    hideOnTenant: true,
   },
 ];
 
