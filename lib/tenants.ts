@@ -146,6 +146,14 @@ export interface TenantV3 {
     pre: { label: string; href?: string };
     post?: { label: string; href?: string };
   };
+  /**
+   * Curated library views reachable as `/<tenant>?collection=<key>`. The
+   * landing filters its library to exactly these slugs, in this order, and
+   * shows a banner naming the collection. Slugs that have no visible row on
+   * the tenant simply don't appear — the banner's "N of M" makes the gap
+   * visible.
+   */
+  collections?: Record<string, { label: string; slugs: string[] }>;
   heroBg: string;
   /** Gold halftone dot spray behind the Latest Highlights card. */
   heroDots: string;
@@ -502,8 +510,44 @@ const TENANTS: Record<string, TenantConfig> = {
           label: 'Pre-Certification Requirements',
           href: '/scarr/course/scarr-pre-certification-requirements',
         },
-        // Placeholder — Jason is confirming the destination (8-21).
-        post: { label: 'Post-Certification Requirements' },
+        // Filters the library to the post-certification collection below
+        // (Jason, 8-25).
+        post: {
+          label: 'Post-Certification Requirements',
+          href: '/scarr?collection=post-certification#library',
+        },
+      },
+      // Jason's post-certification list (8-25-26), in his order. A slug with
+      // no SCARR visibility row is silently absent from the page — keep this
+      // list and resource_visibility in step.
+      collections: {
+        'post-certification': {
+          label: 'Post-Certification Requirements',
+          slugs: [
+            'narr-levels-recovery-housing',
+            'hipaa-42-cfr',
+            'insurance-budgeting-recovery-housing',
+            'responding-to-nimbyism',
+            'recovery-housing-asam-criteria',
+            'pregnant-parenting-recovery-housing',
+            'swot-analysis',
+            'recovery-house-management-community',
+            'cultural-humility',
+            'why-evaluation-matters',
+            'clarifying-language-and-acronyms-substance-use-disorders-and-medications',
+            'implementing-mar',
+            'preventing-mar-discrimination',
+            'urine-analysis-best-practices',
+            'managing-staff',
+            'peer-leadership-best-practices',
+            'naloxone-par-training',
+            'first-aid-household-injuries',
+            'cpr-hands-only',
+            'samhsa-988-crisis-line',
+            'recovery-ecosystems-for-communities',
+            'role-of-recovery-allies',
+          ],
+        },
       },
       heroBg: '#f6f7f8',
       // Jennifer's own halftone ring ("scarr - f5d300.png", filename is the

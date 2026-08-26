@@ -1,6 +1,7 @@
 // GET /api/resources — public filtered resource list
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublicResources } from '@/lib/resources';
+import { getTenantConfig } from '@/lib/tenants';
 import type { ResourceListParams } from '@/types';
 
 export async function GET(request: NextRequest) {
@@ -25,6 +26,15 @@ export async function GET(request: NextRequest) {
     if (type.length)     params.type     = type     as any;
     if (audience.length) params.audience = audience as any;
     if (topic.length)    params.topic    = topic    as any;
+
+    // A tenant's curated collection (?collection=post-certification&tenant=scarr)
+    // resolves to its slug list from the tenant config — the list itself never
+    // comes from the request.
+    const collection = searchParams.get('collection');
+    if (collection && params.tenant) {
+      const slugs = getTenantConfig(params.tenant)?.v3?.collections?.[collection]?.slugs;
+      if (slugs) params.slugs = slugs;
+    }
 
     const result = await getPublicResources(params);
 

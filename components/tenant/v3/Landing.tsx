@@ -48,6 +48,17 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
     params.topic = (Array.isArray(searchParams.topic) ? searchParams.topic : [searchParams.topic]) as TopicTag[];
   }
 
+  // Curated collection (the header's Post-Certification pill): restrict the
+  // library to the tenant's slug list, in list order, all on one page. An
+  // unknown key is ignored and the library renders as normal.
+  const collectionKey = typeof searchParams.collection === 'string' ? searchParams.collection : undefined;
+  const collection = collectionKey ? v3.collections?.[collectionKey] : undefined;
+  if (collection) {
+    params.slugs = collection.slugs;
+    params.per_page = Math.max(collection.slugs.length, 1);
+    params.page = 1;
+  }
+
   const data = await getPublicResources(params);
 
   // Highlights are FGI's newest items and point at the FGI site — they are
@@ -294,6 +305,29 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath={home} />
+            {collection && (
+              <div
+                role="status"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: '1rem', flexWrap: 'wrap',
+                  margin: '0 0 1.25rem', padding: '12px 18px',
+                  background: v3.highlightTileBg, border: `1px solid ${tenant.accent}`,
+                  borderRadius: 'var(--radius-md, 8px)', fontSize: '15px', lineHeight: 1.4,
+                }}
+              >
+                <span>
+                  <strong>{collection.label}</strong>
+                  {' — '}showing {data.total} of {collection.slugs.length} required items
+                </span>
+                <Link
+                  href={`${home}#library`}
+                  style={{ color: tenant.primary, fontWeight: 600, textDecoration: 'underline', whiteSpace: 'nowrap' }}
+                >
+                  Show full library
+                </Link>
+              </div>
+            )}
             <ResourceGrid
               key={linkQuery}
               initial={data.resources}

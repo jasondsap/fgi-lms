@@ -155,6 +155,12 @@ export interface ResourceListParams {
   duration?: 'under_15' | '16_30' | '31_60' | '61_90' | '91_120' | '121_plus';
   search?: string;
   tenant?: string;       // tenant slug — filters visibility
+  /**
+   * Restrict to an explicit slug list (a curated "collection", e.g. a
+   * tenant's post-certification requirements). Results come back in the
+   * order the slugs are listed, not newest-first.
+   */
+  slugs?: string[];
   page?: number;
   per_page?: number;
   match?: 'any' | 'all'; // any category match vs all categories must match

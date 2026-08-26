@@ -75,6 +75,17 @@ export async function getPublicResources(
     conditions.push(`(title ILIKE ${ph} OR description ILIKE ${ph})`);
   }
 
+  // Curated collection: an explicit slug list (tenant config), returned in
+  // list order. The list is bound as one text[] parameter and reused for the
+  // ORDER BY via array_position — no user input reaches the SQL text.
+  const slugArr = params.slugs && params.slugs.length > 0 ? params.slugs : null;
+  let collectionSort = '';
+  if (slugArr) {
+    const ph = bind(slugArr);
+    conditions.push(`slug = ANY(${ph}::text[])`);
+    collectionSort = `array_position(${ph}::text[], slug) ASC, `;
+  }
+
   if (duration && DURATION_CLAUSES[duration]) {
     // Whitelist lookup — fragment is a constant, no binding needed.
     conditions.push(DURATION_CLAUSES[duration]);
@@ -113,7 +124,7 @@ export async function getPublicResources(
   // anyone who has expressed intent gets newest-first, which is what they want.
   // `tenant` is the surface, not a user filter, so it doesn't count here.
   const isDefaultView = typeArr.length === 0 && !search && !duration
-    && audienceArr.length === 0 && topicArr.length === 0;
+    && audienceArr.length === 0 && topicArr.length === 0 && !slugArr;
 
   // A video-only filter (the tenants' "Required Videos") is a certification
   // sequence, not a feed: the CORR/SCARR series must list Part 1 → 7, and all
@@ -176,7 +187,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY ${videoSort}${podcastSort}published_at DESC NULLS LAST, id DESC
+    ORDER BY ${collectionSort}${videoSort}${podcastSort}published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 
