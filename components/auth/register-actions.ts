@@ -12,6 +12,7 @@ import {
   CognitoAuthError, createConfirmedUser, PASSWORD_REGEX,
 } from '@/lib/cognito';
 import { createRegisteredUser } from '@/lib/users';
+import { REGISTRATION_CLOSED_MESSAGE, SELF_REGISTRATION_OPEN } from '@/lib/registration';
 import { USER_ROLE_LABELS, US_STATES, type UserRole } from '@/types';
 import type { AuthActionResult } from '@/components/auth/login-actions';
 
@@ -35,6 +36,10 @@ const VALID_ROLES = new Set(Object.keys(USER_ROLE_LABELS));
 const VALID_STATES = new Set(US_STATES.map((s) => s.code));
 
 export async function registerAction(payload: RegisterPayload): Promise<AuthActionResult> {
+  // Server-side half of the kill switch: hiding the tab isn't enough, the
+  // action is a public endpoint and must refuse on its own.
+  if (!SELF_REGISTRATION_OPEN) return { ok: false, error: REGISTRATION_CLOSED_MESSAGE };
+
   const firstName = payload.firstName?.trim() ?? '';
   const lastName = payload.lastName?.trim() ?? '';
   const email = payload.email?.trim().toLowerCase() ?? '';

@@ -5,6 +5,7 @@ import {
   confirmResetAction, loginAction, requestResetAction,
 } from '@/components/auth/login-actions';
 import RegisterForm from '@/components/auth/RegisterForm';
+import { SELF_REGISTRATION_OPEN } from '@/lib/registration';
 
 /**
  * On-site login (8-20-26 auth rebuild, phase 2) — replaces the redirect to
@@ -57,9 +58,12 @@ export default function LoginModal(
     accent?: string;
   },
 ) {
+  // Registration kill switch (lib/registration.ts): while closed, a request
+  // to open on 'register' lands on Log In and the tab strip is hidden.
+  const startView: View = SELF_REGISTRATION_OPEN ? initialView : 'login';
   const router = useRouter();
   const [open, setOpen] = useState(autoOpen);
-  const [view, setView] = useState<View>(initialView);
+  const [view, setView] = useState<View>(startView);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
@@ -82,7 +86,11 @@ export default function LoginModal(
     };
   }, [open, view]);
 
-  const reset = (v: View) => { setView(v); setError(''); setNotice(''); };
+  const reset = (v: View) => {
+    setView(v === 'register' && !SELF_REGISTRATION_OPEN ? 'login' : v);
+    setError('');
+    setNotice('');
+  };
 
   const submitLogin = () => startTransition(async () => {
     setError('');
@@ -140,7 +148,7 @@ export default function LoginModal(
       {trigger === 'pill' && (
         <button
           type="button"
-          onClick={() => { setOpen(true); reset(initialView); }}
+          onClick={() => { setOpen(true); reset(startView); }}
           style={{
             background: 'transparent', color, border: `1.5px solid ${color}`,
             borderRadius: '20px', padding: '7px 20px', fontSize: '14px',
@@ -154,7 +162,7 @@ export default function LoginModal(
       {trigger === 'cta' && (
         <button
           type="button"
-          onClick={() => { setOpen(true); reset(initialView); }}
+          onClick={() => { setOpen(true); reset(startView); }}
           style={{
             background: accent, color: '#ffffff', border: 'none',
             borderRadius: '999px', padding: '13px 30px', fontSize: '16px',
@@ -162,7 +170,7 @@ export default function LoginModal(
             whiteSpace: 'nowrap',
           }}
         >
-          {triggerLabel ?? 'Create a Free Account'}
+          {triggerLabel ?? (SELF_REGISTRATION_OPEN ? 'Create a Free Account' : 'Log In')}
         </button>
       )}
 
@@ -207,7 +215,7 @@ export default function LoginModal(
               </button>
             </div>
 
-            {(view === 'login' || view === 'register') && (
+            {SELF_REGISTRATION_OPEN && (view === 'login' || view === 'register') && (
               <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
                 <button type="button" style={TAB(view === 'login')} onClick={() => reset('login')}>
                   Log In
@@ -263,7 +271,7 @@ export default function LoginModal(
                 </form>
               )}
 
-              {view === 'register' && (
+              {SELF_REGISTRATION_OPEN && view === 'register' && (
                 <RegisterForm
                   surface={surface}
                   onSuccess={() => { setOpen(false); router.refresh(); }}

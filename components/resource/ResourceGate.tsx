@@ -3,6 +3,7 @@ import LoginModal from '@/components/auth/LoginModal';
 import type { ResourceTeaser } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import { RESOURCE_TYPE_LABELS, type ResourceType } from '@/types';
+import { REGISTRATION_CLOSED_MESSAGE, SELF_REGISTRATION_OPEN } from '@/lib/registration';
 
 /**
  * The signed-out view of any resource page (8-20-26 auth rebuild, phase 4).
@@ -58,15 +59,23 @@ export default function ResourceGate(
           textAlign: 'center',
         }}>
           <div style={{ fontSize: '21px', fontWeight: 700, color: 'var(--text-primary)' }}>
-            This resource is free — it just needs an account.
+            {SELF_REGISTRATION_OPEN
+              ? 'This resource is free — it just needs an account.'
+              : 'This resource requires an account.'}
           </div>
           <p style={{
             fontSize: '15px', lineHeight: 1.6, color: 'var(--text-secondary)',
             margin: '10px 0 1.25rem',
           }}>
-            Create a free Learning Resource Center account to view courses, videos,
-            documents, and more. Already have one? Log in and you&rsquo;ll land right
-            back here.
+            {SELF_REGISTRATION_OPEN ? (
+              <>
+                Create a free Learning Resource Center account to view courses, videos,
+                documents, and more. Already have one? Log in and you&rsquo;ll land right
+                back here.
+              </>
+            ) : (
+              <>{REGISTRATION_CLOSED_MESSAGE} You&rsquo;ll land right back here.</>
+            )}
           </p>
           <LoginModal
             surface={surface.key}
