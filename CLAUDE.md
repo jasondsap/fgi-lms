@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FGI Learning Resource Center — a Next.js 14 (App Router) + TypeScript resource library built by MADE180 for Fletcher Group, Inc., modeled after PsychArmor. Deployed on Vercel. Data lives in Neon serverless PostgreSQL; PDFs live in a private S3 bucket (`fgi-resources`, **us-east-2**) served via presigned URLs.
 
-The system is decoupled: **Moodle owns CE-eligible courses; Neon owns everything else** (newsletters, toolkits, papers, videos, etc.). A Moodle 5 instance is already live on AWS EC2 (staging: `fgi-lms.made180.dev`) with its REST web-services API enabled — the frontend integration (`lib/moodle.ts`, unified catalog, Cognito + Auth.js auth bridge) is not yet built. **Read `docs/CLAUDE.md` before any Moodle-related work** — it documents the Moodle server config, API functions, token handling, and the integration plan.
+The system is decoupled: **Moodle owns CE-eligible courses; Neon owns everything else** (newsletters, toolkits, papers, videos, etc.). A Moodle 5 instance is already live on AWS EC2 (`lms.fgilearn.org`; the old `fgi-lms.made180.dev` redirects) with its REST web-services API enabled — the frontend integration (`lib/moodle.ts`, unified catalog, Cognito + Auth.js auth bridge) is not yet built. **Read `docs/CLAUDE.md` before any Moodle-related work** — it documents the Moodle server config, API functions, token handling, and the integration plan.
 
 ## Commands
 

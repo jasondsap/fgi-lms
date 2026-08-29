@@ -246,7 +246,7 @@ const TENANTS: Record<string, TenantConfig> = {
   colorado: {
     slug: 'colorado',
     name: 'Ohio Recovery Housing – Colorado',
-    fgiSiteUrl: 'https://resource.made180.dev',
+    fgiSiteUrl: 'https://fgilearn.org',
     // Reverse mark (white outlines + white wordmark), so it sits directly on
     // the navy header and footer with no white box (Jason, 8-11).
     logo: '/images/tenants/colorado/logo-white.webp',
@@ -433,7 +433,7 @@ const TENANTS: Record<string, TenantConfig> = {
   scarr: {
     slug: 'scarr',
     name: 'South Carolina Alliance for Recovery Residences',
-    fgiSiteUrl: 'https://resource.made180.dev',
+    fgiSiteUrl: 'https://fgilearn.org',
     logo: '/images/tenants/scarr/logo-square.webp',
     logoWhite: '/images/tenants/scarr/logo-horizontal.webp',
     logoAlt: 'South Carolina Alliance for Recovery Residences (SCARR)',

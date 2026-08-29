@@ -80,9 +80,9 @@ Load an activity twice — top level and in an iframe — and confirm the chrome
 present in the first and gone in the second:
 
 ```js
-// Run in the console on any fgi-lms.made180.dev page (same-origin iframe).
+// Run in the console on any lms.fgilearn.org page (same-origin iframe).
 const f = document.createElement('iframe');
-f.src = 'https://fgi-lms.made180.dev/mod/page/view.php?id=<cmid>';
+f.src = 'https://lms.fgilearn.org/mod/page/view.php?id=<cmid>';
 document.body.appendChild(f);
 f.onload = () => console.log({
   styled: !!f.contentDocument.querySelector('#fgiembed'),
