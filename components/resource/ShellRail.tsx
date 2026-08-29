@@ -39,7 +39,16 @@ interface Props {
 export default function ShellRail(
   { slug, surface, action, facts = [], presenters = [], related, extras }: Props,
 ) {
-  const contactable = presenters.filter((p) => p.org_url);
+  // One globe link per organisation — co-presenters from the same org (e.g.
+  // the PPW webinar's two PEARL Program speakers) used to list it twice.
+  const seenOrg = new Set<string>();
+  const contactable = presenters.filter((p) => {
+    if (!p.org_url) return false;
+    const key = p.org_url.trim().toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+    if (seenOrg.has(key)) return false;
+    seenOrg.add(key);
+    return true;
+  });
 
   return (
     <aside style={{
