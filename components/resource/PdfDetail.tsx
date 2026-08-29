@@ -30,16 +30,6 @@ const TYPE_ILLUSTRATION: Record<string, string> = {
  * `.pdf-shell-grid` in globals.css, where it can also carry a breakpoint.
  */
 
-function formatMonth(value: string | Date | null | undefined): string | null {
-  if (!value) return null;
-  const iso = (value instanceof Date ? value.toISOString() : String(value)).slice(0, 10);
-  const [y, m] = iso.split('-').map(Number);
-  if (!y || !m) return null;
-  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'];
-  return `${MONTHS[m - 1]} ${y}`;
-}
-
 /**
  * Document detail page — Jennifer's 8-11-26 "PDF shell".
  *
@@ -72,21 +62,12 @@ export default async function PdfDetail(
   const illustration = resource.thumbnail_url || TYPE_ILLUSTRATION[type] || null;
   const presenters = resource.presenters ?? [];
   const materials  = resource.materials ?? [];
-  const published  = formatMonth(resource.published_at);
   const related    = await getRelatedResources(resource, surface.key, 3);
 
-  // A publication is a document that carries a citation. Its date is only ever
-  // a year of publication, so the month formatting above would invent precision.
+  // No date on the ID line for any document (Jennifer, 8-29, system-wide:
+  // only live events — webinars and podcasts — carry a date outside the
+  // description). Publications keep their year inside the citation itself.
   const isPublication = Boolean(resource.citation);
-  // published_at arrives as a Date on one driver path and a string on the
-  // other; String(Date) starts "Sun Jan 01 …", so it has to be normalised.
-  // The Resource type says string, but the Neon driver hands back a Date on one
-  // of its paths, and String(Date) starts "Sun Jan 01 …".
-  const publishedAt = resource.published_at as string | Date | null | undefined;
-  const year = publishedAt
-    ? (publishedAt instanceof Date ? publishedAt.toISOString() : String(publishedAt)).slice(0, 4)
-    : '';
-  const dateLabel = isPublication ? (year || null) : published;
   const body = resource.abstract || resource.description;
 
   return (
@@ -115,16 +96,13 @@ export default async function PdfDetail(
 
             {/* Where the mockup puts "Course ID: yk3232". Documents have no
                 course code, so the slot carries what a reader can use. Only a
-                course is a "Course ID" — a handbook's code is just an ID, and
-                handbooks show no date at all (Jennifer, 8-22: cert documents
-                aren't dated artifacts the way newsletters and papers are). */}
+                course is a "Course ID" — a handbook's code is just an ID. The
+                " · Month Year" that used to follow it is gone for every
+                document type (Jennifer, 8-29, generals tab). */}
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code
                 ? `${type === 'course' || type === 'naadac_ce' ? 'Course ID' : 'ID'}: ${resource.course_code}`
                 : typeLabel}
-              {dateLabel && type !== 'handbook' && (
-                <span style={{ color: 'var(--text-muted)' }}> · {dateLabel}</span>
-              )}
             </div>
 
             {/* The citation sits between the title and the ID line, indented,
