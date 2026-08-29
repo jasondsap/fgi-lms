@@ -40,15 +40,19 @@ export default function ShellRail(
   { slug, surface, action, facts = [], presenters = [], related, extras }: Props,
 ) {
   // One globe link per organisation — co-presenters from the same org (e.g.
-  // the PPW webinar's two PEARL Program speakers) used to list it twice.
+  // the PPW webinar's two PEARL Program speakers) used to list it twice. A
+  // presenter's second affiliation (org2_url, 8-29-26) gets its own link.
   const seenOrg = new Set<string>();
-  const contactable = presenters.filter((p) => {
-    if (!p.org_url) return false;
-    const key = p.org_url.trim().toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-    if (seenOrg.has(key)) return false;
-    seenOrg.add(key);
-    return true;
-  });
+  const orgLinks: Array<{ key: string; url: string }> = [];
+  for (const p of presenters) {
+    for (const [suffix, url] of [['url', p.org_url], ['url2', p.org2_url]] as const) {
+      if (!url) continue;
+      const norm = url.trim().toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+      if (seenOrg.has(norm)) continue;
+      seenOrg.add(norm);
+      orgLinks.push({ key: `${p.id}-${suffix}`, url });
+    }
+  }
 
   return (
     <aside style={{
@@ -84,9 +88,9 @@ export default function ShellRail(
             {/* The mockup pairs a mail and a globe icon here. Only the org link
                 exists in the data — presenters have no email column — so the
                 mail icon is deliberately absent rather than drawn dead. */}
-            {contactable.map((p) => (
+            {orgLinks.map((link) => (
               <a
-                key={`${p.id}-url`} href={p.org_url!} target="_blank" rel="noopener noreferrer"
+                key={link.key} href={link.url} target="_blank" rel="noopener noreferrer"
                 style={{
                   display: 'flex', alignItems: 'center', gap: '10px',
                   fontSize: '15px', color: surface.primary,
@@ -97,7 +101,7 @@ export default function ShellRail(
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20M12 2a15 15 0 010 20a15 15 0 010-20" />
                 </svg>
-                <span>{p.org_url!.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                <span>{link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
               </a>
             ))}
           </div>

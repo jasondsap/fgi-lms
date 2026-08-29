@@ -60,6 +60,17 @@ export default function PresenterCard(
               {p.org_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
             </a>
           )}
+          {/* Second affiliation (8-29-26): e.g. Jac Charlier is TASC's
+              executive director AND CEO of PTACC — Jennifer wants both. */}
+          {p.org2_url && (
+            <a
+              href={p.org2_url} target="_blank" rel="noopener noreferrer"
+              title={p.org2_name ?? undefined}
+              style={{ display: 'block', marginTop: '4px', fontSize: '13px', color: accent }}
+            >
+              {p.org2_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+            </a>
+          )}
         </div>
       )}
     </div>

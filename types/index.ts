@@ -63,6 +63,9 @@ export interface Presenter {
   org_name: string | null;
   org_logo_url: string | null;
   org_url: string | null;
+  /** Optional second affiliation (8-29-26) — e.g. TASC + PTACC for Jac Charlier. */
+  org2_name?: string | null;
+  org2_url?: string | null;
 }
 
 export type MaterialKind = 'transcript' | 'slides' | 'handout' | 'other';

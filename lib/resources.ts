@@ -610,7 +610,8 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
 async function getResourcePresenters(resourceId: string): Promise<Presenter[]> {
   const rows = await sql`
     SELECT p.id, p.name, p.credentials, p.title, p.bio,
-           p.photo_url, p.org_name, p.org_logo_url, p.org_url
+           p.photo_url, p.org_name, p.org_logo_url, p.org_url,
+           p.org2_name, p.org2_url
     FROM resource_presenters rp
     JOIN presenters p ON p.id = rp.presenter_id
     WHERE rp.resource_id = ${resourceId}
