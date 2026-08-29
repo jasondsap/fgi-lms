@@ -539,11 +539,15 @@ export interface CourseResource {
   description: string;
   duration_minutes: number | null;
   moodle_course_id: number | null;
+  /** CE fields — snapshotted onto user_course_progress at completion. */
+  ceu_credits: number | null;
+  is_naadac_ce: boolean;
 }
 
 export async function getCourseResource(slug: string): Promise<CourseResource | null> {
   const rows = await sql`
-    SELECT id, title, slug, type, description, duration_minutes, moodle_course_id
+    SELECT id, title, slug, type, description, duration_minutes, moodle_course_id,
+           ceu_credits, is_naadac_ce
     FROM resources
     WHERE slug = ${slug} AND published = TRUE
     LIMIT 1

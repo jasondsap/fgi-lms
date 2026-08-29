@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { authEnabled, getSession } from '@/auth';
 import LoginModal from '@/components/auth/LoginModal';
 import { signOutAction } from './auth-actions';
@@ -22,12 +23,25 @@ export default async function AuthNav({
 
   const displayName =
     session.user.givenName || session.user.name || session.user.email || 'Account';
+  // The greeting doubles as the link to the learner's own page (8-29-26),
+  // on whichever surface they are browsing.
+  const accountHref = surface === 'fgi' ? '/account' : `/${surface}/account`;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', whiteSpace: 'nowrap' }}>
-      <span style={{ color, fontSize: '15px', fontWeight: 700 }}>
+      <Link
+        href={accountHref}
+        title="My Learning"
+        style={{ color, fontSize: '15px', fontWeight: 700, textDecoration: 'none' }}
+      >
         Hi, {displayName}
-      </span>
+      </Link>
+      <Link
+        href={accountHref}
+        style={{ color, fontSize: '15px', fontWeight: 400, textDecoration: 'none', opacity: 0.92 }}
+      >
+        My Learning
+      </Link>
       {/* Bound arg, not a closure — see auth-actions.ts for why. */}
       <form action={signOutAction.bind(null, signOutRedirect)}>
         <button

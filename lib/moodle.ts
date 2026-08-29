@@ -299,3 +299,35 @@ export async function getUserKeyLoginUrl(email: string, wantsUrl?: string): Prom
     ? `${res.loginurl}&wantsurl=${encodeURIComponent(wantsUrl)}`
     : res.loginurl;
 }
+
+// ---------------------------------------------------------------------------
+// Grades (My Learning page) — needs `gradereport_user_get_grade_items` granted
+// to the fgi_frontend service (scripts/moodle/grantws.php). Callers treat a
+// failure as "no grade yet" so the page never depends on the grant.
+// ---------------------------------------------------------------------------
+
+export interface MoodleGradeItem {
+  id: number;
+  itemname: string | null;
+  itemtype: string;        // 'mod' | 'course' | ...
+  itemmodule: string | null;
+  iteminstance: number | null;
+  cmid: number | null;
+  graderaw: number | null;
+  grademin: number;
+  grademax: number;
+  percentageformatted: string; // e.g. "80.00 %" or "-"
+  gradedategraded: number | null;
+}
+
+/** Every grade item (quiz, course total, …) for one learner in one course. */
+export async function getUserGradeItems(
+  courseId: number,
+  moodleUserId: number,
+): Promise<MoodleGradeItem[]> {
+  const res = await moodleCall<{ usergrades: Array<{ gradeitems: MoodleGradeItem[] }> }>(
+    'gradereport_user_get_grade_items',
+    { courseid: courseId, userid: moodleUserId },
+  );
+  return res.usergrades?.[0]?.gradeitems ?? [];
+}

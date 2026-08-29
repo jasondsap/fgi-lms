@@ -24,6 +24,8 @@ export interface AppUser {
   role: string;
   /** Surface the account registered from: fgi | colorado | scarr. */
   registered_surface: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export async function upsertUser(input: {
@@ -133,6 +135,12 @@ export async function isRegistered(userId: string): Promise<boolean> {
     SELECT registration_completed_at FROM users WHERE id = ${userId}
   `;
   return Boolean(rows[0]?.registration_completed_at);
+}
+
+/** Role keys the learner picked at registration (My Learning profile card). */
+export async function getUserRoles(userId: string): Promise<UserRole[]> {
+  const rows = await sql`SELECT role FROM user_roles WHERE user_id = ${userId}`;
+  return rows.map((r) => r.role as UserRole);
 }
 
 /** Profile fields the modal prefills from the Cognito-sourced user record. */

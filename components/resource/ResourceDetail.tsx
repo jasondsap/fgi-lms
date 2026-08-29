@@ -6,6 +6,8 @@ import PodcastDetail from '@/components/resource/PodcastDetail';
 import ResourceGate from '@/components/resource/ResourceGate';
 import VideoDetail from '@/components/resource/VideoDetail';
 import WebinarDetail from '@/components/resource/WebinarDetail';
+import BookmarkButton from '@/components/account/BookmarkButton';
+import { isBookmarked, logResourceEvent } from '@/lib/progress';
 import { getResourceBySlug, getResourceTeaser } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 
@@ -30,7 +32,8 @@ export default async function ResourceDetail(
   // free, opening a resource requires an account. Signed out, only the
   // card-level teaser is fetched — the full row (and its presigned URLs) is
   // never touched. No-op while auth is unconfigured (authEnabled flag).
-  if (authEnabled && !(await getSession())?.user) {
+  const session = authEnabled ? await getSession() : null;
+  if (authEnabled && !session?.user) {
     const teaser = await getResourceTeaser(slug);
     if (!teaser) notFound();
     return <ResourceGate resource={teaser} surface={surface} />;
@@ -41,17 +44,47 @@ export default async function ResourceDetail(
   const resource = await getResourceBySlug(slug);
   if (!resource) notFound();
 
+  // My Learning (8-29-26): record the view and find out whether the learner
+  // has saved this resource. Both are one cheap query; logging never throws.
+  const userId = session?.user?.id;
+  let saved = false;
+  if (userId) {
+    [saved] = await Promise.all([
+      isBookmarked(userId, resource.id),
+      logResourceEvent(userId, resource.id, 'view', surface.key),
+    ]);
+  }
+
+  let shell: React.ReactNode;
   switch (resource.type) {
     case 'webinar':
-      return <WebinarDetail resource={resource} surface={surface} />;
+      shell = <WebinarDetail resource={resource} surface={surface} />;
+      break;
     case 'podcast':
-      return <PodcastDetail resource={resource} surface={surface} />;
+      shell = <PodcastDetail resource={resource} surface={surface} />;
+      break;
     case 'course':
     case 'naadac_ce':
-      return <CourseDetail resource={resource} surface={surface} />;
+      shell = <CourseDetail resource={resource} surface={surface} />;
+      break;
     case 'video':
-      return <VideoDetail resource={resource} surface={surface} />;
+      shell = <VideoDetail resource={resource} surface={surface} />;
+      break;
     default:
-      return <PdfDetail resource={resource} surface={surface} />;
+      shell = <PdfDetail resource={resource} surface={surface} />;
   }
+
+  return (
+    <>
+      {shell}
+      {userId && (
+        <BookmarkButton
+          resourceId={resource.id}
+          initialSaved={saved}
+          accent={surface.primary}
+          accountHref={`${surface.basePath}/account`}
+        />
+      )}
+    </>
+  );
 }

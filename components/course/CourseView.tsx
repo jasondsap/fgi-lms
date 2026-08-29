@@ -17,6 +17,7 @@ import CoursePlayer, {
   type PlayerSection,
 } from '@/components/course/CoursePlayer';
 import type { Surface } from '@/lib/surface';
+import { syncCourseProgress } from '@/lib/progress';
 
 /**
  * Moodle's web services return activity and section names HTML-escaped
@@ -95,13 +96,25 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
   return groups;
 }
 
+/** `?cm=<cmid>` on a course URL opens that module (My Learning "Resume"). */
+export function parseCm(cm: string | string[] | undefined): number | undefined {
+  const n = Number(Array.isArray(cm) ? cm[0] : cm);
+  return Number.isInteger(n) && n > 0 ? n : undefined;
+}
+
 /**
  * Course player body, shared by the FGI site and both tenant portals.
  * Bounces back to the resource page *on the same surface* so a tenant learner
  * never gets dropped into FGI chrome.
  */
 export default async function CourseView(
-  { slug, surface }: { slug: string; surface: Surface },
+  { slug, surface, openCmid }: {
+    slug: string;
+    surface: Surface;
+    /** `?cm=<cmid>` — open on this module instead of the first lesson (the
+        "Resume" / "View certificate" links on the My Learning page). */
+    openCmid?: number;
+  },
 ) {
   const resource = await getCourseResource(slug);
   if (!resource || !resource.moodle_course_id) notFound();
@@ -141,6 +154,22 @@ export default async function CourseView(
   } catch (e) {
     console.error(`Moodle course load failed (course ${courseId}, ${slug}):`, e);
     return <CourseLoadError href={`${surface.basePath}/course/${slug}`} />;
+  }
+
+  // Mirror this learner's state into Neon for the My Learning page. The
+  // player already has everything the row needs, so this is one upsert; it
+  // must never take the player down, hence the catch.
+  try {
+    await syncCourseProgress({
+      userId: user.id,
+      moodleUserId,
+      resource,
+      surface: surface.key,
+      sections,
+      completion,
+    });
+  } catch (e) {
+    console.error(`Progress sync failed (course ${courseId}, ${slug}):`, e);
   }
 
   const completionByCmid = new Map(completion.map((c) => [c.cmid, c.state]));
@@ -190,7 +219,12 @@ export default async function CourseView(
   // Open on the first lesson in course order. The evaluation group is moved to
   // the end of its section, so this can never land on the quiz.
   const firstGroup = playerSections[0]?.groups[0];
-  const firstModule = firstGroup ? (firstGroup.lead ?? firstGroup.items[0]) : undefined;
+  // A requested module (?cm=) wins when it exists and isn't a locked
+  // certificate; an unknown or stale id falls back to the first lesson.
+  const requested = openCmid
+    ? everyModule.find((m) => m.cmid === openCmid && !m.locked)
+    : undefined;
+  const firstModule = requested ?? (firstGroup ? (firstGroup.lead ?? firstGroup.items[0]) : undefined);
   if (!firstModule) notFound();
 
   // One-time SSO URL establishes the Moodle session inside the iframe and

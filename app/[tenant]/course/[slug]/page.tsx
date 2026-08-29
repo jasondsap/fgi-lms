@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import CourseView from '@/components/course/CourseView';
+import CourseView, { parseCm } from '@/components/course/CourseView';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { tenantSurface } from '@/lib/surface';
 
@@ -7,13 +7,16 @@ import { tenantSurface } from '@/lib/surface';
 export const dynamic = 'force-dynamic';
 
 export default function TenantCoursePage(
-  { params }: { params: { tenant: string; slug: string } },
+  { params, searchParams }: {
+    params: { tenant: string; slug: string };
+    searchParams?: { cm?: string | string[] };
+  },
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
   return (
     <>
-      <CourseView slug={params.slug} surface={surface} />
+      <CourseView slug={params.slug} surface={surface} openCmid={parseCm(searchParams?.cm)} />
       <TenantShellFooter tenant={surface.tenant!} />
     </>
   );
