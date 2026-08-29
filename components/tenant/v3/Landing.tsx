@@ -72,16 +72,19 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
     latestPodcast && {
       label: 'Podcast', title: latestPodcast.title,
       href: `${tenant.fgiSiteUrl}/resource/${latestPodcast.slug}`,
+      naadac: Boolean(latestPodcast.is_naadac_ce),
       icon: '/images/category-cards/podcast.webp',
     },
     latestWebinar && {
       label: 'Webinar', title: latestWebinar.title,
       href: `${tenant.fgiSiteUrl}/resource/${latestWebinar.slug}`,
+      naadac: Boolean(latestWebinar.is_naadac_ce),
       icon: '/images/category-cards/webinar.webp',
     },
     latestBrief && {
       label: 'Learning Brief', title: latestBrief.title,
       href: `${tenant.fgiSiteUrl}/resource/${latestBrief.slug}`,
+      naadac: Boolean(latestBrief.is_naadac_ce),
       icon: '/images/category-cards/learning.webp',
     },
   ].filter(Boolean) as Array<{ label: string; title: string; href: string; icon: string }>;

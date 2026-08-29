@@ -59,16 +59,19 @@ export default async function HomePage({ searchParams }: PageProps) {
     latestPodcast && {
       label: 'Podcast', title: latestPodcast.title,
       href: `/resource/${latestPodcast.slug}`,
+      naadac: Boolean(latestPodcast.is_naadac_ce),
       icon: '/images/category-cards/podcast.webp',
     },
     latestWebinar && {
       label: 'Webinar', title: latestWebinar.title,
       href: `/resource/${latestWebinar.slug}`,
+      naadac: Boolean(latestWebinar.is_naadac_ce),
       icon: '/images/category-cards/webinar.webp',
     },
     latestBrief && {
       label: 'Learning Brief', title: latestBrief.title,
       href: `/resource/${latestBrief.slug}`,
+      naadac: Boolean(latestBrief.is_naadac_ce),
       icon: '/images/category-cards/learning.webp',
     },
   ].filter(Boolean) as HighlightTile[];

@@ -499,7 +499,7 @@ export async function getPodcastAudioUrl(slug: string): Promise<string | null> {
  * date in a source info sheet would promote the wrong webinar here (one such
  * typo was found and fixed during the July 2026 webinar load).
  */
-export interface LatestItem { slug: string; title: string }
+export interface LatestItem { slug: string; title: string; is_naadac_ce?: boolean }
 
 /*
  * Newest published resource of one type on the FGI surface — drives the
@@ -509,7 +509,7 @@ export interface LatestItem { slug: string; title: string }
  */
 export async function getLatestByType(type: ResourceType): Promise<LatestItem | null> {
   const rows = await sql(
-    `SELECT r.slug, r.title
+    `SELECT r.slug, r.title, r.is_naadac_ce
        FROM resources r
       WHERE r.type = $1
         AND r.published = TRUE

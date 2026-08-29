@@ -6,6 +6,8 @@ export interface HighlightTile {
   title: string;
   href: string;
   icon: string;
+  /** Show the NAADAC CE badge beside the category label (8-29-26, Jennifer). */
+  naadac?: boolean;
 }
 
 /*
@@ -100,8 +102,19 @@ export default function LatestHighlights({
                   fontSize: '12.5px', fontWeight: 600, color: accent,
                   textTransform: 'uppercase', letterSpacing: '0.07em',
                   lineHeight: 1.2, marginBottom: '4px',
+                  display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap',
                 }}>
-                  {tile.label}
+                  <span>{tile.label}</span>
+                  {tile.naadac && (
+                    // Same pill as the library card's illustration overlay
+                    <span style={{
+                      fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em',
+                      color: '#ffffff', background: 'var(--fgi-blue)',
+                      borderRadius: '999px', padding: '2px 8px', lineHeight: 1.4,
+                    }}>
+                      NAADAC CE
+                    </span>
+                  )}
                 </div>
                 <div style={{
                   fontSize: '16px', color: 'var(--text-primary)', lineHeight: 1.3,
