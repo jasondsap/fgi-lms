@@ -98,10 +98,10 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
 
 /**
  * Courses whose evaluation runs as the site survey instead of Moodle's
- * feedback UI (8-30-26). Pilot: SCARR pre-cert. Flip to 'all' once Jennifer
- * signs off — no per-course Moodle work is needed either way.
+ * feedback UI (8-30-26). Piloted on SCARR pre-cert, then 'all' the same day
+ * (Jason) — no per-course Moodle work was needed.
  */
-const SITE_EVALUATION_COURSES: Set<number> | 'all' = new Set([127]);
+const SITE_EVALUATION_COURSES: Set<number> | 'all' = 'all';
 
 function usesSiteEvaluation(courseId: number): boolean {
   return SITE_EVALUATION_COURSES === 'all' || SITE_EVALUATION_COURSES.has(courseId);
