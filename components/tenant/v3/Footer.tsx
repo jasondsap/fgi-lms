@@ -79,6 +79,16 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
     }}>
       <ContactLine icon="email">
         <a href={`mailto:${f.email}`} style={link}>{f.email}</a>
+        {/* The contact-form URL belongs with the email, not the website line
+            (Jennifer, 8-29: "it takes them to a form to email"). */}
+        {f.contactUrl && (
+          <>
+            <br />
+            <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
+              {f.contactUrl}
+            </a>
+          </>
+        )}
       </ContactLine>
       <ContactLine icon="location">
         {f.addressLines.map((line, i) => (
@@ -90,29 +100,21 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
         <a href={f.siteUrl} target="_blank" rel="noopener noreferrer" style={link}>
           {f.siteLabel}
         </a>
-        {f.contactUrl && (
-          <>
-            <br />
-            <a href={f.contactUrl} target="_blank" rel="noopener noreferrer" style={link}>
-              {f.contactUrl.replace(/^https?:\/\//, 'https://')}
-            </a>
-          </>
-        )}
       </ContactLine>
     </div>
   );
 
+  // Jennifer 8-29: Follow Us sits lower (level with the contact block's
+  // bottom rather than the lockup), no outline, label and icons on one line,
+  // and more air before the Learning Center Support line.
   const right = (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
-      gap: '1.4rem', paddingBottom: '64px', paddingRight: '0.5rem',
+      gap: '2.2rem', paddingBottom: '64px', paddingRight: '0.5rem', alignSelf: 'end',
     }}>
-      <div style={{
-        display: 'inline-block', border: '2px solid #ffffff', borderRadius: '14px',
-        padding: '0.8rem 1.4rem 1rem', textAlign: 'center',
-      }}>
-        <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '10px' }}>Follow Us</div>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ fontSize: '15px', fontWeight: 700 }}>Follow Us</div>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           {f.socials.map((s) => (
             <a
               key={s.platform}
@@ -201,8 +203,8 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
           <div style={{ marginTop: '1.4rem', marginLeft: '4px' }}>{contact}</div>
         </div>
 
-        {/* Right: Follow Us in line with the lockup, support line beneath.
-            Bottom padding keeps it clear of the fixed Ask-the-library pill. */}
+        {/* Right: Follow Us + support line, bottom-aligned with the contact
+            block (8-29). Bottom padding keeps it clear of the Ask-the-library pill. */}
         {right}
       </div>
     </footer>
