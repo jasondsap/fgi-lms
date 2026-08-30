@@ -215,7 +215,7 @@ export default function AskLibrary({
                       }}>{label}</span>
                       {r.isNaadacCe && (
                         <span style={{
-                          background: 'var(--fgi-blue)', color: '#fff', fontSize: '10px',
+                          background: 'var(--fgi-amber)', color: 'var(--fgi-navy)', fontSize: '10px',
                           fontWeight: 700, padding: '2px 6px', borderRadius: '3px',
                         }}>NAADAC CE</span>
                       )}

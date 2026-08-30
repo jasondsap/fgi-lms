@@ -115,7 +115,8 @@ export default function ResourceCard({ resource, basePath = '', naadacPill, comp
           {resource.is_naadac_ce && (
             <span style={{
               position: 'absolute', top: '10px', right: '10px',
-              background: naadacPill?.bg ?? 'var(--fgi-blue)', color: naadacPill?.fg ?? '#fff',
+              // 8-30-26 (Jason): amber #f2b134 everywhere, navy text
+              background: naadacPill?.bg ?? 'var(--fgi-amber)', color: naadacPill?.fg ?? 'var(--fgi-navy)',
               fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
               padding: '3px 8px', borderRadius: '20px',
             }}>

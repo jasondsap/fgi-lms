@@ -109,7 +109,7 @@ export default function LatestHighlights({
                     // Same pill as the library card's illustration overlay
                     <span style={{
                       fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em',
-                      color: '#ffffff', background: 'var(--fgi-blue)',
+                      color: 'var(--fgi-navy)', background: 'var(--fgi-amber)',
                       borderRadius: '999px', padding: '2px 8px', lineHeight: 1.4,
                     }}>
                       NAADAC CE
