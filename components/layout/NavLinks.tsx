@@ -10,11 +10,14 @@ import MailingListModal from './MailingListModal';
  * link, so it is rendered separately after the list — and since 8-13-26 it
  * opens the signup in a modal instead of sending the visitor to Mailchimp.
  */
+/** Mailing List Sign Up pill in the header — off for now (Jason, 8-30-26). */
+const SHOW_MAILING_LIST = false;
+
 const LINKS = [
   { label: 'Home',         href: '/' },
   { label: 'Library',      href: '/library' },
   { label: 'Fletcher Web', href: 'https://www.fletchergroup.org', external: true },
-  { label: 'TA Request',   href: 'https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form', external: true },
+  { label: 'Consultation Request', href: 'https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form', external: true },
 ];
 
 export default function NavLinks() {
@@ -55,9 +58,12 @@ export default function NavLinks() {
           );
         })}
 
-        <li>
-          <MailingListModal />
-        </li>
+        {/* Mailing List Sign Up hidden for now (Jason, 8-30) — flip SHOW_MAILING_LIST to bring it back. */}
+        {SHOW_MAILING_LIST && (
+          <li>
+            <MailingListModal />
+          </li>
+        )}
       </ul>
     </nav>
   );
