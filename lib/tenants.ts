@@ -243,7 +243,7 @@ const CERT_BLOCK_HTML = `
 const HOSTED_HTML = // right-side text in the "hosted on FGI" bar (shared)
   // Jennifer 8-29: points at the sidebar's Other Libraries link, not the header tab.
   'Our Learning Center is hosted on the Fletcher Group (FGI) platform. As a ' +
-  'registered user, you're also able to explore Fletcher Group's full library ' +
+  "registered user, you're also able to explore Fletcher Group's full library " +
   'of recovery ecosystem support resources by clicking Fletcher Group Library ' +
   'in the other libraries section of the filter bar.';
 
