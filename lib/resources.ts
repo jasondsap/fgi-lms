@@ -229,7 +229,7 @@ export async function getRelatedWebinars(
            r.is_naadac_ce, r.audience_tags, r.topic_tags, r.published_at
     FROM resources r
     WHERE r.type = 'webinar'
-      AND r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+      AND r.published = TRUE AND r.internal = FALSE
       AND r.id <> ${excludeId}
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
@@ -293,7 +293,7 @@ export async function getRelatedResources(
     FROM related_resources rr
     JOIN resources r ON r.id = rr.related_id
     WHERE rr.resource_id = ${resource.id}
-      AND r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+      AND r.published = TRUE AND r.internal = FALSE
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
@@ -323,7 +323,7 @@ export async function getRelatedResources(
             3 * ts_rank(${VECTOR}, to_tsquery('english', $1))
               + ts_rank(${VECTOR}, to_tsquery('english', $2)) AS score
        FROM resources r
-      WHERE r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+      WHERE r.published = TRUE AND r.internal = FALSE
         AND r.id <> $3
         AND (${VECTOR} @@ to_tsquery('english', $1)
              OR ${VECTOR} @@ to_tsquery('english', $2))
@@ -371,7 +371,7 @@ export async function getOtherEpisodes(
     SELECT r.slug, r.title
     FROM resources r
     WHERE r.type = 'podcast'
-      AND r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+      AND r.published = TRUE AND r.internal = FALSE
       AND r.id <> ${excludeId}
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
@@ -425,7 +425,7 @@ export async function getVideoSeries(
     SELECT r.slug, r.title
     FROM resources r
     WHERE r.type = 'video'
-      AND r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+      AND r.published = TRUE AND r.internal = FALSE
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
@@ -514,7 +514,7 @@ export async function getLatestByType(type: ResourceType): Promise<LatestItem | 
     `SELECT r.slug, r.title, r.is_naadac_ce
        FROM resources r
       WHERE r.type = $1
-        AND r.published = TRUE AND r.internal = FALSE AND r.internal = FALSE
+        AND r.published = TRUE AND r.internal = FALSE
         AND EXISTS (
           SELECT 1 FROM resource_visibility rv
           JOIN tenants t ON t.id = rv.tenant_id
