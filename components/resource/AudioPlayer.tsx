@@ -79,7 +79,9 @@ export default function AudioPlayer(
     if (!audio) return;
     audio.playbackRate = rate;
     audio.play().catch(() => { /* browser blocked playback */ });
-    wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // The player now sits under the About/Trailer buttons, so this only
+    // nudges the page when the player is genuinely off-screen (8-30-26).
+    wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // rate is applied inline on track switches; cycleRate handles the rest.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);

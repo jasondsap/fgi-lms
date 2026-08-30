@@ -124,6 +124,19 @@ export default async function PodcastDetail(
                   own page, where Listen Now already plays it. */}
               {!isTrailer && trailerSrc && <TrailerButton />}
             </div>
+
+            {/* The player — invisible until Listen Now or Trailer is clicked
+                (8-18-26 shell), and directly under the About/Trailer buttons so
+                opening it never scrolls the page (Jason, 8-30). download_url is
+                the presigned episode MP3. */}
+            <div style={{ maxWidth: '543px', marginTop: '1.25rem' }}>
+              <AudioPlayer
+                episode={resource.download_url
+                  ? { src: resource.download_url, title: resource.title }
+                  : null}
+                trailer={trailerSrc ? { src: trailerSrc, title: 'Trailer' } : null}
+              />
+            </div>
             {/* ── The episode — continues the left column ── */}
             <div style={{
               display: 'flex', flexDirection: 'column', gap: '1.5rem',
@@ -164,15 +177,6 @@ export default async function PodcastDetail(
                 </div>
               )}
             </div>
-
-            {/* The player — invisible until Listen Now or Trailer is clicked
-                (8-18-26 shell). download_url is the presigned episode MP3. */}
-            <AudioPlayer
-              episode={resource.download_url
-                ? { src: resource.download_url, title: resource.title }
-                : null}
-              trailer={trailerSrc ? { src: trailerSrc, title: 'Trailer' } : null}
-            />
 
             {guests.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
