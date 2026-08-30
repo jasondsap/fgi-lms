@@ -180,7 +180,7 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
             href={fgiLibraryHref}
             style={{ fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'underline' }}
           >
-            FGI Learning Resource Center library
+            Fletcher Group Library
           </a>
         </div>
       )}
