@@ -5,6 +5,7 @@ import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getCompletedResourceIds } from '@/lib/progress';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { filterQuery } from '@/lib/query';
 import { getPublicResources } from '@/lib/resources';
 import type { TenantConfig } from '@/lib/tenants';
@@ -57,6 +58,7 @@ export default async function FgiLibraryView({ tenant, searchParams }: Props) {
     params.topic = (Array.isArray(searchParams.topic) ? searchParams.topic : [searchParams.topic]) as TopicTag[];
   }
 
+  params.includeInternal = canSeeInternal(await getViewer(), 'fgi');
   const data = await getPublicResources(params);
   const linkQuery = filterQuery(searchParams);
   const apiQuery = filterQuery(searchParams, { tenant: 'fgi' });

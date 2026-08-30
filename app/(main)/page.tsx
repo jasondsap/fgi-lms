@@ -8,6 +8,7 @@ import LatestHighlights, { type HighlightTile } from '@/components/home/LatestHi
 import ContactButton from '@/components/layout/ContactButton';
 import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -45,6 +46,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   // Call DB directly — no internal HTTP fetch
+  params.includeInternal = canSeeInternal(await getViewer(), 'fgi');
   const data = await getPublicResources(params);
   const query = filterQuery(searchParams);
   const session = await getSession();

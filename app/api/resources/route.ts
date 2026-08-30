@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublicResources } from '@/lib/resources';
 import { getTenantConfig } from '@/lib/tenants';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import type { ResourceListParams } from '@/types';
 
 export async function GET(request: NextRequest) {
@@ -36,11 +37,16 @@ export async function GET(request: NextRequest) {
       if (slugs) params.slugs = slugs;
     }
 
+    // Internal rows only for viewers who may see them — and never from the
+    // shared cache when they are included.
+    params.includeInternal = canSeeInternal(await getViewer(), params.tenant || 'fgi');
     const result = await getPublicResources(params);
 
     return NextResponse.json(result, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': params.includeInternal
+          ? 'private, no-store'
+          : 'public, s-maxage=60, stale-while-revalidate=300',
       },
     });
   } catch (err) {

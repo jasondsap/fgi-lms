@@ -5,6 +5,7 @@ import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -42,6 +43,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     ) as TopicTag[];
   }
 
+  params.includeInternal = canSeeInternal(await getViewer(), 'fgi');
   const data = await getPublicResources(params);
   const query = filterQuery(searchParams);
   const session = await getSession();

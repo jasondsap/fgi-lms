@@ -8,6 +8,7 @@ import VideoDetail from '@/components/resource/VideoDetail';
 import WebinarDetail from '@/components/resource/WebinarDetail';
 import BookmarkButton from '@/components/account/BookmarkButton';
 import { isBookmarked, logResourceEvent } from '@/lib/progress';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getResourceBySlug, getResourceTeaser } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 
@@ -43,6 +44,8 @@ export default async function ResourceDetail(
   // route at runtime (see docs/CLAUDE.md architecture notes).
   const resource = await getResourceBySlug(slug);
   if (!resource) notFound();
+  // Internal rows (8-29-26): admins and the tenant's own admins only.
+  if (resource.internal && !canSeeInternal(await getViewer(), surface.key)) notFound();
 
   // My Learning (8-29-26): record the view and find out whether the learner
   // has saved this resource. Both are one cheap query; logging never throws.

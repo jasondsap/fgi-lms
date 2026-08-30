@@ -40,7 +40,7 @@ export async function getCatalog(surface: string): Promise<Catalog> {
     SELECT r.slug, r.title, r.type::text AS type, r.description,
            r.duration_minutes, r.is_naadac_ce
     FROM resources r
-    WHERE r.published = TRUE
+    WHERE r.published = TRUE AND r.internal = FALSE
       AND btrim(coalesce(r.description, '')) <> ''
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv

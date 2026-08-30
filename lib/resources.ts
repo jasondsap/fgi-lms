@@ -55,6 +55,8 @@ export async function getPublicResources(
 
   // Build conditions and matching parameter array in lockstep.
   const conditions: string[] = ['published = TRUE'];
+  // Internal rows (8-29-26) only for viewers who may see them — see lib/viewer.ts.
+  if (!params.includeInternal) conditions.push('internal = FALSE');
   const values: unknown[] = [];
 
   // Helper: pushes a value, returns its placeholder ("$1", "$2", ...)
@@ -163,7 +165,7 @@ export async function getPublicResources(
   const COLUMNS = `
       id, title, slug, type, description, duration_minutes,
       thumbnail_url, vimeo_id, external_url,
-      is_naadac_ce, audience_tags, topic_tags, published_at`;
+      is_naadac_ce, internal, audience_tags, topic_tags, published_at`;
 
   // Default view: round-robin across types so the first screen is a sample of
   // the whole library rather than whatever was bulk-loaded most recently.
@@ -461,7 +463,7 @@ export async function getResourceTeaser(slug: string): Promise<ResourceTeaser | 
   const rows = await sql`
     SELECT title, slug, type, description
     FROM resources
-    WHERE slug = ${slug} AND published = TRUE
+    WHERE slug = ${slug} AND published = TRUE AND internal = FALSE
     LIMIT 1
   `;
   return (rows[0] as ResourceTeaser) ?? null;
@@ -560,7 +562,7 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
   const rows = await sql`
     SELECT id, title, slug, type, description, duration_minutes,
            thumbnail_url, vimeo_id, external_url,
-           is_naadac_ce, audience_tags, topic_tags, published_at, s3_key,
+           is_naadac_ce, internal, audience_tags, topic_tags, published_at, s3_key,
            event_date, ceu_credits, course_code, naadac_skill_groups,
            citation, abstract, sponsor_text, sponsor_logo_url, sponsor_url,
            -- The id itself stays server-side (see getCourseResource); the

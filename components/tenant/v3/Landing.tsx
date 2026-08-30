@@ -7,6 +7,7 @@ import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
@@ -64,6 +65,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
     params.page = 1;
   }
 
+  params.includeInternal = canSeeInternal(await getViewer(), tenant.slug);
   const data = await getPublicResources(params);
 
   // Highlights are FGI's newest items and point at the FGI site — they are

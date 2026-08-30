@@ -97,6 +97,8 @@ export interface Resource {
   vimeo_id: string | null;
   external_url: string | null;
   is_naadac_ce: boolean;
+  /** Hidden from ordinary learners; cards show an Internal pill (8-29-26). */
+  internal?: boolean;
   audience_tags: AudienceTag[];
   topic_tags: TopicTag[];
   published_at: string | null;
@@ -167,6 +169,8 @@ export interface ResourceListParams {
   page?: number;
   per_page?: number;
   match?: 'any' | 'all'; // any category match vs all categories must match
+  /** Server-only: include `internal` rows (admins / the tenant's own admins). */
+  includeInternal?: boolean;
 }
 
 export interface ResourceListResponse {
