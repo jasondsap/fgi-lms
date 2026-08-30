@@ -397,7 +397,7 @@ const TENANTS: Record<string, TenantConfig> = {
       highlightTileBg: '#fffdf4',
       supportBar: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
       // Jennifer 8-29 (via Jason): same yellow treatment as SCARR — CO yellow, navy text.
-      naadacPill: { bg: '#ffd100', fg: '#001970' },
+      naadacPill: { bg: '#f2b134', fg: '#001970' },
       contactButton: { bg: '#ffd100', fg: '#001970' },
       certBand: {
         heading: 'Are you wanting to open a Recovery Residence?',
@@ -604,7 +604,7 @@ const TENANTS: Record<string, TenantConfig> = {
       highlightTileBg: '#fffdf4',
       supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
       // Jennifer 8-29: NAADAC pill and Contact buttons in SCARR yellow.
-      naadacPill: { bg: '#f5d300', fg: '#041e42' },
+      naadacPill: { bg: '#f2b134', fg: '#041e42' },
       contactButton: { bg: '#f5d300', fg: '#041e42' },
       certBand: {
         heading: 'Becoming a SCARR Certified Residence',
