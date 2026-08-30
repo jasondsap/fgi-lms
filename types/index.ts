@@ -325,7 +325,7 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     param: 'topic',
     items: [
       'establishing_rh', 'rh_management', 'operations', 'recovery_support',
-      'social_model', 'workforce', 'research', 'reentry', 'funding',
+      'workforce', 'research', 'reentry', 'funding',
       'self_care', 'mental_health', 'recovery_ecosystems',
     ],
     excludeOnTenant: ['workforce', 'reentry', 'funding', 'mental_health'],
@@ -334,7 +334,8 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
   {
     title: 'Recovery House Models',
     param: 'topic',
-    items: ['rhoar_model', 'recovery_ky_model'],
+    // social_model moved here from "I Want To Learn About…" (Jason, 8-30).
+    items: ['social_model', 'rhoar_model', 'recovery_ky_model'],
     hideOnTenant: true,
   },
 ];
