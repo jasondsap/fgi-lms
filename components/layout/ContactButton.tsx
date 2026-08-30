@@ -22,7 +22,7 @@ export default function ContactButton({
         fontSize,
         fontWeight: 400,
         textDecoration: 'none',
-        padding: '9px 22px',
+        padding: '10px 22px',
         borderRadius: '999px',
         whiteSpace: 'nowrap',
       }}

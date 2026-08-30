@@ -81,9 +81,9 @@ export default function ShellFooter({
 
   const contact = (
     <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-      <span style={{ fontSize: '20px' }}>{supportLabel}</span>
+      <span style={{ fontSize: '17px' }}>{supportLabel}</span>
       <ContactButton
-        label="Contact" fontSize="20px"
+        label="Contact" fontSize="16px"
         {...(contactHref ? { href: contactHref } : {})}
         {...(contactBg ? { bg: contactBg } : {})}
         {...(contactFg ? { fg: contactFg } : {})}

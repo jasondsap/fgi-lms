@@ -48,10 +48,14 @@ export default function PresenterCard(
 
       {p.org_logo_url && (
         <div style={{ textAlign: 'center' }}>
-          <Image
-            src={p.org_logo_url} alt={p.org_name ?? ''} width={180} height={90}
-            style={{ width: '100%', maxWidth: '180px', height: 'auto', objectFit: 'contain' }}
-          />
+          {/* Every org logo sits in the same 180×80 frame regardless of shape
+              (Jennifer, 8-29: "a standardish size for logos"). */}
+          <div style={{ width: '180px', height: '80px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Image
+              src={p.org_logo_url} alt={p.org_name ?? ''} width={180} height={80}
+              style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain' }}
+            />
+          </div>
           {p.org_url && (
             <a
               href={p.org_url} target="_blank" rel="noopener noreferrer"

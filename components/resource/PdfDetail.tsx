@@ -4,6 +4,7 @@ import PresenterCard from '@/components/resource/PresenterCard';
 import ShellRail, { RAIL_BUTTON, RAIL_LABEL } from '@/components/resource/ShellRail';
 import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
+import Clamp from '@/components/resource/Clamp';
 import { RESOURCE_TYPE_LABELS, type Resource, type ResourceType } from '@/types';
 
 /*
@@ -62,7 +63,7 @@ export default async function PdfDetail(
   const illustration = resource.thumbnail_url || TYPE_ILLUSTRATION[type] || null;
   const presenters = resource.presenters ?? [];
   const materials  = resource.materials ?? [];
-  const related    = await getRelatedResources(resource, surface.key, 3);
+  const related    = await getRelatedResources(resource, surface.key, 8);
 
   // No date on the ID line for any document (Jennifer, 8-29, system-wide:
   // only live events — webinars and podcasts — carry a date outside the
@@ -86,22 +87,19 @@ export default async function PdfDetail(
 
         {/* ── Title, citation and illustration ── */}
         <div className="pdf-shell-grid">
-          <div>
+          <div style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
-              fontSize: '45px', lineHeight: 1.1, fontWeight: 700,
+              fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
             }}>
               {resource.title}
             </h1>
 
-            {/* Where the mockup puts "Course ID: yk3232". Documents have no
-                course code, so the slot carries what a reader can use. Only a
-                course is a "Course ID" — a handbook's code is just an ID. The
-                " · Month Year" that used to follow it is gone for every
-                document type (Jennifer, 8-29, generals tab). */}
+            {/* Jennifer 8-29: this line is "ID: xxxxxx" and nothing else, on
+                every shell — no "Course ID" prefix, no date. */}
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code
-                ? `${type === 'course' || type === 'naadac_ce' ? 'Course ID' : 'ID'}: ${resource.course_code}`
+                ? `ID: ${resource.course_code}`
                 : typeLabel}
             </div>
 
@@ -138,7 +136,7 @@ export default async function PdfDetail(
             there the rail ended up level with the middle of the article. Here
             the rail starts alongside the top of the body, directly under the
             illustration, which is where Jennifer's shell puts it. */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '2rem' }}>
+        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           {/* LEFT — the document, then anyone credited on it */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {body && (
@@ -149,15 +147,8 @@ export default async function PdfDetail(
                 }}>
                   {isPublication ? 'Abstract Description' : 'Description'}
                 </div>
-                {/* Abstracts arrive as several paragraphs; keep the breaks. */}
-                {body.split(/\n+/).filter(Boolean).map((para, i) => (
-                  <p key={i} style={{
-                    fontSize: '17px', lineHeight: 1.5, color: 'var(--text-primary)',
-                    maxWidth: '62ch', marginBottom: '0.75rem',
-                  }}>
-                    {para}
-                  </p>
-                ))}
+                {/* Paragraph breaks are kept inside the clamp. */}
+                <Clamp text={body} accent={surface.primary} />
               </div>
             )}
 

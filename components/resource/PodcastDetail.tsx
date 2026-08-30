@@ -211,12 +211,14 @@ export default async function PodcastDetail(
                 {/* FGI logo + site in the same slot the guest cards give their
                     organization (Jason, 8-23). */}
                 <div style={{ textAlign: 'center' }}>
-                  <Image
-                    src="/images/logos/fgi-logo-tagline.png"
-                    alt="Fletcher Group, Inc."
-                    width={360} height={120}
-                    style={{ width: '100%', maxWidth: '180px', height: 'auto', objectFit: 'contain' }}
-                  />
+                  <div style={{ width: '180px', height: '80px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Image
+                      src="/images/logos/fgi-logo-tagline.png"
+                      alt="Fletcher Group, Inc."
+                      width={360} height={120}
+                      style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain' }}
+                    />
+                  </div>
                   <a
                     href="https://www.fletchergroup.org" target="_blank" rel="noopener noreferrer"
                     style={{ display: 'block', marginTop: '8px', fontSize: '13px', color: surface.primary }}

@@ -3,6 +3,7 @@ import PresenterCard from '@/components/resource/PresenterCard';
 import ShellRail, { RAIL_LABEL } from '@/components/resource/ShellRail';
 import { getRelatedResources, getVideoSeries } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
+import Clamp from '@/components/resource/Clamp';
 import { ceLabel } from '@/lib/ce';
 import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
@@ -39,7 +40,7 @@ export default async function VideoDetail(
 ) {
   const presenters = resource.presenters ?? [];
   const [related, series] = await Promise.all([
-    getRelatedResources(resource, surface.key, 3),
+    getRelatedResources(resource, surface.key, 8),
     getVideoSeries(resource.title, surface.key),
   ]);
 
@@ -68,9 +69,9 @@ export default async function VideoDetail(
 
         {/* ── Title and illustration ── */}
         <div className="pdf-shell-grid">
-          <div>
+          <div style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
-              fontSize: '45px', lineHeight: 1.1, fontWeight: 700,
+              fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
             }}>
               {resource.title}
@@ -87,17 +88,17 @@ export default async function VideoDetail(
           <img
             src={VIDEO_ILLUSTRATION}
             alt=""
-            style={{ width: '454px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
+            style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
         </div>
 
         {/* ── Description, player, and the action rail ── */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '2rem' }}>
+        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {resource.description && (
               <div>
                 <div style={{ ...PANEL_TITLE }}>Description</div>
-                <p style={{ ...PANEL_TEXT, maxWidth: '62ch' }}>{resource.description}</p>
+                <Clamp text={resource.description} accent={surface.primary} />
               </div>
             )}
 

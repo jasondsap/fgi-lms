@@ -21,7 +21,7 @@ export default function PresenterBio({ bio, accent }: { bio: string; accent: str
           margin: 0,
           ...(expanded ? {} : {
             display: '-webkit-box',
-            WebkitLineClamp: 8,
+            WebkitLineClamp: 6,
             WebkitBoxOrient: 'vertical' as const,
             overflow: 'hidden',
           }),

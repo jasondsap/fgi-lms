@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import FeedbackModal from '@/components/resource/FeedbackModal';
+import RelatedList from '@/components/resource/RelatedList';
 import type { RelatedItem } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
-import { RESOURCE_TYPE_LABELS, type Presenter } from '@/types';
+import type { Presenter } from '@/types';
 
 export const RAIL_LABEL = {
   fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const,
@@ -12,8 +13,9 @@ export const RAIL_LABEL = {
 /** Pill CTA at the top of the rail, shared by both shells. */
 export const RAIL_BUTTON = {
   display: 'block', width: '100%', textAlign: 'center' as const,
-  padding: '15px 12px', borderRadius: '999px',
-  fontWeight: 700, fontSize: '20px', textDecoration: 'none',
+  // 8-29-26 pill scale (Jennifer): sized to the text, shared by every pill
+  padding: '10px 22px', borderRadius: '999px',
+  fontWeight: 700, fontSize: '16px', textDecoration: 'none',
   border: 'none', fontFamily: 'inherit', color: '#ffffff',
 };
 
@@ -110,28 +112,10 @@ export default function ShellRail(
 
       {related.length > 0 && (
         <div style={{ borderTop: '1px solid #d8d8d8', paddingTop: '1.25rem' }}>
-          <div style={{ ...RAIL_LABEL, display: 'block', marginBottom: '12px' }}>
+          <div style={{ ...RAIL_LABEL, display: 'block', marginBottom: '12px', color: surface.primary }}>
             You Might Also Be Interested In
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {related.map((r) => (
-              <Link
-                key={r.slug}
-                href={`${surface.basePath}/resource/${r.slug}`}
-                style={{ textDecoration: 'none', display: 'block' }}
-              >
-                <span style={{
-                  fontSize: '17px', lineHeight: 1.35, fontWeight: 600,
-                  color: surface.primary, display: 'block',
-                }}>
-                  {r.title}
-                </span>
-                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                  {RESOURCE_TYPE_LABELS[r.type] ?? r.type}
-                </span>
-              </Link>
-            ))}
-          </div>
+          <RelatedList items={related} basePath={surface.basePath} accent={surface.primary} />
         </div>
       )}
 

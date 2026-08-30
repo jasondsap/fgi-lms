@@ -135,8 +135,8 @@ export default function FeedbackModal({ slug, surface, accent }: Props) {
         style={{
           display: 'block', width: '100%', border: 'none',
           background: 'var(--fgi-amber)', color: '#ffffff',
-          padding: '15px 12px', borderRadius: '999px',
-          fontWeight: 700, fontSize: '22px', fontFamily: 'inherit',
+          padding: '10px 22px', borderRadius: '999px',
+          fontWeight: 700, fontSize: '16px', fontFamily: 'inherit',
         }}
       >
         Share Your Feedback
