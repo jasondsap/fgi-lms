@@ -46,14 +46,6 @@ const CATEGORY_CARD_IMAGE: Record<string, string> = {
 /** Types still on a photo rather than a transparent illustration. */
 const PHOTO_TYPES = new Set(['fgi_service']);
 
-function formatDuration(mins: number | null): string {
-  if (!mins) return '';
-  if (mins < 60) return `Approx. ${mins} min.`;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m ? `Approx. ${h}h ${m}m.` : `Approx. ${h}h.`;
-}
-
 export default function ResourceCard({ resource, basePath = '', naadacPill, completed }: Props) {
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
@@ -203,17 +195,9 @@ export default function ResourceCard({ resource, basePath = '', naadacPill, comp
             {resource.description}
           </p>
 
-          {/* Duration */}
-          {resource.duration_minutes && (
-            <p style={{
-              fontSize: '12px',
-              fontWeight: 700,
-              color: 'var(--text-muted)',
-              marginTop: 'auto',
-            }}>
-              {formatDuration(resource.duration_minutes)}
-            </p>
-          )}
+          {/* Duration line removed from every card (Jennifer 8-30, consistency
+              across items with and without a duration); the shells still show
+              "Approx. N min." in their facts box. */}
         </div>
       </article>
     </Link>
