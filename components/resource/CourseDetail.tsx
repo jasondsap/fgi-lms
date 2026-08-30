@@ -74,8 +74,12 @@ export default async function CourseDetail(
         </nav>
 
         {/* ── Title and illustration ── */}
-        <div className="pdf-shell-grid">
-          <div style={{ paddingTop: '0.75rem' }}>
+        {/* One grid (8-30-26): title, description and body on the left;
+            illustration + action rail on the right, spanning both rows, so the
+            rail always starts under the illustration however tall the title
+            cell is (citation + abstract on link-only publications). */}
+        <div className="shell-grid">
+          <div className="shell-grid__title" style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
               fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
@@ -95,17 +99,80 @@ export default async function CourseDetail(
             )}
           </div>
 
+          <div className="shell-grid__side">
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={COURSE_ILLUSTRATION}
             alt=""
             style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
-        </div>
+          <ShellRail
+            slug={resource.slug}
+            surface={surface}
+            facts={facts}
+            presenters={presenters}
+            related={related}
+            extras={
+              sponsorSite ? (
+                <div>
+                  {presenters.length === 0 && (
+                    <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
+                      Presenter Information:
+                    </div>
+                  )}
+                  <a
+                    href={resource.sponsor_url!} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '10px',
+                      fontSize: '15px', color: surface.primary,
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="1.7" style={{ flexShrink: 0 }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M2 12h20M12 2a15 15 0 010 20a15 15 0 010-20" />
+                    </svg>
+                    <span>{sponsorSite}</span>
+                  </a>
+                </div>
+              ) : null
+            }
+            action={
+              inMoodle && !gated ? (
+                <Link
+                  href={`${surface.basePath}/course/${resource.slug}`}
+                  style={{ ...RAIL_BUTTON, background: surface.primary }}
+                >
+                  Start Course
+                </Link>
+              ) : gated ? (
+                <form
+                  action={async () => {
+                    'use server';
+                    await signIn('cognito', {
+                      redirectTo: `${surface.basePath}/course/${resource.slug}`,
+                    });
+                  }}
+                >
+                  <button type="submit" style={{ ...RAIL_BUTTON, background: surface.primary }}>
+                    Sign In to Start Course
+                  </button>
+                  <p style={{
+                    fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
+                    marginTop: '8px', lineHeight: 1.5,
+                  }}>
+                    A free account lets us track your progress and issue your CE certificate.
+                  </p>
+                </form>
+              ) : null
+            }
+          />
+          </div>
+
 
         {/* ── Description, presenters, sponsor, CE panels, action rail ── */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="shell-grid__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
             {presenters.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
@@ -176,68 +243,6 @@ export default async function CourseDetail(
               </div>
             )}
           </div>
-
-          <ShellRail
-            slug={resource.slug}
-            surface={surface}
-            facts={facts}
-            presenters={presenters}
-            related={related}
-            extras={
-              sponsorSite ? (
-                <div>
-                  {presenters.length === 0 && (
-                    <div style={{ fontSize: '17px', fontWeight: 700, marginBottom: '10px' }}>
-                      Presenter Information:
-                    </div>
-                  )}
-                  <a
-                    href={resource.sponsor_url!} target="_blank" rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      fontSize: '15px', color: surface.primary,
-                    }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="1.7" style={{ flexShrink: 0 }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M2 12h20M12 2a15 15 0 010 20a15 15 0 010-20" />
-                    </svg>
-                    <span>{sponsorSite}</span>
-                  </a>
-                </div>
-              ) : null
-            }
-            action={
-              inMoodle && !gated ? (
-                <Link
-                  href={`${surface.basePath}/course/${resource.slug}`}
-                  style={{ ...RAIL_BUTTON, background: surface.primary }}
-                >
-                  Start Course
-                </Link>
-              ) : gated ? (
-                <form
-                  action={async () => {
-                    'use server';
-                    await signIn('cognito', {
-                      redirectTo: `${surface.basePath}/course/${resource.slug}`,
-                    });
-                  }}
-                >
-                  <button type="submit" style={{ ...RAIL_BUTTON, background: surface.primary }}>
-                    Sign In to Start Course
-                  </button>
-                  <p style={{
-                    fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
-                    marginTop: '8px', lineHeight: 1.5,
-                  }}>
-                    A free account lets us track your progress and issue your CE certificate.
-                  </p>
-                </form>
-              ) : null
-            }
-          />
         </div>
       </div>
     </div>

@@ -68,8 +68,12 @@ export default async function VideoDetail(
         </nav>
 
         {/* ── Title and illustration ── */}
-        <div className="pdf-shell-grid">
-          <div style={{ paddingTop: '0.75rem' }}>
+        {/* One grid (8-30-26): title, description and body on the left;
+            illustration + action rail on the right, spanning both rows, so the
+            rail always starts under the illustration however tall the title
+            cell is (citation + abstract on link-only publications). */}
+        <div className="shell-grid">
+          <div className="shell-grid__title" style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
               fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
@@ -91,17 +95,52 @@ export default async function VideoDetail(
             )}
           </div>
 
+          <div className="shell-grid__side">
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={VIDEO_ILLUSTRATION}
             alt=""
             style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
-        </div>
+          <ShellRail
+            slug={resource.slug}
+            surface={surface}
+            facts={facts}
+            presenters={presenters}
+            related={related}
+            /* The 7-part certification series all share one title, so this
+               list is the only in-page way from one part to the next. */
+            extras={
+              series.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={RAIL_LABEL}>This Series</div>
+                  {series.map((item) =>
+                    item.slug === resource.slug ? (
+                      <span key={item.slug} style={{
+                        fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)',
+                      }}>
+                        {item.label} — Now Playing
+                      </span>
+                    ) : (
+                      <Link
+                        key={item.slug}
+                        href={`${surface.basePath}/resource/${item.slug}`}
+                        style={{ fontSize: '16px', color: surface.primary, fontWeight: 600 }}
+                      >
+                        {item.label}
+                      </Link>
+                    ),
+                  )}
+                </div>
+              ) : null
+            }
+          />
+          </div>
+
 
         {/* ── Description, player, and the action rail ── */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="shell-grid__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
             {/* The video window — same frame as the webinar shell's inline
                 player, but here it is permanent: the video is the resource. */}
@@ -141,40 +180,6 @@ export default async function VideoDetail(
               </div>
             )}
           </div>
-
-          <ShellRail
-            slug={resource.slug}
-            surface={surface}
-            facts={facts}
-            presenters={presenters}
-            related={related}
-            /* The 7-part certification series all share one title, so this
-               list is the only in-page way from one part to the next. */
-            extras={
-              series.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={RAIL_LABEL}>This Series</div>
-                  {series.map((item) =>
-                    item.slug === resource.slug ? (
-                      <span key={item.slug} style={{
-                        fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)',
-                      }}>
-                        {item.label} — Now Playing
-                      </span>
-                    ) : (
-                      <Link
-                        key={item.slug}
-                        href={`${surface.basePath}/resource/${item.slug}`}
-                        style={{ fontSize: '16px', color: surface.primary, fontWeight: 600 }}
-                      >
-                        {item.label}
-                      </Link>
-                    ),
-                  )}
-                </div>
-              ) : null
-            }
-          />
         </div>
       </div>
     </div>

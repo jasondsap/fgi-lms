@@ -28,7 +28,7 @@ const TYPE_ILLUSTRATION: Record<string, string> = {
 /*
  * Column geometry from the mockup, at the x1.4 artboard-to-site scale: 627pt of
  * document column, a 46.5pt gutter and a 269pt rail = 1320px total. It lives in
- * `.pdf-shell-grid` in globals.css, where it can also carry a breakpoint.
+ * `.shell-grid` in globals.css, where it can also carry a breakpoint.
  */
 
 /**
@@ -86,8 +86,12 @@ export default async function PdfDetail(
         </nav>
 
         {/* ── Title, citation and illustration ── */}
-        <div className="pdf-shell-grid">
-          <div style={{ paddingTop: '0.75rem' }}>
+        {/* One grid (8-30-26): title, description and body on the left;
+            illustration + action rail on the right, spanning both rows, so the
+            rail always starts under the illustration however tall the title
+            cell is (citation + abstract on link-only publications). */}
+        <div className="shell-grid">
+          <div className="shell-grid__title" style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
               fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
@@ -132,6 +136,8 @@ export default async function PdfDetail(
 
           </div>
 
+          <div className="shell-grid__side">
+
           {illustration && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -140,29 +146,6 @@ export default async function PdfDetail(
               style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
             />
           )}
-        </div>
-
-        {/* ── Body + action rail ──
-            The description moved up beside the illustration on 8-29 once the
-            6-line clamp made it short; the rail still starts under the
-            illustration, alongside the document. */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
-          {/* LEFT — the document, then anyone credited on it */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {resource.download_url && (
-              <PdfViewer
-                url={resource.download_url}
-                title={resource.title}
-                label={shortLabel}
-                accent={surface.primary}
-              />
-            )}
-
-            {presenters.map((p) => (
-              <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
-            ))}
-          </div>
-
           <ShellRail
             slug={resource.slug}
             surface={surface}
@@ -209,6 +192,27 @@ export default async function PdfDetail(
               ) : null
             }
           />
+          </div>
+
+
+        {/* ── Body + action rail ──
+            The description moved up beside the illustration on 8-29 once the
+            6-line clamp made it short; the rail still starts under the
+            illustration, alongside the document. */}
+          <div className="shell-grid__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {resource.download_url && (
+              <PdfViewer
+                url={resource.download_url}
+                title={resource.title}
+                label={shortLabel}
+                accent={surface.primary}
+              />
+            )}
+
+            {presenters.map((p) => (
+              <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
+            ))}
+          </div>
         </div>
       </div>
     </div>

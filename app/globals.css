@@ -96,6 +96,32 @@ img { max-width: 100%; height: auto; display: block; }
   .pdf-shell-grid--body > aside { order: -1; }
 }
 
+/* Shell grid (8-30-26) — replaces the two stacked pdf-shell-grids on the
+   webinar, course, video and document shells. The side cell (illustration +
+   action rail) spans both rows, so the rail starts under the illustration
+   regardless of how tall the title cell (title, ID, citation, description)
+   turns out to be. */
+.shell-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 376px);
+  column-gap: 64px;
+  align-items: start;
+}
+.shell-grid__title { grid-column: 1; grid-row: 1; }
+.shell-grid__side  { grid-column: 2; grid-row: 1 / span 2; }
+.shell-grid__side > aside { margin-top: 1.25rem; }
+.shell-grid__body  { grid-column: 1; grid-row: 2; margin-top: 1.25rem; }
+@media (max-width: 1180px) {
+  .shell-grid { column-gap: 36px; }
+}
+@media (max-width: 1000px) {
+  /* Stacked: title, then illustration + rail, then the body — so the action
+     button never lands under a full-height document viewer. */
+  .shell-grid { grid-template-columns: minmax(0, 1fr); }
+  .shell-grid__side { grid-column: 1; grid-row: 2; margin-top: 1.25rem; }
+  .shell-grid__body { grid-column: 1; grid-row: 3; }
+}
+
 /* Podcast shell "Find Us On" platform links — Jennifer's icon set ships each
    brand mark as a gold default and a light-blue hover twin; inline styles
    can't carry :hover, so the pair lives here. */

@@ -88,8 +88,12 @@ export default async function WebinarDetail(
         </nav>
 
         {/* ── Title and illustration ── */}
-        <div className="pdf-shell-grid">
-          <div style={{ paddingTop: '0.75rem' }}>
+        {/* One grid (8-30-26): title, description and body on the left;
+            illustration + action rail on the right, spanning both rows, so the
+            rail always starts under the illustration however tall the title
+            cell is (citation + abstract on link-only publications). */}
+        <div className="shell-grid">
+          <div className="shell-grid__title" style={{ paddingTop: '0.75rem' }}>
             <h1 style={{
               fontSize: '36px', lineHeight: 1.15, fontWeight: 700,
               fontStretch: '75%', color: 'var(--text-primary)',
@@ -112,17 +116,73 @@ export default async function WebinarDetail(
 
           </div>
 
+          <div className="shell-grid__side">
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={WEBINAR_ILLUSTRATION}
             alt=""
             style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
-        </div>
+          <ShellRail
+            slug={resource.slug}
+            surface={surface}
+            facts={facts}
+            presenters={presenters}
+            related={related}
+            /* Transcripts and slide decks belong in the Moodle course now
+               (Jason, 8-12). They stay listed here only while this webinar has
+               no course to hold them, so nothing goes missing mid-migration. */
+            extras={
+              !inMoodle && materials.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={RAIL_LABEL}>Also included</div>
+                  {materials.map((m) => (
+                    <a
+                      key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
+                    >
+                      {m.label}
+                    </a>
+                  ))}
+                </div>
+              ) : null
+            }
+            action={
+              inMoodle && !gated ? (
+                <Link
+                  href={`${surface.basePath}/course/${resource.slug}`}
+                  style={{ ...RAIL_BUTTON, background: surface.primary }}
+                >
+                  Start Webinar
+                </Link>
+              ) : gated ? (
+                <form
+                  action={async () => {
+                    'use server';
+                    await signIn('cognito', {
+                      redirectTo: `${surface.basePath}/course/${resource.slug}`,
+                    });
+                  }}
+                >
+                  <button type="submit" style={{ ...RAIL_BUTTON, background: surface.primary }}>
+                    Sign In to Start
+                  </button>
+                  <p style={{
+                    fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
+                    marginTop: '8px', lineHeight: 1.5,
+                  }}>
+                    A free account lets us track your progress and issue your CE certificate.
+                  </p>
+                </form>
+              ) : null
+            }
+          />
+          </div>
+
 
         {/* ── Presenters, CE panels, and the action rail ── */}
-        <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="shell-grid__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
             {/* Until this webinar has a Moodle course, the recording still
                 plays here — see the component note. */}
@@ -179,61 +239,6 @@ export default async function WebinarDetail(
               </div>
             )}
           </div>
-
-          <ShellRail
-            slug={resource.slug}
-            surface={surface}
-            facts={facts}
-            presenters={presenters}
-            related={related}
-            /* Transcripts and slide decks belong in the Moodle course now
-               (Jason, 8-12). They stay listed here only while this webinar has
-               no course to hold them, so nothing goes missing mid-migration. */
-            extras={
-              !inMoodle && materials.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={RAIL_LABEL}>Also included</div>
-                  {materials.map((m) => (
-                    <a
-                      key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
-                      style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
-                    >
-                      {m.label}
-                    </a>
-                  ))}
-                </div>
-              ) : null
-            }
-            action={
-              inMoodle && !gated ? (
-                <Link
-                  href={`${surface.basePath}/course/${resource.slug}`}
-                  style={{ ...RAIL_BUTTON, background: surface.primary }}
-                >
-                  Start Webinar
-                </Link>
-              ) : gated ? (
-                <form
-                  action={async () => {
-                    'use server';
-                    await signIn('cognito', {
-                      redirectTo: `${surface.basePath}/course/${resource.slug}`,
-                    });
-                  }}
-                >
-                  <button type="submit" style={{ ...RAIL_BUTTON, background: surface.primary }}>
-                    Sign In to Start
-                  </button>
-                  <p style={{
-                    fontSize: '12px', color: 'var(--text-muted)', textAlign: 'center',
-                    marginTop: '8px', lineHeight: 1.5,
-                  }}>
-                    A free account lets us track your progress and issue your CE certificate.
-                  </p>
-                </form>
-              ) : null
-            }
-          />
         </div>
       </div>
     </div>
