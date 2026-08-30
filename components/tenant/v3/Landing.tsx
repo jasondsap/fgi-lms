@@ -336,7 +336,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
             <FilterSidebar
               total={data.total} targetPath={home} isTenant
-              fgiLibraryHref={`${tenant.fgiSiteUrl}/library`}
+              fgiLibraryHref={`${home}/library`}
             />
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>

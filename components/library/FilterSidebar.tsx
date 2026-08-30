@@ -15,6 +15,9 @@ interface Props {
    * "Other Libraries" block at the foot of the sidebar (Jennifer, 8-25).
    */
   fgiLibraryHref?: string;
+  /** Label for that link — "Fletcher Group Library" on a tenant's own library,
+      "SCARR Library" (etc.) when the tenant is browsing the FGI catalogue. */
+  fgiLibraryLabel?: string;
 }
 
 const LABEL_MAPS: Record<string, Record<string, string>> = {
@@ -75,7 +78,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
-export default function FilterSidebar({ total, targetPath, isTenant = false, fgiLibraryHref }: Props) {
+export default function FilterSidebar({ total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -171,7 +174,9 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
         </FilterGroup>
       ))}
 
-      {isTenant && fgiLibraryHref && (
+      {/* Present on the tenant library (→ FGI catalogue) and on the tenant's
+          FGI-catalogue view (→ back to its own library); never on FGI itself. */}
+      {fgiLibraryHref && (
         <div style={{ paddingTop: '14px' }}>
           <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
             Other Libraries
@@ -180,7 +185,7 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
             href={fgiLibraryHref}
             style={{ fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'underline' }}
           >
-            Fletcher Group Library
+            {fgiLibraryLabel ?? 'Fletcher Group Library'}
           </a>
         </div>
       )}
