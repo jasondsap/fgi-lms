@@ -39,9 +39,12 @@ export default function TenantHeaderV3({
   }, [pathname]);
   const inLibrary = pathname === home && hash === '#library';
 
+  // The tenant's own site link joins the left nav (Jason, 8-30: every link
+  // sits by the logo; only the account control lives at the right).
   const links = [
     { label: 'Home', href: home, active: pathname === home && !inLibrary },
     { label: 'Library', href: `${home}#library`, active: inLibrary },
+    { label: v3.orgSiteLabel, href: v3.orgSiteUrl, active: false, external: true },
   ];
 
   const pillBase = {
@@ -59,10 +62,12 @@ export default function TenantHeaderV3({
           display: 'flex', gap: '2rem', listStyle: 'none',
           alignItems: 'center', margin: 0, padding: 0,
         }}>
-          {links.map(({ label, href, active }) => (
+          {links.map(({ label, href, active, external }) => (
             <li key={label}>
               <Link
                 href={href}
+                target={external ? '_blank' : undefined}
+                rel={external ? 'noopener noreferrer' : undefined}
                 aria-current={active ? 'page' : undefined}
                 style={{
                   color: active ? tenant.accent : 'rgba(255,255,255,0.92)',
@@ -119,15 +124,7 @@ export default function TenantHeaderV3({
         )}
       </div>
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '1.5rem',
-      }}>
-        <a
-          href={v3.orgSiteUrl} target="_blank" rel="noopener noreferrer"
-          style={{ color: 'rgba(255,255,255,0.92)', fontSize: '16px', textDecoration: 'none', whiteSpace: 'nowrap' }}
-        >
-          {v3.orgSiteLabel}
-        </a>
+      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         {authNav}
       </div>
     </>
