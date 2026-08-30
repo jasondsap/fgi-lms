@@ -38,7 +38,9 @@ export default function LatestHighlights({
     <div style={{
       position: 'relative',
       zIndex: 2,
-      maxWidth: '1060px',
+      // Full page width (Jennifer 8-30: "expand it to the left") — wider tiles
+      // wrap less, so the panel is shorter.
+      maxWidth: 'var(--max-width)',
       margin: '-95px auto 0',
       padding: '0 2rem',
     }}>
@@ -82,10 +84,11 @@ export default function LatestHighlights({
                 '--tile-border-hover': tileBorderHover,
               } as React.CSSProperties}
             >
+              {/* Same illustration box as the SCARR/CO portal card (Jennifer 8-30:
+                  "images a bit larger… text like the portals") */}
               <div style={{
-                width: '64px', height: '64px', borderRadius: '16px',
-                background: 'rgba(255,255,255,0.75)',
-                boxShadow: '0 2px 6px rgba(30,70,90,0.06)',
+                width: '96px', height: '84px', borderRadius: '12px',
+                background: '#ffffff', border: '1px solid rgba(37,126,164,0.18)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 flexShrink: 0,
               }}>
@@ -94,14 +97,14 @@ export default function LatestHighlights({
                   alt=""
                   width={800}
                   height={450}
-                  style={{ width: '54px', height: 'auto' }}
+                  style={{ width: '92px', height: 'auto' }}
                 />
               </div>
               <div style={{ minWidth: 0 }}>
+                {/* Portal card typography: dark condensed label + smaller title */}
                 <div style={{
-                  fontSize: '12.5px', fontWeight: 600, color: accent,
-                  textTransform: 'uppercase', letterSpacing: '0.07em',
-                  lineHeight: 1.2, marginBottom: '4px',
+                  fontSize: '17px', fontWeight: 700, color: '#111111', fontStretch: '75%',
+                  lineHeight: 1.2, marginBottom: '3px',
                   display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap',
                 }}>
                   <span>{tile.label}</span>
@@ -117,7 +120,7 @@ export default function LatestHighlights({
                   )}
                 </div>
                 <div style={{
-                  fontSize: '16px', color: 'var(--text-primary)', lineHeight: 1.3,
+                  fontSize: '15px', fontStretch: '75%', color: '#222222', lineHeight: 1.3,
                 }}>
                   {tile.title}
                 </div>
