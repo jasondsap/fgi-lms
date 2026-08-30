@@ -16,6 +16,9 @@ export function TenantShellFooter({ tenant }: { tenant: TenantConfig }) {
       lobeBg={tenant.v2?.lobe?.bg}
       siteUrl={tenant.footer.websiteUrl}
       siteLabel={tenant.footer.websiteLabel}
+      supportLabel={tenant.v3?.supportBar.heading}
+      contactBg={tenant.v3?.contactButton?.bg}
+      contactFg={tenant.v3?.contactButton?.fg}
     />
   );
 }
@@ -41,6 +44,9 @@ export default function ShellFooter({
   siteUrl = 'https://www.fletchergroup.org',
   siteLabel = 'www.fletchergroup.org',
   contactHref,
+  supportLabel = 'Platform Support',
+  contactBg,
+  contactFg,
 }: {
   bg?: string;
   logoSrc?: string;
@@ -51,6 +57,10 @@ export default function ShellFooter({
   siteUrl?: string;
   siteLabel?: string;
   contactHref?: string;
+  /** "Learning Center Support" on the tenants (Jennifer 8-29). */
+  supportLabel?: string;
+  contactBg?: string;
+  contactFg?: string;
 }) {
   const logo = (
     <div style={{
@@ -71,8 +81,13 @@ export default function ShellFooter({
 
   const contact = (
     <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-      <span style={{ fontSize: '20px' }}>Platform Support</span>
-      <ContactButton label="Contact" fontSize="20px" {...(contactHref ? { href: contactHref } : {})} />
+      <span style={{ fontSize: '20px' }}>{supportLabel}</span>
+      <ContactButton
+        label="Contact" fontSize="20px"
+        {...(contactHref ? { href: contactHref } : {})}
+        {...(contactBg ? { bg: contactBg } : {})}
+        {...(contactFg ? { fg: contactFg } : {})}
+      />
     </div>
   );
 

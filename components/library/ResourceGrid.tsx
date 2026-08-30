@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import ResourceCard from './ResourceCard';
+import ResourceCard, { type NaadacPillStyle } from './ResourceCard';
 import type { Resource } from '@/types';
 
 interface Props {
@@ -24,6 +24,10 @@ interface Props {
   total: number;
   /** Link prefix for cards — '' on FGI, '/colorado' or '/scarr'. */
   basePath?: string;
+  /** Tenant colour for the cards' NAADAC CE overlay. */
+  naadacPill?: NaadacPillStyle;
+  /** Resource ids the signed-in learner has completed (checkmark badge). */
+  completedIds?: string[];
 }
 
 /**
@@ -38,9 +42,10 @@ interface Props {
  */
 export default function ResourceGrid({
   initial, startPage, totalPages, perPage, apiQuery, fallbackBase, fallbackQuery, total,
-  basePath = '',
+  basePath = '', naadacPill, completedIds = [],
 }: Props) {
   const [items, setItems] = useState<Resource[]>(initial);
+  const completed = new Set(completedIds);
   const [page, setPage] = useState(startPage);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +104,13 @@ export default function ResourceGrid({
         gap: '1.25rem', marginBottom: '2rem',
       }}>
         {items.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} basePath={basePath} />
+          <ResourceCard
+            key={resource.id}
+            resource={resource}
+            basePath={basePath}
+            naadacPill={naadacPill}
+            completed={completed.has(resource.id)}
+          />
         ))}
       </div>
 

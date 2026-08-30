@@ -3,6 +3,8 @@ import FilterSidebar from '@/components/library/FilterSidebar';
 import AskLibrary from '@/components/library/AskLibrary';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
+import { getSession } from '@/auth';
+import { getCompletedResourceIds } from '@/lib/progress';
 import { getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -42,6 +44,8 @@ export default async function LibraryPage({ searchParams }: PageProps) {
 
   const data = await getPublicResources(params);
   const query = filterQuery(searchParams);
+  const session = await getSession();
+  const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
 
   return (
     <div style={{ background: '#ffffff', padding: '2rem 2rem 4rem' }}>
@@ -67,6 +71,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
             fallbackBase="/library"
             fallbackQuery={query}
             total={data.total}
+            completedIds={completedIds}
           />
         </div>
       </div>

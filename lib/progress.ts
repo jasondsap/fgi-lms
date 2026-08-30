@@ -302,6 +302,15 @@ export async function getUserProgress(userId: string): Promise<CourseProgressRow
   })) as CourseProgressRow[];
 }
 
+/** Resource ids the learner has completed — the library cards' checkmark. */
+export async function getCompletedResourceIds(userId: string): Promise<string[]> {
+  const rows = await sql`
+    SELECT resource_id FROM user_course_progress
+    WHERE user_id = ${userId} AND completed_at IS NOT NULL
+  `;
+  return rows.map((r) => r.resource_id as string);
+}
+
 export interface CeYear { year: number; hours: number; courses: number }
 
 /** CE hours earned, by completion year — NAADAC renews on a two-year cycle. */

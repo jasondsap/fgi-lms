@@ -3,10 +3,16 @@ import Link from 'next/link';
 import type { Resource } from '@/types';
 import { RESOURCE_TYPE_LABELS } from '@/types';
 
+export interface NaadacPillStyle { bg: string; fg: string }
+
 interface Props {
   resource: Resource;
   /** '' on FGI, '/colorado' or '/scarr' — keeps the visitor on their surface. */
   basePath?: string;
+  /** Tenant colour for the NAADAC CE overlay (SCARR yellow, Jennifer 8-29). */
+  naadacPill?: NaadacPillStyle;
+  /** Signed-in learner has completed this course — shows the checkmark badge. */
+  completed?: boolean;
 }
 
 /*
@@ -48,7 +54,7 @@ function formatDuration(mins: number | null): string {
   return m ? `Approx. ${h}h ${m}m.` : `Approx. ${h}h.`;
 }
 
-export default function ResourceCard({ resource, basePath = '' }: Props) {
+export default function ResourceCard({ resource, basePath = '', naadacPill, completed }: Props) {
   const typeLabel    = RESOURCE_TYPE_LABELS[resource.type] ?? resource.type;
   const thumbnailSrc = resource.thumbnail_url || CATEGORY_CARD_IMAGE[resource.type] || null;
 
@@ -104,15 +110,36 @@ export default function ResourceCard({ resource, basePath = '' }: Props) {
             />
           ) : null}
 
-          {/* NAADAC CE overlay — top-right of the illustration */}
+          {/* NAADAC CE overlay — top-right of the illustration; tenants can
+              recolour it (SCARR yellow) */}
           {resource.is_naadac_ce && (
             <span style={{
               position: 'absolute', top: '10px', right: '10px',
-              background: 'var(--fgi-blue)', color: '#fff',
+              background: naadacPill?.bg ?? 'var(--fgi-blue)', color: naadacPill?.fg ?? '#fff',
               fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
               padding: '3px 8px', borderRadius: '20px',
             }}>
               NAADAC CE
+            </span>
+          )}
+
+          {/* Completed checkmark — top-left, from the learner's My Learning
+              progress (Jennifer 8-29: "see on the face card what they have
+              completed") */}
+          {completed && (
+            <span
+              title="Completed"
+              aria-label="Completed"
+              style={{
+                position: 'absolute', top: '10px', left: '10px',
+                width: '26px', height: '26px', borderRadius: '50%',
+                background: '#1e8e3e', color: '#ffffff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '15px', fontWeight: 700, lineHeight: 1,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+              }}
+            >
+              ✓
             </span>
           )}
         </div>

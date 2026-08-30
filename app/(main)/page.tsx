@@ -6,6 +6,8 @@ import SearchBar from '@/components/library/SearchBar';
 import HeroVisual from '@/components/home/HeroVisual';
 import LatestHighlights, { type HighlightTile } from '@/components/home/LatestHighlights';
 import ContactButton from '@/components/layout/ContactButton';
+import { getSession } from '@/auth';
+import { getCompletedResourceIds } from '@/lib/progress';
 import { getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -45,6 +47,8 @@ export default async function HomePage({ searchParams }: PageProps) {
   // Call DB directly — no internal HTTP fetch
   const data = await getPublicResources(params);
   const query = filterQuery(searchParams);
+  const session = await getSession();
+  const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
 
   // "Latest Highlights" is live data for every type the catalog actually
   // holds. Podcasts have no rows yet, so that tile simply drops out until
@@ -197,6 +201,7 @@ export default async function HomePage({ searchParams }: PageProps) {
               fallbackBase="/"
               fallbackQuery={query}
               total={data.total}
+              completedIds={completedIds}
             />
           </div>
         </div>

@@ -165,6 +165,10 @@ export interface TenantV3 {
   highlightTileBg: string;
   /** `heading` defaults to "Need Platform Help?" (SCARR: "Learning Center Support"). */
   supportBar: { bg: string; fg: string; buttonLabel: string; heading?: string };
+  /** Tenant colour for the library cards' NAADAC CE overlay (SCARR yellow, 8-29-26). */
+  naadacPill?: { bg: string; fg: string };
+  /** Colour of the Contact pills (landing support bar + shell footer); defaults to `primary`. */
+  contactButton?: { bg: string; fg: string };
   certBand: {
     heading: string;
     /** Trusted author HTML paragraphs (apply link, contact email). */
@@ -595,6 +599,9 @@ const TENANTS: Record<string, TenantConfig> = {
       heroDots: '/images/tenants/scarr/hero-ring.webp',
       highlightTileBg: '#fffdf4',
       supportBar: { bg: '#e7e9ed', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
+      // Jennifer 8-29: NAADAC pill and Contact buttons in SCARR yellow.
+      naadacPill: { bg: '#f5d300', fg: '#041e42' },
+      contactButton: { bg: '#f5d300', fg: '#041e42' },
       certBand: {
         heading: 'Becoming a SCARR Certified Residence',
         paragraphsHtml: [

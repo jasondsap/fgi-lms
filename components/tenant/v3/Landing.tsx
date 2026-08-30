@@ -5,6 +5,8 @@ import AskLibrary from '@/components/library/AskLibrary';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
+import { getSession } from '@/auth';
+import { getCompletedResourceIds } from '@/lib/progress';
 import { getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
@@ -31,6 +33,9 @@ interface Props {
 export default async function TenantLandingV3({ tenant, searchParams }: Props) {
   const home = `/${tenant.slug}`;
   const v3 = tenant.v3!;
+  // Completed-course checkmarks on the cards (Jennifer 8-29) — signed-in only.
+  const session = await getSession();
+  const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
 
   const params: ResourceListParams = {
     type:     normalizeType(searchParams.type),
@@ -301,7 +306,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               href="mailto:LC@fletchergroup.org"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '9px',
-                background: tenant.primary, color: '#ffffff', fontSize: '16px',
+                background: v3.contactButton?.bg ?? tenant.primary, color: v3.contactButton?.fg ?? '#ffffff', fontSize: '16px',
                 textDecoration: 'none', padding: '9px 22px', borderRadius: '999px',
                 whiteSpace: 'nowrap',
               }}
@@ -370,6 +375,8 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               fallbackQuery={linkQuery}
               total={data.total}
               basePath={home}
+              naadacPill={v3.naadacPill}
+              completedIds={completedIds}
             />
           </div>
         </div>

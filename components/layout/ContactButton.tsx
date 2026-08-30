@@ -7,7 +7,9 @@ export default function ContactButton({
   href = 'mailto:LC@fletchergroup.org',
   label = 'Contact Us',
   fontSize = '17px',
-}: { href?: string; label?: string; fontSize?: string } = {}) {
+  bg = 'var(--fgi-blue)',
+  fg = '#ffffff',
+}: { href?: string; label?: string; fontSize?: string; bg?: string; fg?: string } = {}) {
   return (
     <a
       href={href}
@@ -15,8 +17,8 @@ export default function ContactButton({
         display: 'inline-flex',
         alignItems: 'center',
         gap: '9px',
-        background: 'var(--fgi-blue)',
-        color: '#ffffff',
+        background: bg,
+        color: fg,
         fontSize,
         fontWeight: 400,
         textDecoration: 'none',

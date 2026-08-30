@@ -3,6 +3,7 @@ import PresenterCard from '@/components/resource/PresenterCard';
 import ShellRail, { RAIL_LABEL } from '@/components/resource/ShellRail';
 import { getRelatedResources, getVideoSeries } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
+import { ceLabel } from '@/lib/ce';
 import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
 /** The video drawing from the 8-11-26 illustration set, as on the cards. */
@@ -125,7 +126,7 @@ export default async function VideoDetail(
                 <div style={PANEL_TITLE}>NAADAC CE Details</div>
                 <p style={PANEL_TEXT}>
                   This course has been approved by Fletcher Group, Inc., as a NAADAC Approved
-                  Education Provider, for <strong>{credits ?? 1} CE</strong>. NAADAC Provider
+                  Education Provider, for <strong>{ceLabel(credits)}</strong>. NAADAC Provider
                   {' '}#242360, Fletcher Group, Inc., is responsible for all aspects of their
                   programming.
                 </p>
