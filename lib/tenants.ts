@@ -395,6 +395,9 @@ const TENANTS: Record<string, TenantConfig> = {
       heroDots: '/images/tenants/colorado/hero-ring.webp',
       highlightTileBg: '#fffdf4',
       supportBar: { bg: '#e7e9f1', fg: '#111111', buttonLabel: 'Contact', heading: 'Learning Center Support' },
+      // Jennifer 8-29 (via Jason): same yellow treatment as SCARR — CO yellow, navy text.
+      naadacPill: { bg: '#ffd100', fg: '#001970' },
+      contactButton: { bg: '#ffd100', fg: '#001970' },
       certBand: {
         heading: 'Are you wanting to open a Recovery Residence?',
         paragraphsHtml: [
