@@ -282,6 +282,14 @@ export async function getActivitiesCompletion(
   return res.statuses;
 }
 
+/**
+ * Override-complete an evaluation activity for a learner — the survey was
+ * answered on the site (local_fgiembed 1.2.0). Single-shot write on purpose.
+ */
+export async function markActivityComplete(cmid: number, moodleUserId: number): Promise<void> {
+  await moodleCall('local_fgiembed_mark_complete', { cmid, userid: moodleUserId });
+}
+
 // ---------------------------------------------------------------------------
 // auth_userkey SSO (requires the auth_userkey plugin on the Moodle server)
 // ---------------------------------------------------------------------------

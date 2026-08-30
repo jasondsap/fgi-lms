@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import EvaluationForm from '@/components/resource/EvaluationForm';
+import { EVALUATION_INTRO, EVALUATION_THANKS } from '@/lib/evaluation-items';
 
 export interface PlayerModule {
   cmid: number;
@@ -40,6 +42,13 @@ interface Props {
   slug: string;
   /** '' on FGI, '/colorado' or '/scarr' on a tenant portal. */
   basePath: string;
+  /** Site evaluation (8-30-26): clicking the evaluation activity renders the
+      Learning Center survey in the pane instead of Moodle's feedback UI. */
+  siteEvaluation?: boolean;
+  /** 'fgi' | tenant slug — stored with the evaluation response. */
+  surfaceKey?: string;
+  /** Surface accent for the survey controls. */
+  accent?: string;
   sections: PlayerSection[];
   initialSrc: string; // one-time SSO login URL → first activity
   initialCmid: number;
@@ -58,7 +67,10 @@ const MODNAME_LABELS: Record<string, string> = {
 const groupModules = (g: PlayerGroup): PlayerModule[] =>
   g.lead ? [g.lead, ...g.items] : g.items;
 
-export default function CoursePlayer({ title, slug, basePath, sections, initialSrc, initialCmid }: Props) {
+export default function CoursePlayer({
+  title, slug, basePath, sections, initialSrc, initialCmid,
+  siteEvaluation = false, surfaceKey = 'fgi', accent = 'var(--fgi-blue)',
+}: Props) {
   const router = useRouter();
   // iframe src lives in state so server refreshes (which mint a new one-time
   // login URL) never reload the running activity
@@ -67,6 +79,9 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
   // Collapsed groups only — everything starts expanded, so a group added by a
   // later course edit is visible rather than silently folded away.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  // Site evaluation pane state: showing it, and submitted-this-session.
+  const [showEval, setShowEval] = useState(false);
+  const [evalDone, setEvalDone] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const allGroups = sections.flatMap((s) => s.groups);
@@ -91,8 +106,18 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
     return () => clearInterval(t);
   }, [router]);
 
+  const isSiteEval = (m: PlayerModule) =>
+    siteEvaluation && (m.modname === 'feedback' || m.modname === 'questionnaire');
+
   const openModule = (m: PlayerModule) => {
     setActiveCmid(m.cmid);
+    if (isSiteEval(m)) {
+      // The Learning Center survey renders in the pane — Moodle's feedback
+      // UI is never shown (Jennifer, 8-30).
+      setShowEval(true);
+      return;
+    }
+    setShowEval(false);
     // The Moodle session cookie was established by the initial SSO load —
     // plain activity URLs work from here on.
     setIframeSrc(m.url);
@@ -301,7 +326,41 @@ export default function CoursePlayer({ title, slug, basePath, sections, initialS
       </aside>
 
       {/* ── Activity pane ── */}
-      <main style={{ flex: 1, minWidth: 0 }}>
+      <main style={{ flex: 1, minWidth: 0, position: 'relative' }}>
+        {showEval && (
+          <div style={{
+            position: 'absolute', inset: 0, overflowY: 'auto',
+            background: '#ffffff', zIndex: 5,
+          }}>
+            <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1.5rem 3rem' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                Course Evaluation
+              </h2>
+              {(evalDone || allModules.some((m) => m.cmid === activeCmid && (m.state === 1 || m.state === 2))) ? (
+                <p style={{ fontSize: '16px', fontWeight: 600, marginTop: '1rem' }}>
+                  {EVALUATION_THANKS}
+                </p>
+              ) : (
+                <>
+                  {EVALUATION_INTRO.map((line, i) => (
+                    <p key={i} style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                      {line}
+                    </p>
+                  ))}
+                  <div style={{ marginTop: '1.25rem' }}>
+                    <EvaluationForm
+                      slug={slug}
+                      surface={surfaceKey}
+                      accent={accent}
+                      moodleCmid={activeCmid}
+                      onDone={() => { setEvalDone(true); router.refresh(); }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
         <iframe
           ref={iframeRef}
           src={iframeSrc}

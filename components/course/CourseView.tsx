@@ -96,6 +96,17 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
   return groups;
 }
 
+/**
+ * Courses whose evaluation runs as the site survey instead of Moodle's
+ * feedback UI (8-30-26). Pilot: SCARR pre-cert. Flip to 'all' once Jennifer
+ * signs off — no per-course Moodle work is needed either way.
+ */
+const SITE_EVALUATION_COURSES: Set<number> | 'all' = new Set([127]);
+
+function usesSiteEvaluation(courseId: number): boolean {
+  return SITE_EVALUATION_COURSES === 'all' || SITE_EVALUATION_COURSES.has(courseId);
+}
+
 /** `?cm=<cmid>` on a course URL opens that module (My Learning "Resume"). */
 export function parseCm(cm: string | string[] | undefined): number | undefined {
   const n = Number(Array.isArray(cm) ? cm[0] : cm);
@@ -245,6 +256,9 @@ export default async function CourseView(
       sections={playerSections}
       initialSrc={initialSrc}
       initialCmid={firstModule.cmid}
+      siteEvaluation={usesSiteEvaluation(courseId)}
+      surfaceKey={surface.key}
+      accent={surface.primary}
     />
   );
 }

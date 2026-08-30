@@ -81,6 +81,7 @@ export function parseSubmission(body: any): EvaluationSubmission {
 export async function saveEvaluation(
   submission: EvaluationSubmission,
   userId: string | null,
+  opts: { source?: string; moodleCourseId?: number | null } = {},
 ): Promise<void> {
   const { slug, surface, ratings, texts, may_contact, contact_email } = submission;
 
@@ -89,11 +90,13 @@ export async function saveEvaluation(
 
   await sql`
     INSERT INTO evaluation_responses (
-      resource_id, resource_slug, surface, user_id, source, instrument_version,
+      resource_id, resource_slug, surface, user_id, source, moodle_course_id,
+      instrument_version,
       made_sense, can_apply, presented_well, overall_impression, would_recommend,
       liked, disliked, future_topics, may_contact, contact_email
     ) VALUES (
-      ${resourceId}, ${slug}, ${surface}, ${userId}, 'web', ${INSTRUMENT_VERSION},
+      ${resourceId}, ${slug}, ${surface}, ${userId},
+      ${opts.source ?? 'web'}, ${opts.moodleCourseId ?? null}, ${INSTRUMENT_VERSION},
       ${ratings.made_sense}, ${ratings.can_apply}, ${ratings.presented_well},
       ${ratings.overall_impression}, ${ratings.would_recommend},
       ${texts.liked ?? null}, ${texts.disliked ?? null}, ${texts.future_topics ?? null},

@@ -11,6 +11,7 @@ require('/opt/bitnami/moodle/config.php');
 
 $FUNCTIONS = [
     'gradereport_user_get_grade_items',   // per-learner grade items (quiz best grade)
+    'local_fgiembed_mark_complete',       // site evaluation completes the Moodle activity (1.2.0)
 ];
 
 $apply = in_array('--apply', $argv, true);
