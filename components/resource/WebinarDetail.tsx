@@ -101,8 +101,14 @@ export default async function WebinarDetail(
               {resource.course_code
                 ? `ID: ${resource.course_code}`
                 : RESOURCE_TYPE_LABELS.webinar}
-              {eventDate && <span style={{ color: 'var(--text-muted)' }}> · {eventDate}</span>}
             </div>
+
+            {resource.description && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{ ...PANEL_TITLE }}>Description</div>
+                <Clamp text={resource.description} accent={surface.primary} />
+              </div>
+            )}
 
           </div>
 
@@ -117,12 +123,6 @@ export default async function WebinarDetail(
         {/* ── Presenters, CE panels, and the action rail ── */}
         <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {resource.description && (
-              <div>
-                <div style={{ ...PANEL_TITLE }}>Description</div>
-                <Clamp text={resource.description} accent={surface.primary} />
-              </div>
-            )}
 
             {/* Until this webinar has a Moodle course, the recording still
                 plays here — see the component note. */}

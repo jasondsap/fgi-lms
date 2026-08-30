@@ -82,6 +82,13 @@ export default async function VideoDetail(
                 ? `ID: ${resource.course_code}`
                 : RESOURCE_TYPE_LABELS.video}
             </div>
+
+            {resource.description && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{ ...PANEL_TITLE }}>Description</div>
+                <Clamp text={resource.description} accent={surface.primary} />
+              </div>
+            )}
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -95,12 +102,6 @@ export default async function VideoDetail(
         {/* ── Description, player, and the action rail ── */}
         <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {resource.description && (
-              <div>
-                <div style={{ ...PANEL_TITLE }}>Description</div>
-                <Clamp text={resource.description} accent={surface.primary} />
-              </div>
-            )}
 
             {/* The video window — same frame as the webinar shell's inline
                 player, but here it is permanent: the video is the resource. */}

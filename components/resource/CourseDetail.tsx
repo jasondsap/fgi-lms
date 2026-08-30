@@ -86,6 +86,13 @@ export default async function CourseDetail(
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code ? `ID: ${resource.course_code}` : typeLabel}
             </div>
+
+            {resource.description && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{ ...PANEL_TITLE }}>Description</div>
+                <Clamp text={resource.description} accent={surface.primary} />
+              </div>
+            )}
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -99,12 +106,6 @@ export default async function CourseDetail(
         {/* ── Description, presenters, sponsor, CE panels, action rail ── */}
         <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {resource.description && (
-              <div>
-                <div style={{ ...PANEL_TITLE }}>Description</div>
-                <Clamp text={resource.description} accent={surface.primary} />
-              </div>
-            )}
 
             {presenters.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />

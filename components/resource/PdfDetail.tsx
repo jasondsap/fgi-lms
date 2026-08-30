@@ -117,6 +117,19 @@ export default async function PdfDetail(
               />
             )}
 
+            {body && (
+              <div style={{ marginTop: '1.25rem' }}>
+                <div style={{
+                  fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
+                  marginBottom: '0.75rem',
+                }}>
+                  {isPublication ? 'Abstract Description' : 'Description'}
+                </div>
+                {/* Paragraph breaks are kept inside the clamp. */}
+                <Clamp text={body} accent={surface.primary} />
+              </div>
+            )}
+
           </div>
 
           {illustration && (
@@ -130,28 +143,12 @@ export default async function PdfDetail(
         </div>
 
         {/* ── Body + action rail ──
-            The description lives in this row, not the one above: the rail is the
-            second row's right-hand cell, so anything tall in the first row's
-            left cell pushes it down the page. With a 2,000-character abstract up
-            there the rail ended up level with the middle of the article. Here
-            the rail starts alongside the top of the body, directly under the
-            illustration, which is where Jennifer's shell puts it. */}
+            The description moved up beside the illustration on 8-29 once the
+            6-line clamp made it short; the rail still starts under the
+            illustration, alongside the document. */}
         <div className="pdf-shell-grid pdf-shell-grid--body" style={{ marginTop: '1.25rem' }}>
           {/* LEFT — the document, then anyone credited on it */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {body && (
-              <div>
-                <div style={{
-                  fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
-                  marginBottom: '0.75rem',
-                }}>
-                  {isPublication ? 'Abstract Description' : 'Description'}
-                </div>
-                {/* Paragraph breaks are kept inside the clamp. */}
-                <Clamp text={body} accent={surface.primary} />
-              </div>
-            )}
-
             {resource.download_url && (
               <PdfViewer
                 url={resource.download_url}
