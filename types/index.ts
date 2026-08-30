@@ -302,6 +302,9 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
   {
     title: 'Resource Type',
     param: 'type',
+    // Jason 8-30: reads "External Resources" in the filter bar (cards keep the
+    // full type label).
+    labels: { non_fgi: 'External Resources' },
     items: [
       'webinar', 'podcast', 'toolkit', 'guidebook', 'newsletter',
       'video', 'paper', 'infographic', 'success_story', 'non_fgi',
