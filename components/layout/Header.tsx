@@ -20,7 +20,7 @@ export default function Header() {
         margin: '0 auto',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         height: '92px',
       }}>
 
@@ -39,7 +39,7 @@ export default function Header() {
         <NavLinks />
 
         {/* Account area — hidden until Cognito is configured */}
-        <div style={{ flexShrink: 0, marginLeft: '2.25rem' }}>
+        <div style={{ flexShrink: 0, marginLeft: 'auto' }}>
           <AuthNav />
         </div>
 
