@@ -77,6 +77,21 @@ export default async function AdminPage() {
             Every account — set each person&#39;s role (Admin, FGI Staff, Learner) and home portal.
           </p>
         </Link>
+
+        <Link
+          href="/admin/analytics"
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-teal, #2a9d8f)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Analytics</div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            Traffic across every page — views, visitors, top pages, referrers, countries.
+          </p>
+        </Link>
       </div>
     </div>
   );
