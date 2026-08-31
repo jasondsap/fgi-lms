@@ -100,7 +100,10 @@ export async function getPublicResources(
       const wordConds = words.map((w) => {
         const ph = bind(w);
         return `(to_tsvector('english', ${HAY}) @@ plainto_tsquery('english', ${ph})
-          OR word_similarity(${ph}, title || ' ' || array_to_string(search_keywords, ' ')) > 0.42)`;
+          OR word_similarity(${ph}, title || ' ' || array_to_string(search_keywords, ' ')) > 0.45)`;
+        // 0.45 (was 0.42, tuned 8-31-26): "adiction" scored 0.44 against every
+        // "-ction/-tion" title (medication, certification, inspection…) and
+        // pulled in 14 junk rows; real typo matches all score ≥ 0.50.
       });
       conditions.push(`(${wordConds.join(' AND ')})`);
       // Relevance: weighted full-text rank (title > keywords > description),
