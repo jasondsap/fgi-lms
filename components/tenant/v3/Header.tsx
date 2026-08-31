@@ -132,10 +132,10 @@ export default function TenantHeaderV3({
           aria-label="Help Center"
           title="Help Center"
           style={{
-            width: '38px', height: '38px', borderRadius: '50%',
+            width: '27px', height: '27px', borderRadius: '50%',
             border: '2px solid rgba(255,255,255,0.85)', color: '#ffffff',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '19px', fontWeight: 700, textDecoration: 'none', lineHeight: 1,
+            fontSize: '13px', fontWeight: 700, textDecoration: 'none', lineHeight: 1,
           }}
         >
           ?
