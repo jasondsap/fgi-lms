@@ -593,6 +593,27 @@ export async function getCourseResource(slug: string): Promise<CourseResource | 
   return (rows[0] as CourseResource) ?? null;
 }
 
+/**
+ * Route-surface visibility for the detail pages (8-31-26 surface
+ * enforcement): a resource opens on a surface only if it has a
+ * resource_visibility row there, so a tenant-only item 404s from any other
+ * chrome — FGI-shared content (a row per surface) stays open everywhere.
+ * Admins bypass in the callers.
+ */
+export async function isVisibleOnSurface(slug: string, surfaceKey: string): Promise<boolean> {
+  const rows = await sql`
+    SELECT 1 FROM resources r
+    WHERE r.slug = ${slug} AND r.published = TRUE
+      AND EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = r.id AND t.slug = ${surfaceKey}
+      )
+    LIMIT 1
+  `;
+  return Boolean(rows[0]);
+}
+
 export async function getResourceBySlug(slug: string): Promise<Resource | null> {
   // Tagged-template form — slug is bound as a parameter, not interpolated.
   const rows = await sql`

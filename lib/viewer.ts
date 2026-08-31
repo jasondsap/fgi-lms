@@ -13,9 +13,11 @@ export interface Viewer {
   role: string | null;
   /** Slug of the tenant a tenant_admin administers (users.tenant_id → tenants). */
   tenantSlug: string | null;
+  /** Home surface (users.registered_surface): fgi | colorado | scarr. */
+  surface: string | null;
 }
 
-export const ANONYMOUS: Viewer = { userId: null, role: null, tenantSlug: null };
+export const ANONYMOUS: Viewer = { userId: null, role: null, tenantSlug: null, surface: null };
 
 /** Session → viewer. One indexed lookup; only tenant_admins need the join. */
 export async function getViewer(): Promise<Viewer> {
@@ -23,13 +25,37 @@ export async function getViewer(): Promise<Viewer> {
   const userId = session?.user?.id;
   if (!userId) return ANONYMOUS;
   const rows = await sql`
-    SELECT u.role, t.slug AS tenant_slug
+    SELECT u.role, u.registered_surface, t.slug AS tenant_slug
     FROM users u LEFT JOIN tenants t ON t.id = u.tenant_id
     WHERE u.id = ${userId}
   `;
   const row = rows[0];
   if (!row) return ANONYMOUS;
-  return { userId, role: row.role as string, tenantSlug: (row.tenant_slug as string) ?? null };
+  return {
+    userId,
+    role: row.role as string,
+    tenantSlug: (row.tenant_slug as string) ?? null,
+    surface: (row.registered_surface as string) ?? null,
+  };
+}
+
+/**
+ * Portals are members-only (Jason, 8-31-26 surface enforcement): admins go
+ * everywhere; a tenant_admin enters their own portal; everyone else only the
+ * portal matching their home surface — FGI-registered users included.
+ * Anonymous visitors pass (the portal landing is the sign-in/sign-up door,
+ * and the content gate still blocks everything behind it).
+ */
+export function canEnterPortal(viewer: Viewer, portalSlug: string): boolean {
+  if (!viewer.userId) return true;
+  if (viewer.role === 'admin') return true;
+  if (viewer.role === 'tenant_admin' && viewer.tenantSlug === portalSlug) return true;
+  return viewer.surface === portalSlug;
+}
+
+/** Where a bounced visitor belongs: their portal, or the FGI home. */
+export function viewerHome(viewer: Viewer): string {
+  return viewer.surface && viewer.surface !== 'fgi' ? `/${viewer.surface}` : '/';
 }
 
 /**

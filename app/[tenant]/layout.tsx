@@ -1,9 +1,10 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import AuthNav from '@/components/layout/AuthNav';
 import TenantHeader from '@/components/tenant/TenantHeader';
 import TenantHeaderV2 from '@/components/tenant/v2/Header';
 import TenantHeaderV3 from '@/components/tenant/v3/Header';
 import { getTenantConfig } from '@/lib/tenants';
+import { canEnterPortal, getViewer, viewerHome } from '@/lib/viewer';
 
 /**
  * Chrome for every page inside a tenant portal — the landing page, resource
@@ -13,7 +14,7 @@ import { getTenantConfig } from '@/lib/tenants';
  * route claimed (/library, /resource, /course, /admin, /api all win first).
  * Anything that isn't a known tenant slug 404s.
  */
-export default function TenantLayout({
+export default async function TenantLayout({
   children,
   params,
 }: {
@@ -22,6 +23,14 @@ export default function TenantLayout({
 }) {
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
+
+  // Members-only portals (Jason, 8-31-26): every tenant route resolves
+  // through this layout, so one check covers the landing, resources, the
+  // player, help, support and account. Signed-in accounts from any other
+  // surface bounce to their own home; admins pass; anonymous visitors pass
+  // (this is the sign-in door — the content gate still blocks everything).
+  const viewer = await getViewer();
+  if (!canEnterPortal(viewer, tenant.slug)) redirect(viewerHome(viewer));
 
   // v3 (8-19-26) wins over v2 (8-11-26); tenants with neither keep the
   // original chrome. AuthNav is an async server component, so it is passed
