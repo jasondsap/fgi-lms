@@ -78,7 +78,16 @@ function FaqRow({
   );
 }
 
-export default function HelpView() {
+export default function HelpView({
+  accent = 'var(--fgi-blue)',
+  pillBg = 'var(--fgi-gold)',
+  pillText = 'var(--fgi-navy)',
+}: {
+  /** Fletch panel colours — tenants pass their primary (see /[tenant]/help). */
+  accent?: string;
+  pillBg?: string;
+  pillText?: string;
+}) {
   const [search, setSearch] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
@@ -318,7 +327,7 @@ export default function HelpView() {
       </div>
 
       {/* Fletch in help mode — answers "how do I…" from the same content. */}
-      <AskLibrary mode="help" />
+      <AskLibrary mode="help" accent={accent} pillBg={pillBg} pillText={pillText} />
     </div>
   );
 }

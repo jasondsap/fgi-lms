@@ -125,9 +125,10 @@ export default function TenantHeaderV3({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-        {/* Help Center (FGI-hosted /help) — same "?" as the FGI header (Jason, 8-31-26). */}
+        {/* Help Center in the tenant's own chrome (Jason, 8-31-26: Home must
+            lead back to the portal, never to FGI). */}
         <Link
-          href="/help"
+          href={`${home}/help`}
           aria-label="Help Center"
           title="Help Center"
           style={{
