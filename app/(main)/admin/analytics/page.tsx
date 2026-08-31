@@ -104,8 +104,11 @@ export default async function AdminAnalyticsPage({
   if (viewer.role !== 'admin') notFound();
 
   const days = RANGES.includes(Number(searchParams.days) as never) ? Number(searchParams.days) : 30;
-  const until = new Date();
-  const since = new Date(until.getTime() - (days - 1) * 86400_000);
+  // `until` is exclusive at day granularity — a bare date is read as that
+  // morning UTC, which silently drops today's traffic (verified 8-31-26:
+  // dimension queries came back empty until the bound moved to tomorrow).
+  const until = new Date(Date.now() + 86400_000);
+  const since = new Date(Date.now() - (days - 1) * 86400_000);
 
   let error: string | null = null;
   let daily: DayPoint[] = [];
