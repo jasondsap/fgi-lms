@@ -366,7 +366,8 @@ const TENANTS: Record<string, TenantConfig> = {
       certButtons: {
         pre: {
           label: 'Pre-Certification Requirements',
-          href: '/colorado/course/co-pre-certification-requirements',
+          // The course landing page, not the LMS player (Jason, 8-30).
+          href: '/colorado/resource/co-pre-certification-requirements',
         },
         // No Post-Certification button for Colorado (Jason, 8-23).
       },
@@ -544,7 +545,8 @@ const TENANTS: Record<string, TenantConfig> = {
       certButtons: {
         pre: {
           label: 'Pre-Certification Requirements',
-          href: '/scarr/course/scarr-pre-certification-requirements',
+          // The course landing page, not the LMS player (Jason, 8-30).
+          href: '/scarr/resource/scarr-pre-certification-requirements',
         },
         // Filters the library to the post-certification collection below
         // (Jason, 8-25).

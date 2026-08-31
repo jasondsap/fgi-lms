@@ -354,7 +354,9 @@ function Programs({ progress, viewed, surface }: {
     if (!tenant || !collection) return [];
     // The series are Vimeo video resources, not courses — "done" = opened.
     const done = collection.slugs.filter((s: string) => viewed.has(s)).length;
-    const preSlug = tenant.v3?.certButtons?.pre?.href?.split('/course/')[1];
+    // The button links to the resource landing page (8-30); take the slug
+    // off the last path segment so either /course/ or /resource/ works.
+    const preSlug = tenant.v3?.certButtons?.pre?.href?.split('/').pop();
     const pre = preSlug ? bySlug.get(preSlug) : undefined;
     // Show the card on that tenant's own portal, or anywhere once the learner
     // has touched the program.
