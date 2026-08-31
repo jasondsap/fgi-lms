@@ -11,9 +11,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   CATEGORY_LABEL, STATUS_LABEL, PRIORITY_LABEL, TICKET_PRIORITIES, TICKET_STATUSES,
-  type SupportTicket, type SupportTicketComment,
+  type SupportTicket, type SupportTicketComment, type TicketAssignee,
 } from '@/lib/support';
-import { addCommentAction, updateTicketAction } from './support-actions';
+import { addCommentAction, deleteTicketAction, updateTicketAction } from './support-actions';
 import { TicketPill, ticketDate } from './TicketListView';
 
 const CARD: React.CSSProperties = {
@@ -28,12 +28,14 @@ const FIELD: React.CSSProperties = {
 };
 
 export default function TicketDetailView({
-  ticket, comments, isAdmin, listPath, accent = 'var(--fgi-blue)',
+  ticket, comments, isAdmin, listPath, assignees = [], accent = 'var(--fgi-blue)',
 }: {
   ticket: SupportTicket;
   comments: SupportTicketComment[];
   isAdmin: boolean;
   listPath: string;
+  /** Admin users for the assignee dropdown; only passed for admin viewers. */
+  assignees?: TicketAssignee[];
   accent?: string;
 }) {
   const router = useRouter();
@@ -47,9 +49,14 @@ export default function TicketDetailView({
   // Admin controls
   const [status, setStatus] = useState(ticket.status);
   const [priority, setPriority] = useState(ticket.priority);
+  const [assignee, setAssignee] = useState(ticket.assigned_to ?? '');
   const [note, setNote] = useState(ticket.resolution_note ?? '');
   const [saving, setSaving] = useState(false);
   const [adminError, setAdminError] = useState('');
+
+  // Delete flow: click once to arm, again to confirm
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const sendComment = async () => {
     if (!body.trim() || sending) return;
@@ -68,10 +75,25 @@ export default function TicketDetailView({
     setSaving(true);
     setAdminError('');
     const result = await updateTicketAction(listPath, ticket.id, {
-      status, priority, resolutionNote: note,
+      status, priority, assignedTo: assignee || null, resolutionNote: note,
     });
     setSaving(false);
     if ('error' in result) { setAdminError(result.error); return; }
+    router.refresh();
+  };
+
+  const doDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setAdminError('');
+    const result = await deleteTicketAction(ticket.id);
+    if ('error' in result) {
+      setDeleting(false);
+      setConfirmDelete(false);
+      setAdminError(result.error);
+      return;
+    }
+    router.push('/admin/support');
     router.refresh();
   };
 
@@ -96,6 +118,7 @@ export default function TicketDetailView({
               {ticket.submitted_by_email && ticket.submitted_by_name ? ` (${ticket.submitted_by_email})` : ''} · </>
           )}
           Opened {ticketDate(ticket.created_at)} · Updated {ticketDate(ticket.updated_at)}
+          {isAdmin && ticket.assigned_to_name && <> · Assigned to {ticket.assigned_to_name}</>}
         </div>
         <p style={{
           fontSize: '14.5px', lineHeight: 1.65, color: 'var(--text-primary)',
@@ -220,6 +243,13 @@ export default function TicketDetailView({
                 {TICKET_PRIORITIES.map((p) => <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>)}
               </select>
             </div>
+            <div style={{ flex: '1 1 160px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>Assigned to</label>
+              <select value={assignee} onChange={(e) => setAssignee(e.target.value)} style={FIELD}>
+                <option value="">Unassigned</option>
+                {assignees.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
           </div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
             Resolution note (shown to the submitter)
@@ -233,7 +263,44 @@ export default function TicketDetailView({
           {adminError && (
             <div role="alert" style={{ fontSize: '13px', color: '#8a1c1c', marginTop: '8px' }}>{adminError}</div>
           )}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+            {confirmDelete ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#8a1c1c' }}>
+                Delete this ticket?
+                <button
+                  onClick={doDelete}
+                  disabled={deleting}
+                  style={{
+                    background: '#b3261e', color: '#fff', padding: '7px 14px', border: 'none',
+                    borderRadius: 'var(--radius-md)', fontSize: '13px', fontWeight: 600,
+                    fontFamily: 'inherit', cursor: deleting ? 'default' : 'pointer',
+                    opacity: deleting ? 0.55 : 1,
+                  }}
+                >
+                  {deleting ? 'Deleting…' : 'Yes, delete'}
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  disabled={deleting}
+                  style={{
+                    background: 'none', border: 'none', fontSize: '13px', fontFamily: 'inherit',
+                    color: 'var(--text-secondary)', textDecoration: 'underline', cursor: 'pointer', padding: 0,
+                  }}
+                >
+                  Cancel
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={() => setConfirmDelete(true)}
+                style={{
+                  background: 'none', border: 'none', fontSize: '13px', fontFamily: 'inherit',
+                  color: '#b3261e', textDecoration: 'underline', cursor: 'pointer', padding: 0,
+                }}
+              >
+                Delete ticket
+              </button>
+            )}
             <button
               onClick={saveAdmin}
               disabled={saving}

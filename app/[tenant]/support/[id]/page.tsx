@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import TicketDetailView from '@/components/support/TicketDetailView';
-import { getTicketComments, getTicketForViewer } from '@/lib/support-db';
+import { getTicketAssignees, getTicketComments, getTicketForViewer } from '@/lib/support-db';
 import { getTenantConfig } from '@/lib/tenants';
 import { getViewer } from '@/lib/viewer';
 
@@ -24,6 +24,7 @@ export default async function TenantTicketPage({
   const ticket = await getTicketForViewer(params.id, { userId: viewer.userId, isAdmin });
   if (!ticket) notFound();
   const comments = await getTicketComments(ticket.id, isAdmin);
+  const assignees = isAdmin ? await getTicketAssignees() : [];
 
   return (
     <>
@@ -41,6 +42,7 @@ export default async function TenantTicketPage({
           comments={comments}
           isAdmin={isAdmin}
           listPath={`${basePath}/support`}
+          assignees={assignees}
           accent={tenant.primary}
         />
       </div>

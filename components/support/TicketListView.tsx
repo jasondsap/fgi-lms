@@ -80,6 +80,7 @@ export default function TicketListView({
               <>From {t.submitted_by_name || t.submitted_by_email} · </>
             )}
             Opened {ticketDate(t.created_at)} · Updated {ticketDate(t.updated_at)}
+            {showSubmitter && t.assigned_to_name && <> · Assigned to {t.assigned_to_name}</>}
           </div>
         </Link>
       ))}

@@ -3,14 +3,21 @@
 // and row shapes live in lib/support.ts (pure, client-safe).
 // =============================================================================
 import { sql } from '@/lib/db';
-import type { SupportTicket, SupportTicketComment } from '@/lib/support';
+import type { SupportTicket, SupportTicketComment, TicketAssignee } from '@/lib/support';
 
 const TICKET_COLS = `
-  t.id, t.submitted_by, t.title, t.description, t.category, t.priority,
+  t.id, t.submitted_by, t.assigned_to, t.title, t.description, t.category, t.priority,
   t.status, t.page_url, t.browser_info, t.resolution_note,
   t.created_at, t.updated_at,
   trim(coalesce(u.given_name, '') || ' ' || coalesce(u.family_name, '')) AS submitted_by_name,
-  u.email AS submitted_by_email`;
+  u.email AS submitted_by_email,
+  u.registered_surface AS submitted_by_surface,
+  trim(coalesce(a.given_name, '') || ' ' || coalesce(a.family_name, '')) AS assigned_to_name`;
+
+const TICKET_JOINS = `
+  FROM support_tickets t
+  JOIN users u ON u.id = t.submitted_by
+  LEFT JOIN users a ON a.id = t.assigned_to`;
 
 export async function createTicket(input: {
   userId: string;
@@ -48,7 +55,7 @@ export async function getAllTickets(status?: string): Promise<SupportTicket[]> {
     ? await sql(
         `SELECT ${TICKET_COLS},
            (SELECT count(*)::int FROM support_ticket_comments c WHERE c.ticket_id = t.id) AS comment_count
-         FROM support_tickets t JOIN users u ON u.id = t.submitted_by
+         ${TICKET_JOINS}
          WHERE t.deleted_at IS NULL AND t.status = $1
          ORDER BY t.created_at DESC`,
         [status],
@@ -56,7 +63,7 @@ export async function getAllTickets(status?: string): Promise<SupportTicket[]> {
     : await sql(
         `SELECT ${TICKET_COLS},
            (SELECT count(*)::int FROM support_ticket_comments c WHERE c.ticket_id = t.id) AS comment_count
-         FROM support_tickets t JOIN users u ON u.id = t.submitted_by
+         ${TICKET_JOINS}
          WHERE t.deleted_at IS NULL
          ORDER BY CASE WHEN t.status IN ('open', 'in_progress', 'waiting') THEN 0 ELSE 1 END,
                   t.created_at DESC`,
@@ -72,15 +79,12 @@ export async function getTicketForViewer(
   ticketId: string,
   viewer: { userId: string; isAdmin: boolean },
 ): Promise<SupportTicket | null> {
-  const rows = (await sql`
-    SELECT t.id, t.submitted_by, t.title, t.description, t.category, t.priority,
-           t.status, t.page_url, t.browser_info, t.resolution_note,
-           t.created_at, t.updated_at,
-           trim(coalesce(u.given_name, '') || ' ' || coalesce(u.family_name, '')) AS submitted_by_name,
-           u.email AS submitted_by_email
-    FROM support_tickets t JOIN users u ON u.id = t.submitted_by
-    WHERE t.id = ${ticketId} AND t.deleted_at IS NULL
-  `) as unknown as SupportTicket[];
+  const rows = (await sql(
+    `SELECT ${TICKET_COLS}
+     ${TICKET_JOINS}
+     WHERE t.id = $1 AND t.deleted_at IS NULL`,
+    [ticketId],
+  )) as unknown as SupportTicket[];
   const ticket = rows[0];
   if (!ticket) return null;
   if (!viewer.isAdmin && ticket.submitted_by !== viewer.userId) return null;
@@ -116,20 +120,45 @@ export async function addTicketComment(input: {
   await sql`UPDATE support_tickets SET updated_at = now() WHERE id = ${input.ticketId}`;
 }
 
-/** Admin: status / priority / resolution note. Values validated by the caller. */
+/**
+ * Admin: status / priority / assignee / resolution note. Values validated by
+ * the caller; the assignee subquery additionally pins assigned_to to actual
+ * admins — a non-admin id silently resolves to NULL (unassigned).
+ */
 export async function updateTicket(input: {
   ticketId: string;
   status: string;
   priority: string;
+  assignedTo: string | null;
   resolutionNote: string | null;
 }): Promise<void> {
   await sql`
     UPDATE support_tickets SET
       status = ${input.status},
       priority = ${input.priority},
+      assigned_to = (SELECT id FROM users WHERE id = ${input.assignedTo}::uuid AND role = 'admin'),
       resolution_note = ${input.resolutionNote},
       updated_at = now()
     WHERE id = ${input.ticketId} AND deleted_at IS NULL
+  `;
+}
+
+/** Admins who can be assigned tickets, for the triage dropdown. */
+export async function getTicketAssignees(): Promise<TicketAssignee[]> {
+  const rows = await sql`
+    SELECT id,
+           coalesce(nullif(trim(coalesce(given_name, '') || ' ' || coalesce(family_name, '')), ''), email) AS name
+    FROM users WHERE role = 'admin'
+    ORDER BY name
+  `;
+  return rows as unknown as TicketAssignee[];
+}
+
+/** Admin: soft delete — the ticket vanishes from every list but the row stays. */
+export async function softDeleteTicket(ticketId: string, deletedBy: string): Promise<void> {
+  await sql`
+    UPDATE support_tickets SET deleted_at = now(), deleted_by = ${deletedBy}
+    WHERE id = ${ticketId} AND deleted_at IS NULL
   `;
 }
 

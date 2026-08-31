@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import TicketDetailView from '@/components/support/TicketDetailView';
-import { getTicketComments, getTicketForViewer } from '@/lib/support-db';
+import { getTicketAssignees, getTicketComments, getTicketForViewer } from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = { title: 'Support Ticket — FGI Learning Resource Center' };
@@ -16,6 +16,7 @@ export default async function TicketPage({ params }: { params: { id: string } })
   const ticket = await getTicketForViewer(params.id, { userId: viewer.userId, isAdmin });
   if (!ticket) notFound();
   const comments = await getTicketComments(ticket.id, isAdmin);
+  const assignees = isAdmin ? await getTicketAssignees() : [];
 
   return (
     <div style={{ maxWidth: '840px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
@@ -29,7 +30,7 @@ export default async function TicketPage({ params }: { params: { id: string } })
           </Link>
         )}
       </div>
-      <TicketDetailView ticket={ticket} comments={comments} isAdmin={isAdmin} listPath="/support" />
+      <TicketDetailView ticket={ticket} comments={comments} isAdmin={isAdmin} listPath="/support" assignees={assignees} />
     </div>
   );
 }

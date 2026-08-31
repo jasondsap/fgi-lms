@@ -73,6 +73,7 @@ export const PRIORITY_COLOR: Record<string, { bg: string; fg: string }> = {
 export interface SupportTicket {
   id: string;
   submitted_by: string;
+  assigned_to: string | null;
   title: string;
   description: string;
   category: string;
@@ -86,7 +87,16 @@ export interface SupportTicket {
   // joined display fields
   submitted_by_name?: string | null;
   submitted_by_email?: string | null;
+  /** users.registered_surface — picks the ticket link in submitter emails. */
+  submitted_by_surface?: string | null;
+  assigned_to_name?: string | null;
   comment_count?: number;
+}
+
+/** Admin option for the assignee dropdown. */
+export interface TicketAssignee {
+  id: string;
+  name: string;
 }
 
 export interface SupportTicketComment {

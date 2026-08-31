@@ -7,12 +7,12 @@
 // =============================================================================
 import { revalidatePath } from 'next/cache';
 import { getSession } from '@/auth';
-import { notifyNewTicket } from '@/lib/notify';
+import { notifyNewTicket, notifyTicketReply, notifyTicketResolved } from '@/lib/notify';
 import {
   TICKET_CATEGORY_VALUES, TICKET_PRIORITY_VALUES, TICKET_STATUS_VALUES,
 } from '@/lib/support';
 import {
-  addTicketComment, createTicket, getTicketForViewer, updateTicket,
+  addTicketComment, createTicket, getTicketForViewer, softDeleteTicket, updateTicket,
 } from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
@@ -91,34 +91,98 @@ export async function addCommentAction(
   const text = String(body ?? '').trim().slice(0, 5000);
   if (!text) return { error: 'Comment is empty.' };
 
+  const internal = isAdmin && Boolean(isInternal);
   await addTicketComment({
     ticketId,
     authorId: viewer.userId,
     body: text,
-    isInternal: isAdmin && Boolean(isInternal),
+    isInternal: internal,
   });
+
+  // A public admin reply emails the submitter (8-31-26). Best-effort — the
+  // comment above is already saved.
+  if (isAdmin && !internal && ticket.submitted_by !== viewer.userId && ticket.submitted_by_email) {
+    try {
+      await notifyTicketReply({
+        ticketId,
+        title: ticket.title,
+        body: text,
+        toEmail: ticket.submitted_by_email,
+        surface: ticket.submitted_by_surface,
+      });
+    } catch (err) {
+      console.error('[support] comment saved but reply notification failed:', err);
+    }
+  }
+
   revalidatePath(`${safePath(listPath)}/${ticketId}`);
   return { ok: true };
 }
 
-/** Admin only: status / priority / resolution note. */
+/** Admin only: status / priority / assignee / resolution note. */
 export async function updateTicketAction(
   listPath: string,
   ticketId: string,
-  input: { status: string; priority: string; resolutionNote: string },
+  input: { status: string; priority: string; assignedTo: string | null; resolutionNote: string },
 ): Promise<{ ok: true } | { error: string }> {
   const viewer = await getViewer();
-  if (viewer.role !== 'admin' || !UUID.test(ticketId)) return { error: 'Not allowed.' };
+  if (viewer.role !== 'admin' || !viewer.userId || !UUID.test(ticketId)) return { error: 'Not allowed.' };
   if (!TICKET_STATUS_VALUES.has(input.status)) return { error: 'Unknown status.' };
   if (!TICKET_PRIORITY_VALUES.has(input.priority)) return { error: 'Unknown priority.' };
+  const assignedTo = input.assignedTo && UUID.test(input.assignedTo) ? input.assignedTo : null;
 
+  // Read the ticket first so we can see the status transition below.
+  const before = await getTicketForViewer(ticketId, { userId: viewer.userId, isAdmin: true });
+  if (!before) return { error: 'Ticket not found.' };
+
+  const resolutionNote = String(input.resolutionNote ?? '').trim().slice(0, 2000) || null;
   await updateTicket({
     ticketId,
     status: input.status,
     priority: input.priority,
-    resolutionNote: String(input.resolutionNote ?? '').trim().slice(0, 2000) || null,
+    assignedTo,
+    resolutionNote,
   });
+
+  // Entering resolved/closed emails the submitter (8-31-26). Only on the
+  // transition — re-saving an already-resolved ticket stays quiet. Best-effort.
+  const DONE = new Set(['resolved', 'closed']);
+  if (
+    DONE.has(input.status) && !DONE.has(before.status)
+    && before.submitted_by !== viewer.userId && before.submitted_by_email
+  ) {
+    try {
+      await notifyTicketResolved({
+        ticketId,
+        title: before.title,
+        status: input.status,
+        resolutionNote,
+        toEmail: before.submitted_by_email,
+        surface: before.submitted_by_surface,
+      });
+    } catch (err) {
+      console.error('[support] ticket updated but resolution notification failed:', err);
+    }
+  }
+
   revalidatePath(`${safePath(listPath)}/${ticketId}`);
+  revalidatePath('/admin/support');
+  return { ok: true };
+}
+
+/**
+ * Admin only: soft delete (deleted_at + deleted_by). The row survives in the
+ * database for the audit trail, but disappears from every queue and from the
+ * submitter's My Tickets.
+ */
+export async function deleteTicketAction(
+  ticketId: string,
+): Promise<{ ok: true } | { error: string }> {
+  const viewer = await getViewer();
+  if (viewer.role !== 'admin' || !viewer.userId || !UUID.test(ticketId)) {
+    return { error: 'Not allowed.' };
+  }
+  await softDeleteTicket(ticketId, viewer.userId);
   revalidatePath('/admin/support');
   return { ok: true };
 }
