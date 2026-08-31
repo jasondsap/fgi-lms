@@ -61,9 +61,15 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
   const collection = collectionKey ? v3.collections?.[collectionKey] : undefined;
   if (collection) {
     params.slugs = collection.slugs;
-    params.per_page = Math.max(collection.slugs.length, 1);
+    // Floor of 24, not the list length: combined with a type checkbox the
+    // result is the UNION of both (8-31-26), so more rows than the list.
+    params.per_page = Math.max(collection.slugs.length, 24);
     params.page = 1;
   }
+
+  // "Cert. Documents" (type=handbook) gets the same Show-full-library banner
+  // as the Required Videos collection (Jason, 8-31-26).
+  const certDocs = Boolean(params.type?.includes('handbook' as ResourceType));
 
   params.includeInternal = canSeeInternal(await getViewer(), tenant.slug);
   const data = await getPublicResources(params);
@@ -343,7 +349,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
             <SearchBar defaultValue={params.search} targetPath={home} />
-            {collection && (
+            {(collection || certDocs) && (
               <div
                 role="status"
                 style={{
@@ -355,8 +361,13 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 }}
               >
                 <span>
-                  <strong>{collection.label}</strong>
-                  {' — '}showing {data.total} of {collection.slugs.length} required items
+                  <strong>
+                    {[collection?.label, certDocs ? 'Cert. Documents' : null].filter(Boolean).join(' & ')}
+                  </strong>
+                  {' — '}
+                  {collection && !certDocs
+                    ? <>showing {data.total} of {collection.slugs.length} required items</>
+                    : <>showing {data.total} item{data.total === 1 ? '' : 's'}</>}
                 </span>
                 <Link
                   href={`${home}#library`}

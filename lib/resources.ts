@@ -65,6 +65,9 @@ export async function getPublicResources(
     return `$${values.length}`;
   };
 
+  // Held back rather than pushed straight into `conditions`: when a curated
+  // collection is also active the two must OR together (see the slug block).
+  let typeClause = '';
   if (typeArr.length > 0) {
     // A resource has exactly one type, so multiple selections are always OR —
     // the any/all "Match Categories" toggle applies to audience and topic only.
@@ -78,7 +81,7 @@ export async function getPublicResources(
     const typeClauses: string[] = [];
     if (storedTypes.length > 0) typeClauses.push(`type::text = ANY(${bind(storedTypes)}::text[])`);
     if (wantsNaadac) typeClauses.push('is_naadac_ce = TRUE');
-    conditions.push(`(${typeClauses.join(' OR ')})`);
+    typeClause = `(${typeClauses.join(' OR ')})`;
   }
 
   // Fuzzy search (8-30-26, Jennifer/Jason): English full-text search gives
@@ -119,9 +122,16 @@ export async function getPublicResources(
   let collectionSort = '';
   if (slugArr) {
     const ph = bind(slugArr);
-    conditions.push(`slug = ANY(${ph}::text[])`);
-    collectionSort = `array_position(${ph}::text[], slug) ASC, `;
+    // 8-31-26 (Jason): a collection combined with type checkboxes is a UNION,
+    // not an intersection — ticking "Required Videos" (a slug collection) and
+    // "Cert. Documents" (type=handbook) together must show both sets; the AND
+    // used to return nothing because no video is a handbook. Collection items
+    // still sort first, in list order (array_position is NULL for the rest).
+    conditions.push(typeClause ? `(slug = ANY(${ph}::text[]) OR ${typeClause})` : `slug = ANY(${ph}::text[])`);
+    typeClause = '';
+    collectionSort = `array_position(${ph}::text[], slug) ASC NULLS LAST, `;
   }
+  if (typeClause) conditions.push(typeClause);
 
   if (duration && DURATION_CLAUSES[duration]) {
     // Whitelist lookup — fragment is a constant, no binding needed.
