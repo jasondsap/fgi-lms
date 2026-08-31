@@ -92,7 +92,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Finding Resources',
     name: 'Ask Fletch (AI Assistant)',
     description:
-      'Fletch is the library’s AI assistant — the mascot pill in the bottom-right corner of the library pages. Describe what you’re working on in plain language and Fletch replies with the resources that fit, as clickable cards.',
+      'Fletch is the library’s AI assistant — the Ask Fletch pill in the bottom-right corner of the library pages. Describe what you’re working on in plain language and Fletch replies with the resources that fit, as clickable cards.',
     quickStart: [
       'Click the Ask Fletch pill in the bottom-right corner.',
       'Describe your situation — "I need to train new peer support staff" — or pick a starter question.',

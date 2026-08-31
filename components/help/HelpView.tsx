@@ -155,8 +155,6 @@ export default function HelpView({
         display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap',
         padding: '14px 18px', marginBottom: '2rem',
       }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/fletch/fletch-searching.webp" alt="" style={{ width: '56px', height: 'auto', flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: '240px' }}>
           <div style={{ fontWeight: 700, fontSize: '15px' }}>Prefer to just ask?</div>
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
