@@ -62,6 +62,15 @@ export default function AskLibrary({
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [turns, loading]);
   useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
 
+  /** Wipe the chat back to Fletch's greeting; the panel stays open. */
+  function resetConversation() {
+    if (loading) return;
+    setTurns([]);
+    setError(null);
+    setInput('');
+    inputRef.current?.focus();
+  }
+
   async function ask(question: string) {
     const q = question.trim();
     if (!q || loading) return;
@@ -162,16 +171,34 @@ export default function AskLibrary({
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setOpen(false)}
-          aria-label="Close"
-          style={{
-            background: 'transparent', border: 'none', color: '#fff',
-            fontSize: '22px', lineHeight: 1, cursor: 'pointer', padding: '0 4px',
-          }}
-        >
-          ×
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          {/* New-conversation reset (Jason 8-31-26) — only once there is
+              something to clear; wipes turns/error so the greeting returns. */}
+          {(turns.length > 0 || error) && (
+            <button
+              onClick={resetConversation}
+              title="Start a new conversation"
+              style={{
+                background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.45)',
+                color: '#fff', borderRadius: '999px', padding: '4px 11px',
+                fontSize: '12px', fontWeight: 600, fontFamily: 'inherit',
+                lineHeight: 1.4, cursor: 'pointer', whiteSpace: 'nowrap',
+              }}
+            >
+              ↺ Start over
+            </button>
+          )}
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Close"
+            style={{
+              background: 'transparent', border: 'none', color: '#fff',
+              fontSize: '22px', lineHeight: 1, cursor: 'pointer', padding: '0 4px',
+            }}
+          >
+            ×
+          </button>
+        </div>
       </header>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', background: 'var(--body-bg)' }}>
