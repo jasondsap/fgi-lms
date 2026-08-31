@@ -3,7 +3,7 @@ import HelpView from '@/components/help/HelpView';
 
 export const metadata: Metadata = {
   title: 'Help — FGI Learning Resource Center',
-  description: 'How to use the Learning Resource Center: finding resources, courses and CE credits, your account, and the SCARR and Colorado certification portals.',
+  description: 'How to use the Learning Resource Center: finding resources, courses and CE credits, your account, and the partner certification portals.',
 };
 
 // Static content (lib/help-content.ts) rendered by a client view; nothing

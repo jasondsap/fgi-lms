@@ -10,6 +10,11 @@
 // Organised by visitor journey rather than role (the LRC has no user roles to
 // speak of): Finding Resources → Courses & CE → Your Account → the tenant
 // certification portals.
+//
+// Wording rule (Jason, 8-31-26): never name individual tenants — say
+// "certification portal" / "partner portal" so the content stays true as
+// more tenants join. The tenant-specific facts (seven-part series, cert
+// pills) are common to the portal model, not to one tenant.
 
 export interface HelpFaq {
   q: string;
@@ -31,7 +36,7 @@ export const HELP_CATEGORIES = [
   'Finding Resources',
   'Courses & CE Credits',
   'Your Account',
-  'SCARR & Colorado Certification',
+  'Certification Portals',
 ] as const;
 
 export const HELP_TOPICS: HelpTopic[] = [
@@ -51,12 +56,12 @@ export const HELP_TOPICS: HelpTopic[] = [
     tips: [
       'Boxes within a section add together — ticking Webinars and Podcasts shows both.',
       'The first screen mixes every resource type so you get a sample of the whole library; once you filter or search, newest items come first.',
-      'On the SCARR and Colorado portals a Certification Info section sits at the top of the filter bar.',
+      'On a certification portal, a Certification Info section sits at the top of the filter bar.',
     ],
     faqs: [
       {
         q: 'Why do I see different items than a colleague?',
-        a: 'Each library surface (Fletcher Group, SCARR, Colorado) has its own catalog. You may be browsing different surfaces, and some internal items are visible only to administrators.',
+        a: 'The Fletcher Group library and each partner portal have their own catalogs. You may be browsing different libraries, and some internal items are visible only to administrators.',
       },
     ],
   },
@@ -127,7 +132,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Finding Resources',
     name: 'Other Libraries',
     description:
-      'SCARR and Colorado members have full access to the Fletcher Group library as well. The "Other Libraries" section at the bottom of the filter bar moves you between them.',
+      'Certification-portal members have full access to the Fletcher Group library as well. The "Other Libraries" section at the bottom of the filter bar moves you between them.',
     quickStart: [
       'On your portal’s library, expand Other Libraries and click "Fletcher Group Library" — it opens in a new browser tab.',
       'To come back, expand Other Libraries in that tab and click your portal’s name — the tab closes and you’re back where you were.',
@@ -259,7 +264,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       'Download your transcript (CSV) for records or reporting.',
     ],
     tips: [
-      'On SCARR and Colorado accounts, My Learning also tracks your required-video series as a program with its own progress bar.',
+      'On a certification-portal account, My Learning also tracks your required-video series as a program with its own progress bar.',
     ],
     faqs: [],
   },
@@ -278,13 +283,13 @@ export const HELP_TOPICS: HelpTopic[] = [
     faqs: [],
   },
 
-  // ── SCARR & Colorado Certification ────────────────────────────────────────
+  // ── Certification Portals ─────────────────────────────────────────────────
   {
     id: 'portal-basics',
-    category: 'SCARR & Colorado Certification',
+    category: 'Certification Portals',
     name: 'Your Certification Portal',
     description:
-      'The SCARR and Colorado portals are curated views for recovery-residence certification: the header carries the Pre-Certification (and, where offered, Post-Certification) buttons, and the library’s Certification Info filter separates the Required Videos and Certification Documents from everything else.',
+      'Partner certification portals are curated views for recovery-residence certification: the header carries the Pre-Certification (and, where offered, Post-Certification) buttons, and the library’s Certification Info filter separates the Required Videos and Certification Documents from everything else.',
     quickStart: [
       'Use Home and Library in the portal header to move around.',
       'In the filter bar, expand Certification Info and tick Required Videos or Cert. Documents.',
@@ -298,7 +303,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: 'pre-cert',
-    category: 'SCARR & Colorado Certification',
+    category: 'Certification Portals',
     name: 'Pre-Certification Videos',
     description:
       'The pre-certification course is a seven-part video series taken in order: each video unlocks after you’ve watched the one before it (about 90% counts as watched). The certificate unlocks after all seven plus the evaluation.',
@@ -316,7 +321,7 @@ export const HELP_TOPICS: HelpTopic[] = [
   },
   {
     id: 'cert-docs',
-    category: 'SCARR & Colorado Certification',
+    category: 'Certification Portals',
     name: 'Certification Documents',
     description:
       'The Cert. Documents filter gathers the certification paperwork — checklists, standards, policies, and the code of ethics — so you can review or download the full set in one place.',
