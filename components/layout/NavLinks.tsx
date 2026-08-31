@@ -25,7 +25,7 @@ export default function NavLinks() {
 
   return (
     // Links sit next to the logo; the account control alone goes to the far right (Jason, 8-30).
-    <nav aria-label="Main navigation" style={{ marginLeft: '3rem' }}>
+    <nav aria-label="Main navigation" style={{ marginLeft: '5rem' }}>
       <ul style={{
         display: 'flex',
         gap: '2.25rem',
