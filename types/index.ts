@@ -203,6 +203,30 @@ export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   non_fgi:       'Non-FGI Recommended',
 };
 
+/**
+ * Jennifer's content hierarchy (8-31-26): four levels of item importance for
+ * search/library ranking and the Fletch recommender. Types within a level are
+ * equal (results blend); lower number = more important. A searched keyword
+ * appearing in the title elevates a result one level (see lib/resources.ts).
+ */
+export const RESOURCE_TYPE_TIERS: Record<ResourceType, number> = {
+  course:        1,
+  naadac_ce:     1,
+  webinar:       1,
+  toolkit:       1,   // Learning Brief
+  guidebook:     1,   // RH guide/handbook
+  handbook:      1,
+  podcast:       2,
+  video:         2,
+  paper:         2,
+  whitepaper:    2,
+  newsletter:    3,
+  infographic:   3,
+  success_story: 4,
+  fgi_service:   4,
+  non_fgi:       4,   // external resource
+};
+
 export const AUDIENCE_TAG_LABELS: Record<AudienceTag, string> = {
   house_owner:      'RH Owner / Operator / Staff',
   peer_support:     'Peer Support Professional',

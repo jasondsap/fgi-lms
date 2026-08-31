@@ -12,6 +12,8 @@
 // allow-list the library uses, so a Colorado visitor is never recommended
 // something that isn't on the Colorado portal.
 import { sql } from '@/lib/db';
+import { RESOURCE_TYPE_TIERS } from '@/types';
+import type { ResourceType } from '@/types';
 
 export interface CatalogEntry {
   slug: string;
@@ -50,6 +52,12 @@ export async function getCatalog(surface: string): Promise<Catalog> {
     ORDER BY r.type, r.title
   `) as unknown as Array<CatalogEntry & { description: string; search_keywords: string[] }>;
 
+  // Jennifer's hierarchy (8-31-26): catalog listed most-important level first,
+  // and each line carries its level so the model can weigh format importance.
+  rows.sort((a, b) =>
+    (RESOURCE_TYPE_TIERS[a.type as ResourceType] ?? 4) - (RESOURCE_TYPE_TIERS[b.type as ResourceType] ?? 4)
+    || a.type.localeCompare(b.type) || a.title.localeCompare(b.title));
+
   const bySlug = new Map<string, CatalogEntry>();
   const lines: string[] = [];
 
@@ -63,7 +71,7 @@ export async function getCatalog(surface: string): Promise<Catalog> {
     });
     const bits = [
       r.slug,
-      r.type + (r.is_naadac_ce ? ' (NAADAC CE)' : ''),
+      `L${RESOURCE_TYPE_TIERS[r.type as ResourceType] ?? 4} ` + r.type + (r.is_naadac_ce ? ' (NAADAC CE)' : ''),
       r.duration_minutes ? `${r.duration_minutes} min` : '',
       `${r.title} — ${r.description.replace(/\s+/g, ' ').trim()}`,
       // Jennifer's per-course tags (8-30-26) — abbreviations, synonyms and

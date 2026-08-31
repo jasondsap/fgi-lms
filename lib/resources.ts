@@ -13,6 +13,14 @@ import { getPresignedUrl, getPresignedDownloadUrl } from './s3';
 import type {
   Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial, ResourceType,
 } from '@/types';
+import { RESOURCE_TYPE_TIERS } from '@/types';
+
+// Jennifer's four-level content hierarchy (8-31-26) as a SQL CASE. Built from
+// the hardcoded RESOURCE_TYPE_TIERS map in types/index.ts — type names and
+// numbers only, never user input (same rule as DURATION_CLAUSES). ELSE 4 keeps
+// any future unmapped type at the bottom rather than breaking the sort.
+const TIER_SQL = `(CASE type::text ${Object.entries(RESOURCE_TYPE_TIERS)
+  .map(([t, n]) => `WHEN '${t}' THEN ${n}`).join(' ')} ELSE 4 END)`;
 
 // Whitelist of duration keys → SQL fragments. Lookup is by key only;
 // fragments are static and never derived from user input.
@@ -106,10 +114,19 @@ export async function getPublicResources(
         // pulled in 14 junk rows; real typo matches all score ≥ 0.50.
       });
       conditions.push(`(${wordConds.join(' AND ')})`);
-      // Relevance: weighted full-text rank (title > keywords > description),
-      // with trigram title similarity breaking ties for typo-only matches.
+      // Ordering (Jennifer's hierarchy, 8-31-26): importance level first — but
+      // any searched word appearing in the title itself elevates the result one
+      // level (floor 1). Within a level, relevance blends the types: weighted
+      // full-text rank (title > keywords > description), with trigram title
+      // similarity breaking ties for typo-only matches.
+      const titleHit = words.map((w) => {
+        const ph = bind(w);
+        return `to_tsvector('english', coalesce(title, '')) @@ plainto_tsquery('english', ${ph})
+          OR word_similarity(${ph}, title) > 0.45`;
+      }).join(' OR ');
       const qph = bind(search);
-      searchRank = `(ts_rank_cd(
+      searchRank = `GREATEST(${TIER_SQL} - CASE WHEN (${titleHit}) THEN 1 ELSE 0 END, 1) ASC,
+        (ts_rank_cd(
           setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
           setweight(to_tsvector('english', array_to_string(search_keywords, ' ')), 'B') ||
           setweight(to_tsvector('english', coalesce(description, '')), 'C'),
@@ -206,30 +223,38 @@ export async function getPublicResources(
       thumbnail_url, vimeo_id, external_url,
       is_naadac_ce, internal, audience_tags, topic_tags, published_at`;
 
-  // Default view: round-robin across types so the first screen is a sample of
-  // the whole library rather than whatever was bulk-loaded most recently.
+  // Default view: Jennifer's hierarchy levels in order, round-robin across
+  // types within each level so a level reads as a blend rather than one type's
+  // bulk load.
   //
   // ROW_NUMBER() partitioned by type gives each resource its position within its
-  // own type; ordering by that number first interleaves the types — every type's
-  // 1st item, then every type's 2nd, and so on. Types run out at different
-  // points and simply drop out of the rotation.
+  // own type; ordering by tier, then that number, interleaves the types of a
+  // level — every level-1 type's 1st item, their 2nd, and so on — before any
+  // level-2 row appears. Types run out at different points and simply drop out
+  // of the rotation.
   //
   // Deliberately not `ORDER BY random()`: "Load More" appends, so a fresh
   // shuffle per request would repeat and skip items across pages. The seed is
   // stable for a day, which keeps paging consistent while still rotating what
   // greets a returning visitor.
+  //
+  // Filtered (non-search) views keep the hierarchy too — levels in order,
+  // newest first within a level. searchRank already leads with the (possibly
+  // title-elevated) tier, so it and tierSort are mutually exclusive.
+  const tierSort = searchRank ? '' : `${TIER_SQL} ASC, `;
   const query = isDefaultView
     ? `
     SELECT ${COLUMNS}, total_count
     FROM (
       SELECT ${COLUMNS},
         COUNT(*) OVER() AS total_count,
+        ${TIER_SQL} AS tier,
         ROW_NUMBER() OVER (PARTITION BY type ORDER BY md5(id::text || ${seedPh})) AS type_rank,
         md5(id::text || ${seedPh}) AS shuffle
       FROM resources
       WHERE ${where}
     ) ranked
-    ORDER BY type_rank, shuffle
+    ORDER BY tier, type_rank, shuffle
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `
     : `
@@ -237,7 +262,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY ${collectionSort}${videoSort}${podcastSort}${searchRank}published_at DESC NULLS LAST, id DESC
+    ORDER BY ${collectionSort}${videoSort}${podcastSort}${searchRank}${tierSort}published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 
