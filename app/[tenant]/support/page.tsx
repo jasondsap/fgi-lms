@@ -4,7 +4,7 @@ import { getSession } from '@/auth';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { ReportProblemButton } from '@/components/support/ReportProblemModal';
 import TicketListView from '@/components/support/TicketListView';
-import { getMyTickets } from '@/lib/support';
+import { getMyTickets } from '@/lib/support-db';
 import { getTenantConfig } from '@/lib/tenants';
 
 export const metadata: Metadata = { title: 'My Tickets — Learning Resource Center' };

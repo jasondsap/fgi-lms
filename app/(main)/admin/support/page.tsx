@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import TicketListView from '@/components/support/TicketListView';
-import { getAllTickets, STATUS_LABEL, TICKET_STATUSES } from '@/lib/support';
+import { STATUS_LABEL, TICKET_STATUSES } from '@/lib/support';
+import { getAllTickets } from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = { title: 'Support Queue — FGI Learning Resource Center' };

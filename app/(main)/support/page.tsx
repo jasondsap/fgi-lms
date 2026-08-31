@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getSession } from '@/auth';
 import { ReportProblemButton } from '@/components/support/ReportProblemModal';
 import TicketListView from '@/components/support/TicketListView';
-import { getMyTickets } from '@/lib/support';
+import { getMyTickets } from '@/lib/support-db';
 
 export const metadata: Metadata = { title: 'My Tickets — FGI Learning Resource Center' };
 

@@ -8,9 +8,11 @@
 import { revalidatePath } from 'next/cache';
 import { getSession } from '@/auth';
 import {
-  addTicketComment, createTicket, getTicketForViewer, updateTicket,
   TICKET_CATEGORY_VALUES, TICKET_PRIORITY_VALUES, TICKET_STATUS_VALUES,
 } from '@/lib/support';
+import {
+  addTicketComment, createTicket, getTicketForViewer, updateTicket,
+} from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
 const UUID = /^[0-9a-f-]{36}$/i;

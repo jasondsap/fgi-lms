@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import TicketDetailView from '@/components/support/TicketDetailView';
-import { getTicketComments, getTicketForViewer } from '@/lib/support';
+import { getTicketComments, getTicketForViewer } from '@/lib/support-db';
 import { getTenantConfig } from '@/lib/tenants';
 import { getViewer } from '@/lib/viewer';
 

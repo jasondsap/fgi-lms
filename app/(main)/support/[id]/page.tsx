@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import TicketDetailView from '@/components/support/TicketDetailView';
-import { getTicketComments, getTicketForViewer } from '@/lib/support';
+import { getTicketComments, getTicketForViewer } from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = { title: 'Support Ticket — FGI Learning Resource Center' };
