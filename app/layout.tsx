@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import RegistrationGate from '@/components/account/RegistrationGate';
 
@@ -46,6 +47,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         {/* Blocks the site until a signed-in user completes registration */}
         <RegistrationGate />
+        {/* Vercel Web Analytics (Jason, 8-31-26) — data appears on the Vercel
+            dashboard's Analytics tab once Web Analytics is ENABLED there. */}
+        <Analytics />
       </body>
     </html>
   );
