@@ -103,6 +103,16 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
  */
 const SITE_EVALUATION_COURSES: Set<number> | 'all' = 'all';
 
+/**
+ * Courses whose video lessons unlock in order (Jason, 8-30: the SCARR and
+ * Colorado pre-cert series — "make sure they watch all or 90%% of each video
+ * before continuing"). Videos-only: each lesson-group lead locks until every
+ * earlier tracked lead is complete; handouts and the evaluation stay open.
+ * The 90%% watch gate (local_fgiembed 1.1.0) is what actually completes each
+ * video, so "previous video complete" means genuinely watched.
+ */
+const SEQUENTIAL_VIDEO_COURSES = new Set([127, 133]);
+
 function usesSiteEvaluation(courseId: number): boolean {
   return SITE_EVALUATION_COURSES === 'all' || SITE_EVALUATION_COURSES.has(courseId);
 }
@@ -225,6 +235,26 @@ export default async function CourseView(
     .every((m) => m.state === 1 || m.state === 2);
   for (const m of everyModule) {
     if (m.modname === 'customcert') m.locked = !gatesDone;
+  }
+
+  // Sequential video courses: lock each lesson until every earlier tracked
+  // lesson is watched. Player-level UX — the hard guarantee stays the watch
+  // gate + certificate availability, which need every video regardless.
+  if (SEQUENTIAL_VIDEO_COURSES.has(courseId)) {
+    const leads = playerSections
+      .flatMap((s) => s.groups)
+      .filter((g) => g.kind === 'lesson' && g.lead)
+      .map((g) => g.lead!);
+    let priorIncomplete = false;
+    for (const lead of leads) {
+      if (priorIncomplete && !lead.locked) {
+        lead.locked = true;
+        lead.lockTitle = 'Watch the previous video to unlock this one';
+      }
+      if ((lead.completion ?? 0) > 0 && !(lead.state === 1 || lead.state === 2)) {
+        priorIncomplete = true;
+      }
+    }
   }
 
   // Open on the first lesson in course order. The evaluation group is moved to

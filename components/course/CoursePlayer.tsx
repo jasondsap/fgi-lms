@@ -16,6 +16,8 @@ export interface PlayerModule {
   completion: number;
   /** Certificate not yet earned — rendered locked, not clickable. */
   locked?: boolean;
+  /** Tooltip for a locked row; defaults to the certificate wording. */
+  lockTitle?: string;
 }
 
 /**
@@ -151,7 +153,7 @@ export default function CoursePlayer({
       <button
         onClick={locked ? undefined : () => openModule(m)}
         disabled={locked}
-        title={locked ? 'Complete every item above to unlock your certificate' : undefined}
+        title={locked ? (m.lockTitle ?? 'Complete every item above to unlock your certificate') : undefined}
         style={{
           display: 'flex', alignItems: 'center', gap: nested ? '10px' : '12px',
           width: '100%', textAlign: 'left',
