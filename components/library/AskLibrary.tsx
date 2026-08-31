@@ -98,19 +98,35 @@ export default function AskLibrary({
   }
 
   if (!open) {
+    // Fletch (the FGI mascot, 8-30-26) perches on the pill's top edge; the
+    // whole thing is one button so his fur is clickable too.
     return (
       <button
         onClick={() => setOpen(true)}
-        aria-label="Ask the library"
+        aria-label="Ask Fletch"
         style={{
           position: 'fixed', bottom: '24px', right: '24px', zIndex: 200,
-          background: pillBg, color: pillText, border: 'none',
-          borderRadius: '999px', padding: '13px 22px',
-          fontSize: '15px', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
+          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+          fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
         }}
       >
-        Ask the library
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/fletch/fletch-hello.webp"
+          alt=""
+          style={{
+            width: '84px', height: 'auto', marginBottom: '-12px', marginRight: '10px',
+            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))', pointerEvents: 'none',
+          }}
+        />
+        <span style={{
+          background: pillBg, color: pillText,
+          borderRadius: '999px', padding: '13px 22px',
+          fontSize: '15px', fontWeight: 600,
+          boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
+        }}>
+          Ask Fletch
+        </span>
       </button>
     );
   }
@@ -118,7 +134,7 @@ export default function AskLibrary({
   return (
     <div
       role="dialog"
-      aria-label="Ask the library"
+      aria-label="Ask Fletch"
       style={{
         position: 'fixed', bottom: '24px', right: '24px', zIndex: 200,
         width: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(620px, calc(100vh - 48px))',
@@ -132,9 +148,19 @@ export default function AskLibrary({
         background: accent, color: '#fff', padding: '13px 16px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
       }}>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: '15px' }}>Ask the library</div>
-          <div style={{ fontSize: '12px', opacity: 0.9 }}>Describe what you&#39;re working on</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/fletch/fletch-hello.webp"
+            alt=""
+            style={{ width: '42px', height: 'auto', flexShrink: 0 }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: '15px' }}>Ask Fletch</div>
+            <div style={{ fontSize: '12px', opacity: 0.9 }}>
+              Describe what you&#39;re working on or resources you&#39;re looking for
+            </div>
+          </div>
         </div>
         <button
           onClick={() => setOpen(false)}
@@ -239,8 +265,16 @@ export default function AskLibrary({
         )}
 
         {loading && (
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)', padding: '4px 2px' }}>
-            Looking through the library…
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 2px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-searching.webp"
+              alt=""
+              style={{ width: '64px', height: 'auto' }}
+            />
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+              Fletch is looking through the library…
+            </span>
           </div>
         )}
         {error && (
