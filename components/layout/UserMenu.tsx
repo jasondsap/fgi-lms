@@ -107,7 +107,7 @@ export default function UserMenu({
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 21a8 8 0 0116 0" />
               </svg>
-              My Learning
+              My Resources
             </Link>
             {adminHref && (
               <Link href={adminHref} role="menuitem" onClick={() => setOpen(false)} style={item}>
