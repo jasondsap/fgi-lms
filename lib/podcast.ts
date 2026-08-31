@@ -38,6 +38,13 @@ export const PODCAST_FEEDBACK_FORM_URL =
   'https://forms.monday.com/forms/461c03a66ea8eb689a7a2e592e5c2543?r=use1';
 
 /**
+ * The same Monday form as an embeddable URL (8-30-26): only /forms/embed/
+ * omits Monday's frame-ancestors CSP, so this is the one an iframe may load.
+ */
+export const PODCAST_FEEDBACK_EMBED_URL =
+  'https://forms.monday.com/forms/embed/461c03a66ea8eb689a7a2e592e5c2543?r=use1';
+
+/**
  * Hosting-platform links for the "Find Us On" box and the footer icons — from
  * Jennifer's "podcast links.docx" (8-15-26), with the session/tracking params
  * stripped to the canonical listing URLs (each verified live before wiring).

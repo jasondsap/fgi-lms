@@ -2,12 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
 import AudioPlayer, { ListenNowButton, TrailerButton } from '@/components/resource/AudioPlayer';
+import PodcastFeedbackModal from '@/components/resource/PodcastFeedbackModal';
 import PodcastInfoModal from '@/components/resource/PodcastInfoModal';
 import { CollapsedBio } from '@/components/resource/PresenterBio';
 import PresenterCard from '@/components/resource/PresenterCard';
 import { getOtherEpisodes, getPodcastAudioUrl } from '@/lib/resources';
 import {
-  ABOUT_THE_PODCAST, PODCAST_EMAIL, PODCAST_FEEDBACK_FORM_URL, PODCAST_HOST,
+  ABOUT_THE_PODCAST, PODCAST_EMAIL, PODCAST_FEEDBACK_EMBED_URL, PODCAST_FEEDBACK_FORM_URL, PODCAST_HOST,
   PODCAST_PLATFORMS, SHOW_LOGO, SHOW_TAGLINE, SHOW_TITLE, TRAILER_SLUG, WEBBERIZED,
 } from '@/lib/podcast';
 import type { Surface } from '@/lib/surface';
@@ -98,7 +99,8 @@ export default async function PodcastDetail(
               width={852} height={432}
               priority
               style={{
-                width: '100%', maxWidth: '543px', height: 'auto',
+                // A bit smaller per Jason, 8-30 (was 543px).
+                width: '100%', maxWidth: '480px', height: 'auto',
                 borderRadius: 'var(--radius-lg)', display: 'block',
               }}
             />
@@ -327,20 +329,14 @@ export default async function PodcastDetail(
               </div>
             )}
 
-            {/* Share Your Feedback — the mockup's gold button opens Jennifer's
-                Monday form; Tony's inbox and the form link sit beneath it. */}
+            {/* Share Your Feedback — same modal look as everywhere else
+                (8-30-26); the body is Jennifer's Monday podcast form. The old
+                separate "Feedback form" link is gone — the button IS the form. */}
             <div>
-              <a
-                href={PODCAST_FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer"
-                style={{
-                  display: 'block', textAlign: 'center',
-                  background: 'var(--fgi-amber)', color: '#ffffff',
-                  fontWeight: 700, fontSize: '18px', textDecoration: 'none',
-                  borderRadius: 'var(--radius-md)', padding: '12px 16px',
-                }}
-              >
-                Share Your Feedback
-              </a>
+              <PodcastFeedbackModal
+                embedUrl={PODCAST_FEEDBACK_EMBED_URL}
+                fallbackUrl={PODCAST_FEEDBACK_FORM_URL}
+              />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
                 <a
                   href={`mailto:${PODCAST_EMAIL}`}
@@ -355,20 +351,6 @@ export default async function PodcastDetail(
                     <path d="M22 6l-10 7L2 6" />
                   </svg>
                   <span>{PODCAST_EMAIL}</span>
-                </a>
-                <a
-                  href={PODCAST_FEEDBACK_FORM_URL} target="_blank" rel="noopener noreferrer"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '10px',
-                    fontSize: '15px', color: surface.primary,
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="1.7" style={{ flexShrink: 0 }}>
-                    <path d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5" />
-                    <path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z" />
-                  </svg>
-                  <span>Feedback form</span>
                 </a>
               </div>
             </div>
