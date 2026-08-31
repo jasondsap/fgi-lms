@@ -279,10 +279,25 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           display: 'grid', gridTemplateColumns: '1fr 460px', gap: '1.5rem',
           alignItems: 'stretch',
         }}>
-          <div style={{
-            background: '#ffffff', borderRadius: '10px',
-            padding: '1.9rem 2.1rem',
-          }}>
+          {/* Jennifer's Mockup A (8-31-26): the white box gets a rounded
+              outline in the tenant frame colour with a dot grid peeking out
+              from behind its top-left corner (CO red, SCARR yellow). */}
+          <div style={{ position: 'relative' }}>
+            {v3.certBoxFrame && (
+              <span aria-hidden style={{
+                position: 'absolute', top: '-16px', left: '-16px',
+                width: '80px', height: '80px',
+                backgroundImage: `radial-gradient(circle, ${v3.certBoxFrame} 2.5px, transparent 3px)`,
+                backgroundSize: '13px 13px', backgroundPosition: '0 0',
+              }} />
+            )}
+            <div style={{
+              position: 'relative', height: '100%',
+              background: '#ffffff',
+              borderRadius: v3.certBoxFrame ? '18px' : '10px',
+              border: v3.certBoxFrame ? `2px solid ${v3.certBoxFrame}` : undefined,
+              padding: '1.9rem 2.1rem',
+            }}>
             <h2 style={{
               fontSize: '20px', fontWeight: 700, color: '#111111', marginBottom: '1.1rem',
             }}>
@@ -299,6 +314,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 dangerouslySetInnerHTML={{ __html: html }}
               />
             ))}
+            </div>
           </div>
 
           {/* Photo card — grey mat with the composited photo at its base. */}

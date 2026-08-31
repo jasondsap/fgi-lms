@@ -169,6 +169,12 @@ export interface TenantV3 {
   naadacPill?: { bg: string; fg: string };
   /** Colour of the Contact pills (landing support bar + shell footer); defaults to `primary`. */
   contactButton?: { bg: string; fg: string };
+  /**
+   * Cert-band white box frame — Jennifer's 8-31-26 "Mockup A (Red Dots + Red
+   * Outline)": a rounded outline in this colour plus a dot grid peeking from
+   * behind the top-left corner. Colorado red, SCARR yellow; unset = plain box.
+   */
+  certBoxFrame?: string;
   certBand: {
     heading: string;
     /** Trusted author HTML paragraphs (apply link, contact email). */
@@ -400,6 +406,7 @@ const TENANTS: Record<string, TenantConfig> = {
       // Jennifer 8-29 (via Jason): same yellow treatment as SCARR — CO yellow, navy text.
       naadacPill: { bg: '#f2b134', fg: '#001970' },
       contactButton: { bg: '#ffd100', fg: '#001970' },
+      certBoxFrame: '#e8112d',   // Mockup A red (8-31-26)
       certBand: {
         heading: 'Are you wanting to open a Recovery Residence?',
         paragraphsHtml: [
@@ -608,6 +615,7 @@ const TENANTS: Record<string, TenantConfig> = {
       // Jennifer 8-29: NAADAC pill and Contact buttons in SCARR yellow.
       naadacPill: { bg: '#f2b134', fg: '#041e42' },
       contactButton: { bg: '#f5d300', fg: '#041e42' },
+      certBoxFrame: '#f5d300',   // Mockup A, SCARR yellow (8-31-26)
       certBand: {
         heading: 'Becoming a SCARR Certified Residence',
         paragraphsHtml: [
