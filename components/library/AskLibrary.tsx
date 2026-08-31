@@ -177,8 +177,15 @@ export default function AskLibrary({
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', background: 'var(--body-bg)' }}>
         {turns.length === 0 && (
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-hello.webp"
+              alt=""
+              style={{ width: '110px', height: 'auto', display: 'block', margin: '4px auto 10px' }}
+            />
             <p style={{ marginBottom: '12px' }}>
-              Tell me the situation you&#39;re facing and I&#39;ll point you to what we have.
+              Hi, I&#39;m Fletch! Tell me the situation you&#39;re facing and I&#39;ll
+              point you to what we have.
             </p>
             {STARTERS.map((s) => (
               <button
@@ -278,11 +285,19 @@ export default function AskLibrary({
           </div>
         )}
         {error && (
-          <div role="alert" style={{
-            fontSize: '13px', color: '#8a1c1c', background: '#fdf0f0',
-            border: '1px solid #f2d4d4', borderRadius: 'var(--radius-md)', padding: '9px 12px',
-          }}>
-            {error}
+          <div role="alert" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-break.webp"
+              alt=""
+              style={{ width: '56px', height: 'auto', flexShrink: 0 }}
+            />
+            <div style={{
+              fontSize: '13px', color: '#8a1c1c', background: '#fdf0f0',
+              border: '1px solid #f2d4d4', borderRadius: 'var(--radius-md)', padding: '9px 12px',
+            }}>
+              {error}
+            </div>
           </div>
         )}
         <div ref={endRef} />
