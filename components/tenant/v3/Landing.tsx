@@ -100,7 +100,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
       naadac: Boolean(latestBrief.is_naadac_ce),
       icon: '/images/category-cards/learning.webp',
     },
-  ].filter(Boolean) as Array<{ label: string; title: string; href: string; icon: string }>;
+  ].filter(Boolean) as Array<{ label: string; title: string; href: string; icon: string; naadac: boolean }>;
 
   const linkQuery = filterQuery(searchParams);
   const apiQuery = filterQuery(searchParams, { tenant: tenant.slug });
@@ -230,11 +230,25 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                         <img src={tile.icon} alt="" style={{ width: '92px', height: 'auto' }} />
                       </span>
                       <span>
-                        <span style={{
-                          display: 'block', fontSize: '17px', fontWeight: 700,
-                          fontStretch: '75%', color: '#111111',
-                        }}>
-                          {tile.label}
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            fontSize: '17px', fontWeight: 700,
+                            fontStretch: '75%', color: '#111111',
+                          }}>
+                            {tile.label}
+                          </span>
+                          {/* NAADAC CE pill (Jason 8-31) — same colours as the
+                              tenant's library-card overlay. */}
+                          {tile.naadac && (
+                            <span style={{
+                              background: v3.naadacPill?.bg ?? 'var(--fgi-amber)',
+                              color: v3.naadacPill?.fg ?? 'var(--fgi-navy)',
+                              fontSize: '10px', fontWeight: 700, letterSpacing: '0.03em',
+                              padding: '3px 8px', borderRadius: '20px', flexShrink: 0,
+                            }}>
+                              NAADAC CE
+                            </span>
+                          )}
                         </span>
                         <span style={{
                           display: 'block', fontSize: '15px', fontStretch: '75%',
