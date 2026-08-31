@@ -200,6 +200,71 @@ export default async function WebinarDetail(
               </div>
             )}
 
+            {/* Featured book / sponsor card (8-30-26: Jay Davidson's "Miracle on
+
+                Market" on the Healing Place webinar). Data-driven off the sponsor
+
+                fields; renders wherever they are set on a webinar row. */}
+
+            {resource.sponsor_text && (
+
+              <div style={{
+
+                background: '#ffffff', border: '1px solid var(--border-color)',
+
+                borderRadius: '8px', padding: '1.5rem', display: 'grid',
+
+                gridTemplateColumns: resource.sponsor_logo_url ? '1fr 150px' : '1fr',
+
+                gap: '1.75rem', alignItems: 'center',
+
+              }}>
+
+                <div style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--text-body-dark)' }}>
+
+                  {resource.sponsor_text}
+
+                  {resource.sponsor_url && (
+
+                    <a
+
+                      href={resource.sponsor_url} target="_blank" rel="noopener noreferrer"
+
+                      style={{ display: 'block', marginTop: '10px', fontWeight: 700, color: surface.primary }}
+
+                    >
+
+                      Learn more →
+
+                    </a>
+
+                  )}
+
+                </div>
+
+                {resource.sponsor_logo_url && (
+
+                  <a href={resource.sponsor_url ?? '#'} target="_blank" rel="noopener noreferrer">
+
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+
+                    <img
+
+                      src={resource.sponsor_logo_url} alt=""
+
+                      style={{ width: '100%', maxWidth: '150px', height: 'auto', display: 'block', margin: '0 auto', borderRadius: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.18)' }}
+
+                    />
+
+                  </a>
+
+                )}
+
+              </div>
+
+            )}
+
+
             {presenters.map((p) => (
               <PresenterCard key={p.id} presenter={p} accent={surface.primary} />
             ))}
