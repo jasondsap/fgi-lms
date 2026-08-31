@@ -42,6 +42,8 @@ export default async function AuthNav({
       name={name}
       email={email}
       accountHref={accountHref}
+      // Admins get the Admin entry (8-31-26) — always FGI-chromed /admin.
+      adminHref={user?.role === 'admin' ? '/admin' : undefined}
       // Bound arg, not a closure — see auth-actions.ts for why.
       signOut={signOutAction.bind(null, signOutRedirect)}
       chevronColor={color}

@@ -15,6 +15,7 @@ export default function UserMenu({
   name,
   email,
   accountHref,
+  adminHref,
   signOut,
   avatarBg = 'var(--fgi-teal)',
   avatarFg = '#ffffff',
@@ -24,6 +25,8 @@ export default function UserMenu({
   name: string;
   email: string;
   accountHref: string;
+  /** Set only for users.role='admin' — renders the Admin menu item. */
+  adminHref?: string;
   signOut: () => Promise<void>;
   avatarBg?: string;
   avatarFg?: string;
@@ -106,6 +109,17 @@ export default function UserMenu({
               </svg>
               My Learning
             </Link>
+            {adminHref && (
+              <Link href={adminHref} role="menuitem" onClick={() => setOpen(false)} style={item}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden
+                  style={{ color: 'var(--text-secondary)' }}>
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" />
+                </svg>
+                Admin
+              </Link>
+            )}
           </div>
 
           <form action={signOut} style={{ padding: '6px 0' }}>
