@@ -23,6 +23,9 @@ interface Props {
   tileBorderHover?: string;
   /** Colour of the rule beside the heading (and the tile category labels). */
   accent?: string;
+  /** Open tiles in a new tab — tenant portals link to FGI resources and must
+      not navigate the portal away (Jason 8-31-26). */
+  newTab?: boolean;
 }
 
 export default function LatestHighlights({
@@ -31,6 +34,7 @@ export default function LatestHighlights({
   tileBorder = 'rgba(37, 126, 164, 0.18)',
   tileBorderHover = 'rgba(37, 126, 164, 0.28)',
   accent = 'var(--fgi-gold)',
+  newTab = false,
 }: Props) {
   if (!tiles.length) return null;
 
@@ -72,6 +76,7 @@ export default function LatestHighlights({
             <Link
               key={tile.label}
               href={tile.href}
+              {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className="highlight-tile"
               style={{
                 display: 'flex', alignItems: 'center', gap: '14px',

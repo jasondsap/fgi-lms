@@ -157,6 +157,7 @@ export default async function TenantLandingV2({ tenant, searchParams }: Props) {
         tileBorder="#e7e2cd"
         tileBorderHover="#d8d0b2"
         accent={tenant.accent}
+        newTab
       />
 
       {/* ── Hosted-on-FGI bar ── */}
