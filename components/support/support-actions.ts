@@ -7,6 +7,7 @@
 // =============================================================================
 import { revalidatePath } from 'next/cache';
 import { getSession } from '@/auth';
+import { notifyNewTicket } from '@/lib/notify';
 import {
   TICKET_CATEGORY_VALUES, TICKET_PRIORITY_VALUES, TICKET_STATUS_VALUES,
 } from '@/lib/support';
@@ -50,6 +51,23 @@ export async function createTicketAction(input: {
     pageUrl: input.pageUrl ? String(input.pageUrl).slice(0, 1000) : null,
     browserInfo: input.browserInfo ? String(input.browserInfo).slice(0, 500) : null,
   });
+
+  // Email the queue owners (8-31-26) — best-effort: a mail failure never
+  // costs the ticket, which is already saved above.
+  try {
+    await notifyNewTicket({
+      ticketId: id,
+      title,
+      category: input.category,
+      priority,
+      description,
+      submitterName: session.user.givenName ?? null,
+      submitterEmail: session.user.email ?? null,
+    });
+  } catch (err) {
+    console.error('[support] ticket saved but notification failed:', err);
+  }
+
   return { id };
 }
 
