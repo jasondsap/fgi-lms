@@ -211,12 +211,10 @@ export default function FilterSidebar({
         </FilterGroup>
       ))}
 
-      {/* Tenant side: "Fletcher Group Library", into a new tab. */}
+      {/* Tenant side: "Fletcher Group Library", into a new tab. Accordion like
+          the filter groups above (Jason, 8-31-26). */}
       {fgiLibraryHref && (
-        <div style={{ paddingTop: '14px' }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-            Other Libraries
-          </div>
+        <FilterGroup title="Other Libraries">
           <a
             href={fgiLibraryHref}
             target={fgiLibraryNewTab ? '_blank' : undefined}
@@ -224,16 +222,13 @@ export default function FilterSidebar({
           >
             {fgiLibraryLabel ?? 'Fletcher Group Library'}
           </a>
-        </div>
+        </FilterGroup>
       )}
 
       {/* FGI side: the library this tab was opened from — clicking closes the
           tab and lands the visitor back where they were. */}
       {!isTenant && !fgiLibraryHref && returnTenant && (
-        <div style={{ paddingTop: '14px' }}>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-            Other Libraries
-          </div>
+        <FilterGroup title="Other Libraries">
           <a
             href={returnTenant.href}
             onClick={(e) => returnToTenant(e, returnTenant.href)}
@@ -241,7 +236,7 @@ export default function FilterSidebar({
           >
             {returnTenant.label}
           </a>
-        </div>
+        </FilterGroup>
       )}
     </aside>
   );
