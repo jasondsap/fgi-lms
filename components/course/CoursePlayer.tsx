@@ -191,7 +191,7 @@ export default function CoursePlayer({
           }}>
             {MODNAME_LABELS[m.modname] ?? m.modname}
             {m.state === 3 ? ' · not yet passed' : ''}
-            {locked ? ' · complete all items to unlock' : ''}
+            {locked ? ` · ${(m.lockTitle ?? 'Complete all items to unlock').toLowerCase()}` : ''}
           </span>
         </span>
       </button>
