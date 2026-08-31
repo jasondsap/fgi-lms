@@ -65,7 +65,8 @@ export const PODCAST_PLATFORMS: PodcastPlatform[] = [
   { key: 'apple',   label: 'Apple Podcasts',
     url: 'https://podcasts.apple.com/us/podcast/recovery-ecosystem-radio-an-fgi-podcast/id6792062382' },
   { key: 'amazon',  label: 'Amazon Music',
-    url: 'https://music.amazon.com/podcasts/B0H8LWBS6M' },
+    // Canonical show URL per Jason 8-30 (the bare-ASIN form also resolves).
+    url: 'https://music.amazon.com/podcasts/14311bb8-f04d-4762-8943-ba627db80db5/recovery-ecosystem-radio-an-fgi-podcast' },
   { key: 'audible', label: 'Audible',
     url: 'https://www.audible.com/podcast/Recovery-Ecosystem-Radio-an-FGI-Podcast/B0H8LWJGS1' },
 ];
