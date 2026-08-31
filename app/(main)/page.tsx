@@ -20,6 +20,15 @@ function normalizeType(v: string | string[] | undefined) {
   return (Array.isArray(v) ? v : [v]) as ResourceType[];
 }
 
+// The search snippet Jason wants Google to show (8-31-26) — the home-page
+// welcome copy, with the bare domain as canonical so every filtered/query
+// variant of the home URL consolidates onto fgilearn.org.
+export const metadata = {
+  title: 'Fletcher Group Learning Resource Center',
+  description: 'Welcome! Your one-stop, no-cost library for building stronger recovery housing and support programs — courses, guides, webinars, podcasts, NAADAC CE opportunities, research, and more. Whether you’re opening your first recovery home, leading an established program, working as a peer or recovery support provider, or a community partner, there’s something here for you.',
+  alternates: { canonical: '/' },
+};
+
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
