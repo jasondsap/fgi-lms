@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   RESOURCE_TYPE_LABELS, AUDIENCE_TAG_LABELS, TOPIC_TAG_LABELS, FILTER_GROUPS,
 } from '@/types';
@@ -18,7 +18,20 @@ interface Props {
   /** Label for that link — "Fletcher Group Library" on a tenant's own library,
       "SCARR Library" (etc.) when the tenant is browsing the FGI catalogue. */
   fgiLibraryLabel?: string;
+  /** Open the other-library link in a new tab (the tenant → FGI direction). */
+  fgiLibraryNewTab?: boolean;
 }
+
+/**
+ * 8-30-26 (Jason/Jennifer): a tenant's "Fletcher Group Library" link opens
+ * the real FGI library in a new tab with ?from=<tenant>; this remembers the
+ * origin for the tab's lifetime so the FGI sidebar can offer the way back
+ * even after filtering churns the query string.
+ */
+const RETURN_TENANTS: Record<string, { label: string; href: string }> = {
+  scarr:    { label: 'SCARR Library',    href: '/scarr#library' },
+  colorado: { label: 'Colorado Library', href: '/colorado#library' },
+};
 
 const LABEL_MAPS: Record<string, Record<string, string>> = {
   type:     RESOURCE_TYPE_LABELS,
@@ -78,7 +91,9 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
-export default function FilterSidebar({ total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel }: Props) {
+export default function FilterSidebar({
+  total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel, fgiLibraryNewTab = false,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -106,6 +121,28 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
   }, [router, dest, searchParams]);
 
   const clearAll = useCallback(() => { router.push(dest, { scroll: false }); }, [router, dest]);
+
+  // FGI side of the new-tab flow: remember which tenant opened this tab.
+  const [returnTenant, setReturnTenant] = useState<{ label: string; href: string } | null>(null);
+  useEffect(() => {
+    if (isTenant) return;
+    try {
+      const fromParam = searchParams.get('from');
+      const slug = fromParam && RETURN_TENANTS[fromParam]
+        ? fromParam
+        : sessionStorage.getItem('fgi-from-tenant');
+      if (fromParam && RETURN_TENANTS[fromParam]) sessionStorage.setItem('fgi-from-tenant', fromParam);
+      if (slug && RETURN_TENANTS[slug]) setReturnTenant(RETURN_TENANTS[slug]);
+    } catch { /* private mode */ }
+  }, [isTenant, searchParams]);
+
+  // Close the tab the tenant opened; if the browser refuses (direct visit,
+  // same-tab navigation), fall back to plainly going there.
+  const returnToTenant = useCallback((e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+    window.close();
+    setTimeout(() => { window.location.href = href; }, 150);
+  }, []);
 
   const active: Record<string, string[]> = {
     type:       searchParams.getAll('type'),
@@ -174,8 +211,7 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
         </FilterGroup>
       ))}
 
-      {/* Present on the tenant library (→ FGI catalogue) and on the tenant's
-          FGI-catalogue view (→ back to its own library); never on FGI itself. */}
+      {/* Tenant side: "Fletcher Group Library", into a new tab. */}
       {fgiLibraryHref && (
         <div style={{ paddingTop: '14px' }}>
           <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
@@ -183,9 +219,27 @@ export default function FilterSidebar({ total, targetPath, isTenant = false, fgi
           </div>
           <a
             href={fgiLibraryHref}
+            target={fgiLibraryNewTab ? '_blank' : undefined}
             style={{ fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'underline' }}
           >
             {fgiLibraryLabel ?? 'Fletcher Group Library'}
+          </a>
+        </div>
+      )}
+
+      {/* FGI side: the library this tab was opened from — clicking closes the
+          tab and lands the visitor back where they were. */}
+      {!isTenant && !fgiLibraryHref && returnTenant && (
+        <div style={{ paddingTop: '14px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+            Other Libraries
+          </div>
+          <a
+            href={returnTenant.href}
+            onClick={(e) => returnToTenant(e, returnTenant.href)}
+            style={{ fontSize: '13px', color: 'var(--fgi-blue)', textDecoration: 'underline' }}
+          >
+            {returnTenant.label}
           </a>
         </div>
       )}
