@@ -172,9 +172,9 @@ export default function HelpView({
         padding: '14px 18px', marginBottom: '2rem',
       }}>
         <div style={{ flex: 1, minWidth: '240px' }}>
-          <div style={{ fontWeight: 700, fontSize: '15px' }}>Something not working?</div>
+          <div style={{ fontWeight: 700, fontSize: '15px' }}>Have a question, or something not working?</div>
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Report it and Learning Center Support will follow up right in the ticket.
+            Ask it or report it — Learning Center Support will follow up right in the ticket.
           </div>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

@@ -38,7 +38,7 @@ export async function createTicketAction(input: {
   const title = String(input.title ?? '').trim().slice(0, 300);
   const description = String(input.description ?? '').trim().slice(0, 5000);
   if (!title) return { error: 'Please add a short title.' };
-  if (!description) return { error: 'Please describe what happened.' };
+  if (!description) return { error: 'Please add your question or describe what happened.' };
   if (!TICKET_CATEGORY_VALUES.has(input.category)) return { error: 'Please choose a category.' };
   const priority = TICKET_PRIORITY_VALUES.has(input.priority) ? input.priority : 'normal';
 

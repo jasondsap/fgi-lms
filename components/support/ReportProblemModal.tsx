@@ -1,10 +1,12 @@
 'use client';
 
 /**
- * Report-a-problem modal + its launcher button, ported from the DDOR platform
- * (8-31-26) and re-skinned LRC-style. No attachments in phase 1. Auto-captures
- * the page URL and browser info; submits via the createTicketAction server
- * action; success state links to the ticket and to My Tickets.
+ * Question/problem ticket modal + its launcher button, ported from the DDOR
+ * platform (8-31-26) and re-skinned LRC-style. Wording widened same day
+ * (Jennifer/Jason): tickets are for questions as well as problems. No
+ * attachments in phase 1. Auto-captures the page URL and browser info;
+ * submits via the createTicketAction server action; success state links to
+ * the ticket and to My Tickets.
  */
 
 import { useState } from 'react';
@@ -52,7 +54,7 @@ export default function ReportProblemModal({
     setError('');
     if (!title.trim()) { setError('Please add a short title.'); return; }
     if (!category) { setError('Please choose a category.'); return; }
-    if (!description.trim()) { setError('Please describe what happened.'); return; }
+    if (!description.trim()) { setError('Please add your question or describe what happened.'); return; }
 
     setSubmitting(true);
     try {
@@ -91,7 +93,7 @@ export default function ReportProblemModal({
       />
       <div
         role="dialog"
-        aria-label="Report a problem"
+        aria-label="Ask a question or report a problem"
         style={{
           position: 'relative', width: 'min(520px, 100%)',
           background: '#fff', borderRadius: 'var(--radius-lg)',
@@ -102,7 +104,7 @@ export default function ReportProblemModal({
           background: 'var(--fgi-navy)', color: '#fff', padding: '13px 18px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <div style={{ fontWeight: 700, fontSize: '16px' }}>Report a Problem</div>
+          <div style={{ fontWeight: 700, fontSize: '16px' }}>Ask a Question or Report a Problem</div>
           <button
             onClick={close}
             aria-label="Close"
@@ -156,7 +158,7 @@ export default function ReportProblemModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={300}
-                placeholder="Short summary of the problem"
+                placeholder="Short summary of your question or problem"
                 style={FIELD}
               />
             </div>
@@ -187,7 +189,7 @@ export default function ReportProblemModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
-                placeholder="What happened? What did you expect? Steps to reproduce help us fix it faster."
+                placeholder="Ask your question, or tell us what happened — for problems, steps to reproduce help us fix it faster."
                 style={{ ...FIELD, resize: 'vertical' }}
               />
             </div>
@@ -236,7 +238,7 @@ export default function ReportProblemModal({
 
 /** Filled launcher button + the modal it opens. */
 export function ReportProblemButton({
-  basePath = '', accent = 'var(--fgi-blue)', label = 'Report a problem',
+  basePath = '', accent = 'var(--fgi-blue)', label = 'Question / Problem',
 }: { basePath?: string; accent?: string; label?: string }) {
   const [open, setOpen] = useState(false);
   return (

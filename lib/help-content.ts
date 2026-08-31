@@ -286,16 +286,16 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: 'report-problem',
     category: 'Your Account',
-    name: 'Reporting a Problem',
+    name: 'Asking a Question or Reporting a Problem',
     description:
-      'When something isn’t working, report it from the Help page — the report becomes a support ticket that Learning Center Support reads and replies to. You can follow the whole conversation and the ticket’s status under My Tickets.',
+      'Have a question, or something isn’t working? Send it from the Help page — it becomes a support ticket that Learning Center Support reads and replies to. You can follow the whole conversation and the ticket’s status under My Tickets.',
     quickStart: [
-      'Open Help (the ? icon in the header) and click Report a Problem.',
-      'Give it a short title, pick a category, and describe what happened — the page you were on is captured automatically.',
+      'Open Help (the ? icon in the header) and click Question / Problem.',
+      'Give it a short title, pick a category (including "Ask a question"), and write your question or describe what happened — the page you were on is captured automatically.',
       'Track replies and status anytime under My Tickets on the Help page.',
     ],
     tips: [
-      'Steps to reproduce the problem help us fix it faster.',
+      'For problems, steps to reproduce help us fix it faster.',
       'You can reply inside the ticket — no email thread needed.',
     ],
     faqs: [

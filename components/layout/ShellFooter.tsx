@@ -19,6 +19,8 @@ export function TenantShellFooter({ tenant }: { tenant: TenantConfig }) {
       supportLabel={tenant.v3?.supportBar.heading}
       contactBg={tenant.v3?.contactButton?.bg}
       contactFg={tenant.v3?.contactButton?.fg}
+      contactBasePath={`/${tenant.slug}`}
+      contactAccent={tenant.primary}
     />
   );
 }
@@ -43,10 +45,11 @@ export default function ShellFooter({
   lobeBg,
   siteUrl = 'https://www.fletchergroup.org',
   siteLabel = 'www.fletchergroup.org',
-  contactHref,
   supportLabel = 'Platform Support',
   contactBg,
   contactFg,
+  contactBasePath = '',
+  contactAccent,
 }: {
   bg?: string;
   logoSrc?: string;
@@ -56,11 +59,13 @@ export default function ShellFooter({
   lobeBg?: string;
   siteUrl?: string;
   siteLabel?: string;
-  contactHref?: string;
   /** "Learning Center Support" on the tenants (Jennifer 8-29). */
   supportLabel?: string;
   contactBg?: string;
   contactFg?: string;
+  /** Ticket-modal wiring (8-31-26): tenant chrome path + modal accent. */
+  contactBasePath?: string;
+  contactAccent?: string;
 }) {
   const logo = (
     <div style={{
@@ -84,7 +89,8 @@ export default function ShellFooter({
       <span style={{ fontSize: '17px' }}>{supportLabel}</span>
       <ContactButton
         label="Contact" fontSize="16px"
-        {...(contactHref ? { href: contactHref } : {})}
+        basePath={contactBasePath}
+        {...(contactAccent ? { accent: contactAccent } : {})}
         {...(contactBg ? { bg: contactBg } : {})}
         {...(contactFg ? { fg: contactFg } : {})}
       />

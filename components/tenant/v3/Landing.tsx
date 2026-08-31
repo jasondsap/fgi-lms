@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import AskLibrary from '@/components/library/AskLibrary';
+import ContactButton from '@/components/layout/ContactButton';
 import FilterSidebar from '@/components/library/FilterSidebar';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
@@ -343,20 +344,16 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '18px', fontWeight: 700 }}>{v3.supportBar.heading ?? 'Need Platform Help?'}</span>
-            <a
-              href="mailto:LC@fletchergroup.org"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '9px',
-                background: v3.contactButton?.bg ?? tenant.primary, color: v3.contactButton?.fg ?? '#ffffff', fontSize: '16px',
-                textDecoration: 'none', padding: '9px 22px', borderRadius: '999px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M2.5 11.1 20.6 3.3c.8-.3 1.5.4 1.2 1.2l-7.8 18.1c-.3.8-1.5.8-1.7-.1l-1.9-7-7-1.9c-.9-.2-.9-1.4-.1-1.7z" />
-              </svg>
-              {v3.supportBar.buttonLabel}
-            </a>
+            {/* Opens the Question/Problem ticket modal (8-31-26) — signed-out
+                clicks are caught by SignedOutGate and prompt sign-in. */}
+            <ContactButton
+              label={v3.supportBar.buttonLabel}
+              fontSize="16px"
+              bg={v3.contactButton?.bg ?? tenant.primary}
+              fg={v3.contactButton?.fg ?? '#ffffff'}
+              basePath={`/${tenant.slug}`}
+              accent={tenant.primary}
+            />
           </div>
 
           <Image

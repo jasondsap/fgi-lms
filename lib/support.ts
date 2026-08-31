@@ -20,6 +20,10 @@
 // ---- Vocabularies (code-as-config, matching the DDOR convention) -----------
 
 export const TICKET_CATEGORIES = [
+  // 'question' added 8-31-26 (Jennifer/Jason): tickets are for questions too,
+  // not just problems. Requires 'question' in the support_tickets_category_chk
+  // CHECK constraint (widened via direct SQL in Neon, like all schema).
+  { value: 'question', label: 'Ask a question' },
   { value: 'bug', label: 'Something is broken' },
   { value: 'access', label: 'Sign-in / access problem' },
   { value: 'content', label: 'Content issue (wrong or missing material)' },
