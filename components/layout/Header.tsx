@@ -38,8 +38,21 @@ export default function Header() {
 
         <NavLinks />
 
-        {/* Account area — hidden until Cognito is configured */}
-        <div style={{ flexShrink: 0, marginLeft: 'auto' }}>
+        {/* Help + account area (help "?" icon: Jason, 8-31-26) */}
+        <div style={{ flexShrink: 0, marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '18px' }}>
+          <Link
+            href="/help"
+            aria-label="Help Center"
+            title="Help Center"
+            style={{
+              width: '38px', height: '38px', borderRadius: '50%',
+              border: '2px solid rgba(255,255,255,0.85)', color: '#ffffff',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '19px', fontWeight: 700, textDecoration: 'none', lineHeight: 1,
+            }}
+          >
+            ?
+          </Link>
           <AuthNav />
         </div>
 

@@ -124,7 +124,21 @@ export default function TenantHeaderV3({
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+        {/* Help Center (FGI-hosted /help) — same "?" as the FGI header (Jason, 8-31-26). */}
+        <Link
+          href="/help"
+          aria-label="Help Center"
+          title="Help Center"
+          style={{
+            width: '38px', height: '38px', borderRadius: '50%',
+            border: '2px solid rgba(255,255,255,0.85)', color: '#ffffff',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '19px', fontWeight: 700, textDecoration: 'none', lineHeight: 1,
+          }}
+        >
+          ?
+        </Link>
         {authNav}
       </div>
     </>

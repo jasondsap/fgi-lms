@@ -29,12 +29,21 @@ interface Props {
   /** Closed-pill colours — FGI gold per Jennifer 8-17-26; tenants pass their primary. */
   pillBg?: string;
   pillText?: string;
+  /** 'library' (default) recommends resources; 'help' (the /help page, 8-31-26)
+      answers how-to questions and links Help Center topics as `#<id>` anchors. */
+  mode?: 'library' | 'help';
 }
 
 const STARTERS = [
   'I run a recovery house and neighbours are pushing back',
   'I need to train new peer support staff',
   'How do I fund a new recovery residence?',
+];
+
+const HELP_STARTERS = [
+  'How do I get my CE certificate?',
+  "Why isn't my video marked complete?",
+  'How do I download my transcript?',
 ];
 
 /**
@@ -50,6 +59,7 @@ export default function AskLibrary({
   accent = 'var(--fgi-blue)',
   pillBg = 'var(--fgi-gold)',
   pillText = 'var(--fgi-navy)',
+  mode = 'library',
 }: Props) {
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -82,11 +92,11 @@ export default function AskLibrary({
     setError(null);
 
     try {
-      const res = await fetch('/api/recommend', {
+      const res = await fetch(mode === 'help' ? '/api/help-assistant' : '/api/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          surface,
+          ...(mode === 'help' ? {} : { surface }),
           messages: next.map((t) => ({ role: t.role, content: t.content })),
         }),
       });
@@ -95,9 +105,17 @@ export default function AskLibrary({
         setError(data.error ?? 'Something went wrong.');
         return;
       }
+      // Help mode returns topics; shape them into the same card model — the
+      // category becomes the type pill, the topic id the in-page anchor.
+      const cards: Recommendation[] = mode === 'help'
+        ? (data.topics ?? []).map((t: { id: string; name: string; category: string; why: string }) => ({
+            slug: t.id, title: t.name, type: t.category,
+            durationMinutes: null, isNaadacCe: false, why: t.why,
+          }))
+        : data.recommendations ?? [];
       setTurns((prev) => [
         ...prev,
-        { role: 'assistant', content: data.answer, recommendations: data.recommendations ?? [] },
+        { role: 'assistant', content: data.answer, recommendations: cards },
       ]);
     } catch {
       setError('Could not reach the assistant. Please try again.');
@@ -167,7 +185,9 @@ export default function AskLibrary({
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: '15px' }}>Ask Fletch</div>
             <div style={{ fontSize: '12px', opacity: 0.9 }}>
-              Describe what you&#39;re working on or resources you&#39;re looking for
+              {mode === 'help'
+                ? 'Ask how to use the Learning Resource Center'
+                : <>Describe what you&#39;re working on or resources you&#39;re looking for</>}
             </div>
           </div>
         </div>
@@ -211,10 +231,12 @@ export default function AskLibrary({
               style={{ width: '110px', height: 'auto', display: 'block', margin: '4px auto 10px' }}
             />
             <p style={{ marginBottom: '12px' }}>
-              Hi, I&#39;m Fletch! Tell me the situation you&#39;re facing and I&#39;ll
-              point you to what we have.
+              {mode === 'help'
+                ? <>Hi, I&#39;m Fletch! Ask me how to do anything here and I&#39;ll walk you through it.</>
+                : <>Hi, I&#39;m Fletch! Tell me the situation you&#39;re facing and I&#39;ll
+                  point you to what we have.</>}
             </p>
-            {STARTERS.map((s) => (
+            {(mode === 'help' ? HELP_STARTERS : STARTERS).map((s) => (
               <button
                 key={s}
                 onClick={() => ask(s)}
@@ -259,7 +281,7 @@ export default function AskLibrary({
                 return (
                   <Link
                     key={r.slug}
-                    href={`${basePath}/resource/${r.slug}`}
+                    href={mode === 'help' ? `#${r.slug}` : `${basePath}/resource/${r.slug}`}
                     style={{
                       display: 'block', textDecoration: 'none', color: 'inherit',
                       background: '#fff', border: '1px solid var(--border-color)',
@@ -307,7 +329,7 @@ export default function AskLibrary({
               style={{ width: '64px', height: 'auto' }}
             />
             <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-              Fletch is looking through the library…
+              {mode === 'help' ? 'Fletch is checking the guide…' : 'Fletch is looking through the library…'}
             </span>
           </div>
         )}
@@ -341,7 +363,7 @@ export default function AskLibrary({
           ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="What are you working on?"
+          placeholder={mode === 'help' ? 'What do you need help with?' : 'What are you working on?'}
           maxLength={1000}
           style={{
             flex: 1, padding: '9px 12px', fontSize: '14px', fontFamily: 'inherit',
