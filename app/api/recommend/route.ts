@@ -24,6 +24,7 @@ You are given the complete catalog of everything available to this visitor. Each
 slug | type | duration | title — description
 
 Rules:
+- Write in American English spelling — "neighbors", "colors", "organize" — never British spellings like "neighbours" or "colours".
 - Recommend ONLY from the catalog. Never invent a resource, a slug, a title, or a topic that isn't there.
 - Return the slug exactly as written in the catalog.
 - Recommend at most 4, ordered best-first. Two strong matches beat four weak ones.
