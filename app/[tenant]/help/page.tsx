@@ -17,7 +17,12 @@ export default function TenantHelpPage({ params }: { params: { tenant: string } 
   if (!tenant) notFound();
   return (
     <>
-      <HelpView accent={tenant.primary} pillBg={tenant.primary} pillText="#ffffff" />
+      <HelpView
+        accent={tenant.primary}
+        pillBg={tenant.primary}
+        pillText="#ffffff"
+        basePath={`/${tenant.slug}`}
+      />
       <TenantShellFooter tenant={tenant} />
     </>
   );

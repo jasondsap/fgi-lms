@@ -283,6 +283,29 @@ export const HELP_TOPICS: HelpTopic[] = [
     faqs: [],
   },
 
+  {
+    id: 'report-problem',
+    category: 'Your Account',
+    name: 'Reporting a Problem',
+    description:
+      'When something isn’t working, report it from the Help page — the report becomes a support ticket that Learning Center Support reads and replies to. You can follow the whole conversation and the ticket’s status under My Tickets.',
+    quickStart: [
+      'Open Help (the ? icon in the header) and click Report a Problem.',
+      'Give it a short title, pick a category, and describe what happened — the page you were on is captured automatically.',
+      'Track replies and status anytime under My Tickets on the Help page.',
+    ],
+    tips: [
+      'Steps to reproduce the problem help us fix it faster.',
+      'You can reply inside the ticket — no email thread needed.',
+    ],
+    faqs: [
+      {
+        q: 'What do the ticket statuses mean?',
+        a: 'Open — received. In progress — being worked on. Waiting on you — we need more information from you. Resolved — fixed, with a note explaining the outcome. Closed — wrapped up.',
+      },
+    ],
+  },
+
   // ── Certification Portals ─────────────────────────────────────────────────
   {
     id: 'portal-basics',

@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import AskLibrary from '@/components/library/AskLibrary';
+import { ReportProblemButton } from '@/components/support/ReportProblemModal';
 import {
   GENERAL_FAQS, HELP_CATEGORIES, HELP_TOPICS, SUPPORT_EMAIL, type HelpTopic,
 } from '@/lib/help-content';
@@ -82,11 +84,14 @@ export default function HelpView({
   accent = 'var(--fgi-blue)',
   pillBg = 'var(--fgi-gold)',
   pillText = 'var(--fgi-navy)',
+  basePath = '',
 }: {
   /** Fletch panel colours — tenants pass their primary (see /[tenant]/help). */
   accent?: string;
   pillBg?: string;
   pillText?: string;
+  /** '' on FGI, '/scarr' etc. — keeps the support links in-chrome. */
+  basePath?: string;
 }) {
   const [search, setSearch] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -165,6 +170,33 @@ export default function HelpView({
             own words — &ldquo;how do I get my certificate?&rdquo; — and Fletch will walk you
             through it and link the right topics on this page.
           </div>
+        </div>
+      </div>
+
+      {/* ── Report-a-problem CTA (support tickets, 8-31-26) ── */}
+      <div style={{
+        ...CARD, borderLeft: '4px solid var(--fgi-navy)',
+        display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap',
+        padding: '14px 18px', marginBottom: '2rem',
+      }}>
+        <div style={{ flex: 1, minWidth: '240px' }}>
+          <div style={{ fontWeight: 700, fontSize: '15px' }}>Something not working?</div>
+          <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            Report it and Learning Center Support will follow up right in the ticket.
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <Link
+            href={`${basePath}/support`}
+            style={{
+              background: '#fff', color: 'var(--text-primary)', padding: '9px 18px',
+              border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+              fontSize: '14px', fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap',
+            }}
+          >
+            My Tickets
+          </Link>
+          <ReportProblemButton basePath={basePath} accent={accent} />
         </div>
       </div>
 
