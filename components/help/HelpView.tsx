@@ -127,14 +127,8 @@ export default function HelpView({
   return (
     <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
 
-      {/* ── Hero ── */}
+      {/* ── Hero (Fletch image removed per Jason, 8-31-26) ── */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/fletch/fletch-hello.webp"
-          alt=""
-          style={{ width: '120px', height: 'auto', display: 'block', margin: '0 auto 8px' }}
-        />
         <h1 style={{ fontSize: '34px', fontWeight: 700, color: 'var(--fgi-navy)', margin: 0 }}>
           Help Center
         </h1>
