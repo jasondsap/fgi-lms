@@ -49,9 +49,9 @@ export const PODCAST_FEEDBACK_EMBED_URL =
  * Jennifer's "podcast links.docx" (8-15-26), with the session/tracking params
  * stripped to the canonical listing URLs (each verified live before wiring).
  * The doc's Amazon link was the amazon.in *retail* page for the same catalog
- * item (ASIN B0H8LWBS6M); the US Amazon Music URL for that ASIN is used
- * instead. An entry with a null url simply doesn't render an icon, so this
- * list stays the only edit needed per platform.
+ * item; since 8-30-26 the canonical US Amazon Music show URL (Jason) is used.
+ * An entry with a null url simply doesn't render an icon, so this list stays
+ * the only edit needed per platform.
  */
 export interface PodcastPlatform {
   key: 'spotify' | 'apple' | 'amazon' | 'audible';
