@@ -15,10 +15,12 @@
 // If Jennifer revises a question, bump INSTRUMENT_VERSION rather than editing
 // history — old rows were answering the old wording.
 
-export const INSTRUMENT_VERSION = 1;
+// v2 (8-30-26, Jennifer): "Learning Resource Center" in the intro, and the
+// future-topics question reworded — v1 rows answered the old wording.
+export const INSTRUMENT_VERSION = 2;
 
 export const EVALUATION_INTRO = [
-  'Thank you for visiting the Learning Center. Your feedback is greatly appreciated!',
+  'Thank you for visiting the Learning Resource Center. Your feedback is greatly appreciated!',
   'Please take a few minutes to share your thoughts so we can continue to improve and provide the content you find relevant.',
 ];
 
@@ -37,7 +39,7 @@ export const RATING_ITEMS = [
 export const TEXT_ITEMS = [
   { key: 'liked',         prompt: 'What did you LIKE?' },
   { key: 'disliked',      prompt: 'What did you NOT LIKE?' },
-  { key: 'future_topics', prompt: 'Are there other topics or suggestions for what you would like to see in the Learning Center in the future?' },
+  { key: 'future_topics', prompt: "Any other topics or suggestions for what you'd like to see in the Learning Resource Center?" },
 ] as const;
 
 export const CONTACT_ITEM = {
