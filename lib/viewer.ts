@@ -34,9 +34,12 @@ export async function getViewer(): Promise<Viewer> {
 
 /**
  * May this viewer see `internal` resources on the given surface?
- * FGI admins everywhere; a tenant admin only on their own portal.
+ * Admins everywhere; FGI staff on the FGI library (Jason's 8-31-26 role
+ * model: "FGI Staff can see all items in the FGI portal, including internal
+ * and private"); a tenant admin only on their own portal.
  */
 export function canSeeInternal(viewer: Viewer, surface: string): boolean {
   if (viewer.role === 'admin') return true;
+  if (viewer.role === 'staff' && surface === 'fgi') return true;
   return viewer.role === 'tenant_admin' && viewer.tenantSlug === surface;
 }

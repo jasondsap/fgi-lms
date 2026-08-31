@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { countUsers } from '@/lib/admin-users';
 import { countOpenTickets } from '@/lib/support-db';
 import { getViewer } from '@/lib/viewer';
 
@@ -16,7 +17,7 @@ export default async function AdminPage() {
   const viewer = await getViewer();
   if (viewer.role !== 'admin') notFound();
 
-  const openTickets = await countOpenTickets();
+  const [openTickets, userCount] = await Promise.all([countOpenTickets(), countUsers()]);
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
@@ -50,6 +51,30 @@ export default async function AdminPage() {
           </div>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
             Every reported problem — triage status, priority, and replies.
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/users"
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-navy)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '6px' }}>
+            <span style={{ fontWeight: 700, fontSize: '16px' }}>Users</span>
+            <span style={{
+              background: '#eef1f3', color: '#5f6e7c',
+              fontSize: '12.5px', fontWeight: 700, padding: '3px 11px', borderRadius: '999px',
+              whiteSpace: 'nowrap',
+            }}>
+              {userCount} account{userCount === 1 ? '' : 's'}
+            </span>
+          </div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            Every account — set each person&#39;s role (Admin, FGI Staff, Learner) and home portal.
           </p>
         </Link>
       </div>
