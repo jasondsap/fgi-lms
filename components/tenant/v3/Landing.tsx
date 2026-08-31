@@ -209,6 +209,9 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                     <a
                       key={tile.label}
                       href={tile.href}
+                      // FGI resources — leave the portal page in place (Jason 8-31)
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         display: 'grid', gridTemplateColumns: '96px 1fr',
                         gap: '12px', alignItems: 'center',
