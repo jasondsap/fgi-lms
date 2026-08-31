@@ -38,7 +38,7 @@ export interface Catalog {
 export async function getCatalog(surface: string): Promise<Catalog> {
   const rows = (await sql`
     SELECT r.slug, r.title, r.type::text AS type, r.description,
-           r.duration_minutes, r.is_naadac_ce
+           r.duration_minutes, r.is_naadac_ce, r.search_keywords
     FROM resources r
     WHERE r.published = TRUE AND r.internal = FALSE
       AND btrim(coalesce(r.description, '')) <> ''
@@ -48,7 +48,7 @@ export async function getCatalog(surface: string): Promise<Catalog> {
         WHERE rv.resource_id = r.id AND t.slug = ${surface}
       )
     ORDER BY r.type, r.title
-  `) as unknown as Array<CatalogEntry & { description: string }>;
+  `) as unknown as Array<CatalogEntry & { description: string; search_keywords: string[] }>;
 
   const bySlug = new Map<string, CatalogEntry>();
   const lines: string[] = [];
@@ -66,6 +66,9 @@ export async function getCatalog(surface: string): Promise<Catalog> {
       r.type + (r.is_naadac_ce ? ' (NAADAC CE)' : ''),
       r.duration_minutes ? `${r.duration_minutes} min` : '',
       `${r.title} — ${r.description.replace(/\s+/g, ' ').trim()}`,
+      // Jennifer's per-course tags (8-30-26) — abbreviations, synonyms and
+      // common misspellings the description doesn't contain.
+      r.search_keywords?.length ? `tags: ${r.search_keywords.join(', ')}` : '',
     ].filter(Boolean);
     lines.push(bits.join(' | '));
   }

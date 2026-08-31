@@ -81,9 +81,35 @@ export async function getPublicResources(
     conditions.push(`(${typeClauses.join(' OR ')})`);
   }
 
+  // Fuzzy search (8-30-26, Jennifer/Jason): English full-text search gives
+  // stemming and plurals ("houses" finds "housing"); pg_trgm word similarity
+  // gives typo tolerance ("HIPPA" finds HIPAA); and `search_keywords` — the
+  // per-course tags from Jennifer's UMU sheet — count as first-class matching
+  // signal alongside title and description. Each word of the query must match
+  // somewhere (exactly, stemmed, or fuzzily), so multi-word queries with one
+  // typo still land. Every user value enters through bind(); the SQL text
+  // holds only placeholders and constants (see the file-top rule).
+  let searchRank = '';
   if (search) {
-    const ph = bind(`%${search}%`);
-    conditions.push(`(title ILIKE ${ph} OR description ILIKE ${ph})`);
+    const words = search.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).slice(0, 6);
+    const HAY = "title || ' ' || array_to_string(search_keywords, ' ') || ' ' || description";
+    if (words.length > 0) {
+      const wordConds = words.map((w) => {
+        const ph = bind(w);
+        return `(to_tsvector('english', ${HAY}) @@ plainto_tsquery('english', ${ph})
+          OR word_similarity(${ph}, title || ' ' || array_to_string(search_keywords, ' ')) > 0.42)`;
+      });
+      conditions.push(`(${wordConds.join(' AND ')})`);
+      // Relevance: weighted full-text rank (title > keywords > description),
+      // with trigram title similarity breaking ties for typo-only matches.
+      const qph = bind(search);
+      searchRank = `(ts_rank_cd(
+          setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+          setweight(to_tsvector('english', array_to_string(search_keywords, ' ')), 'B') ||
+          setweight(to_tsvector('english', coalesce(description, '')), 'C'),
+          websearch_to_tsquery('english', ${qph})) * 4
+        + similarity(title, ${qph})) DESC, `;
+    }
   }
 
   // Curated collection: an explicit slug list (tenant config), returned in
@@ -198,7 +224,7 @@ export async function getPublicResources(
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
-    ORDER BY ${collectionSort}${videoSort}${podcastSort}published_at DESC NULLS LAST, id DESC
+    ORDER BY ${collectionSort}${videoSort}${podcastSort}${searchRank}published_at DESC NULLS LAST, id DESC
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `;
 
