@@ -36,7 +36,15 @@ export default async function TenantLayout({
   // original chrome. AuthNav is an async server component, so it is passed
   // into the (client) headers as a slot.
   const authNav = (
-    <AuthNav color="#ffffff" signOutRedirect={`/${tenant.slug}`} surface={tenant.slug} />
+    // Initials circle in the tenant's brand yellow with black letters
+    // (Jason, 8-31-26) — `accent` is CO #ffd100 / SCARR #f5d300.
+    <AuthNav
+      color="#ffffff"
+      signOutRedirect={`/${tenant.slug}`}
+      surface={tenant.slug}
+      avatarBg={tenant.accent}
+      avatarFg="#000000"
+    />
   );
   return (
     <>

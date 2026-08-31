@@ -17,7 +17,13 @@ export default async function AuthNav({
   color = '#ffffff',
   signOutRedirect = '/',
   surface = 'fgi',
-}: { color?: string; signOutRedirect?: string; surface?: string } = {}) {
+  avatarBg,
+  avatarFg,
+}: {
+  color?: string; signOutRedirect?: string; surface?: string;
+  /** Tenant-branded initials circle (8-31-26: SCARR/CO yellow + black letters). */
+  avatarBg?: string; avatarFg?: string;
+} = {}) {
   if (!authEnabled) return null;
   const session = await getSession();
 
@@ -55,6 +61,8 @@ export default async function AuthNav({
       // Bound arg, not a closure — see auth-actions.ts for why.
       signOut={signOutAction.bind(null, signOutRedirect)}
       chevronColor={color}
+      avatarBg={avatarBg}
+      avatarFg={avatarFg}
     />
   );
 }
