@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
 import AudioPlayer, { ListenNowButton, TrailerButton } from '@/components/resource/AudioPlayer';
 import PodcastFeedbackModal from '@/components/resource/PodcastFeedbackModal';
+import RelatedList from '@/components/resource/RelatedList';
+import { getRelatedResources } from '@/lib/resources';
 import PodcastInfoModal from '@/components/resource/PodcastInfoModal';
 import { CollapsedBio } from '@/components/resource/PresenterBio';
 import PresenterCard from '@/components/resource/PresenterCard';
@@ -70,6 +72,12 @@ export default async function PodcastDetail(
     isTrailer ? Promise.resolve(null) : getPodcastAudioUrl(TRAILER_SLUG),
   ]);
   const platforms = PODCAST_PLATFORMS.filter((p) => p.url);
+  // "You Might Also Be Interested In" (Jason, 8-30) — same engine as the
+  // other shells; episodes of the show itself are excluded because the rail
+  // already lists More Episodes.
+  const related = (await getRelatedResources(resource, surface.key, 10))
+    .filter((r) => r.type !== 'podcast')
+    .slice(0, 8);
 
   // The docx titles carry their own label ("Episode 1: Health, Housing and
   // Hope: …"), so the heading is simply the title.
@@ -379,6 +387,18 @@ export default async function PodcastDetail(
                     </Link>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {related.length > 0 && (
+              <div>
+                <div style={{
+                  fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.1em', color: surface.primary, marginBottom: '12px',
+                }}>
+                  You Might Also Be Interested In
+                </div>
+                <RelatedList items={related} basePath={surface.basePath} accent={surface.primary} />
               </div>
             )}
 
