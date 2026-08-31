@@ -4,6 +4,7 @@ import { getSession } from '@/auth';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { ReportProblemButton } from '@/components/support/ReportProblemModal';
 import TicketListView from '@/components/support/TicketListView';
+import { requireSignIn } from '@/lib/lockdown';
 import { getMyTickets } from '@/lib/support-db';
 import { getTenantConfig } from '@/lib/tenants';
 
@@ -15,6 +16,7 @@ export default async function TenantSupportPage({ params }: { params: { tenant: 
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
   const basePath = `/${tenant.slug}`;
+  await requireSignIn(basePath);
 
   const session = await getSession();
   const userId = session?.user?.id;

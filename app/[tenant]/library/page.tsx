@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
+import { requireSignIn } from '@/lib/lockdown';
 import { getTenantConfig } from '@/lib/tenants';
 
 /**
@@ -8,8 +9,10 @@ import { getTenantConfig } from '@/lib/tenants';
  * ?from=<tenant>, and the FGI sidebar offers the way back (closing the
  * tab). This route survives only to catch old links.
  */
-export default function TenantFgiLibraryPage({ params }: { params: { tenant: string } }) {
+export default async function TenantFgiLibraryPage({ params }: { params: { tenant: string } }) {
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
+  // Gate before the forward so a signed-out visitor lands back on THEIR portal.
+  await requireSignIn(`/${tenant.slug}`);
   redirect(`/library?from=${tenant.slug}`);
 }

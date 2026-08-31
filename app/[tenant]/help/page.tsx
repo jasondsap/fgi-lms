@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import HelpView from '@/components/help/HelpView';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
+import { requireSignIn } from '@/lib/lockdown';
 import { getTenantConfig } from '@/lib/tenants';
 
 export const metadata: Metadata = { title: 'Help — Learning Resource Center' };
@@ -12,9 +13,10 @@ export const metadata: Metadata = { title: 'Help — Learning Resource Center' }
  * strand a SCARR/Colorado visitor on FGI chrome. Same content as /help;
  * Fletch's help pill wears the tenant's colours.
  */
-export default function TenantHelpPage({ params }: { params: { tenant: string } }) {
+export default async function TenantHelpPage({ params }: { params: { tenant: string } }) {
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
+  await requireSignIn(`/${tenant.slug}`);
   return (
     <>
       <HelpView

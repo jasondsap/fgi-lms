@@ -4,6 +4,7 @@ import AskLibrary from '@/components/library/AskLibrary';
 import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import { getSession } from '@/auth';
+import { requireSignIn } from '@/lib/lockdown';
 import { getCompletedResourceIds } from '@/lib/progress';
 import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getPublicResources } from '@/lib/resources';
@@ -22,6 +23,7 @@ interface PageProps {
 }
 
 export default async function LibraryPage({ searchParams }: PageProps) {
+  await requireSignIn('/'); // 8-31-26 lockdown: landing page only until signed in
   const params: ResourceListParams = {
     type:     normalizeType(searchParams.type),
     duration: (searchParams.duration as any)           || undefined,

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import TicketDetailView from '@/components/support/TicketDetailView';
+import { requireSignIn } from '@/lib/lockdown';
 import { getTicketAssignees, getTicketComments, getTicketForViewer } from '@/lib/support-db';
 import { getTenantConfig } from '@/lib/tenants';
 import { getViewer } from '@/lib/viewer';
@@ -16,6 +17,7 @@ export default async function TenantTicketPage({
   const tenant = getTenantConfig(params.tenant);
   if (!tenant) notFound();
   const basePath = `/${tenant.slug}`;
+  await requireSignIn(basePath);
 
   const viewer = await getViewer();
   if (!viewer.userId || !/^[0-9a-f-]{36}$/i.test(params.id)) notFound();

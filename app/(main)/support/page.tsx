@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getSession } from '@/auth';
+import { requireSignIn } from '@/lib/lockdown';
 import { ReportProblemButton } from '@/components/support/ReportProblemModal';
 import TicketListView from '@/components/support/TicketListView';
 import { getMyTickets } from '@/lib/support-db';
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: 'My Tickets — FGI Learning Resource
 export const dynamic = 'force-dynamic';
 
 export default async function SupportPage() {
+  await requireSignIn('/');
   const session = await getSession();
   const userId = session?.user?.id;
   const tickets = userId ? await getMyTickets(userId) : [];

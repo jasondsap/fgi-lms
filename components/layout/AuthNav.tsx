@@ -1,5 +1,6 @@
 import { authEnabled, getSession } from '@/auth';
 import LoginModal from '@/components/auth/LoginModal';
+import SignedOutGate from '@/components/auth/SignedOutGate';
 import { getUserById } from '@/lib/users';
 import { signOutAction } from './auth-actions';
 import UserMenu from './UserMenu';
@@ -23,7 +24,14 @@ export default async function AuthNav({
   if (!session?.user?.id) {
     // On-site login modal (8-20-26 auth rebuild) — no more hosted-UI redirect.
     // `surface` stamps users.registered_surface when someone registers here.
-    return <LoginModal color={color} surface={surface} triggerLabel="Sign In" />;
+    // SignedOutGate (8-31-26 lockdown) rides along: while signed out, every
+    // in-page click opens the login modal instead of navigating.
+    return (
+      <>
+        <LoginModal color={color} surface={surface} triggerLabel="Sign In" />
+        <SignedOutGate surface={surface} />
+      </>
+    );
   }
 
   // The initials come from the Neon row (given + family name); the session
