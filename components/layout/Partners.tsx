@@ -8,6 +8,7 @@ const PARTNERS = [
   { file: 'partner-marr',       alt: 'MARR — Michigan Association of Recovery Resources', width: 110, height: 56 },
   { file: 'partner-ohio-rh',    alt: 'Ohio Recovery Housing Colorado',     width: 100, height: 72  },
   { file: 'partner-scarr',      alt: 'SCARR — South Carolina Alliance for Recovery Residences', width: 100, height: 72 },
+  { file: 'partner-made180',    alt: 'MADE180 Digital Solutions',          width: 145, height: 33  },
   // TODO (Jason): the 8-10-26 mockup adds a seventh logo, Webberized. No
   // artwork for it was supplied in the drop, so the row is still six wide.
 ];
