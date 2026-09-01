@@ -1,23 +1,9 @@
-import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import AskLibrary from '@/components/library/AskLibrary';
 import ContactButton from '@/components/layout/ContactButton';
-import FilterSidebar from '@/components/library/FilterSidebar';
-import ResourceGrid from '@/components/library/ResourceGrid';
-import SearchBar from '@/components/library/SearchBar';
-import { getSession } from '@/auth';
-import { getCompletedResourceIds } from '@/lib/progress';
-import { canSeeInternal, getViewer } from '@/lib/viewer';
-import { getLatestByType, getPublicResources } from '@/lib/resources';
-import { filterQuery } from '@/lib/query';
+import TenantLibrarySection from './LibrarySection';
+import { getLatestByType } from '@/lib/resources';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
-import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
-
-function normalizeType(v: string | string[] | undefined) {
-  if (!v) return undefined;
-  return (Array.isArray(v) ? v : [v]) as ResourceType[];
-}
 
 interface Props {
   tenant: TenantConfig;
@@ -35,45 +21,6 @@ interface Props {
 export default async function TenantLandingV3({ tenant, searchParams }: Props) {
   const home = `/${tenant.slug}`;
   const v3 = tenant.v3!;
-  // Completed-course checkmarks on the cards (Jennifer 8-29) — signed-in only.
-  const session = await getSession();
-  const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
-
-  const params: ResourceListParams = {
-    type:     normalizeType(searchParams.type),
-    duration: (searchParams.duration as any)           || undefined,
-    search:   (searchParams.search   as string)        || undefined,
-    match:    (searchParams.match    as 'any' | 'all') || 'any',
-    tenant:   tenant.slug,
-    page:     parseInt((searchParams.page as string)   || '1', 10),
-    per_page: 12,
-  };
-  if (searchParams.audience) {
-    params.audience = (Array.isArray(searchParams.audience) ? searchParams.audience : [searchParams.audience]) as AudienceTag[];
-  }
-  if (searchParams.topic) {
-    params.topic = (Array.isArray(searchParams.topic) ? searchParams.topic : [searchParams.topic]) as TopicTag[];
-  }
-
-  // Curated collection (the header's Post-Certification pill): restrict the
-  // library to the tenant's slug list, in list order, all on one page. An
-  // unknown key is ignored and the library renders as normal.
-  const collectionKey = typeof searchParams.collection === 'string' ? searchParams.collection : undefined;
-  const collection = collectionKey ? v3.collections?.[collectionKey] : undefined;
-  if (collection) {
-    params.slugs = collection.slugs;
-    // Floor of 24, not the list length: combined with a type checkbox the
-    // result is the UNION of both (8-31-26), so more rows than the list.
-    params.per_page = Math.max(collection.slugs.length, 24);
-    params.page = 1;
-  }
-
-  // "Cert. Documents" (type=handbook) gets the same Show-full-library banner
-  // as the Required Videos collection (Jason, 8-31-26).
-  const certDocs = Boolean(params.type?.includes('handbook' as ResourceType));
-
-  params.includeInternal = canSeeInternal(await getViewer(), tenant.slug);
-  const data = await getPublicResources(params);
 
   // Highlights are FGI's newest items and point at the FGI site — they are
   // FGI-only resources, not in the tenant's own library.
@@ -102,9 +49,6 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
       icon: '/images/category-cards/learning.webp',
     },
   ].filter(Boolean) as Array<{ label: string; title: string; href: string; icon: string; naadac: boolean }>;
-
-  const linkQuery = filterQuery(searchParams);
-  const apiQuery = filterQuery(searchParams, { tenant: tenant.slug });
 
   return (
     <div>
@@ -176,11 +120,11 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               <img
                 src={v3.heroDots} alt=""
                 style={{
-                  // Down-and-left so the ring almost centers on the card
-                  // (Jennifer via Jason, 8-31; was -40px/60px).
-                  position: 'absolute', top: '40px', left: '-20px',
+                  // Down-and-left so the ring almost centers on the card,
+                  // then back right half the shift (Jason, 8-31; was -40px/60px).
+                  position: 'absolute', top: '40px', left: '20px',
                   width: '525px', height: 'auto', pointerEvents: 'none',
-                  opacity: 0.38,
+                  opacity: 0.4,
                 }}
               />
               {/* The two gold outlier dots from the mockup — one above-right of
@@ -370,64 +314,10 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
         </div>
       </section>
 
-      {/* ── Curated library (unchanged per Jason, 8-21) ── */}
-      <section id="library" style={{ background: '#ffffff', padding: '2.25rem 2rem 4rem', scrollMarginTop: '90px' }}>
-        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-          <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
-            <FilterSidebar
-              total={data.total} targetPath={home} isTenant
-              fgiLibraryHref={`/library?from=${tenant.slug}`} fgiLibraryNewTab
-            />
-          </Suspense>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <SearchBar defaultValue={params.search} targetPath={home} />
-            {(collection || certDocs) && (
-              <div
-                role="status"
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  gap: '1rem', flexWrap: 'wrap',
-                  margin: '0 0 1.25rem', padding: '12px 18px',
-                  background: v3.highlightTileBg, border: `1px solid ${tenant.accent}`,
-                  borderRadius: 'var(--radius-md, 8px)', fontSize: '15px', lineHeight: 1.4,
-                }}
-              >
-                <span>
-                  <strong>
-                    {[collection?.label, certDocs ? 'Cert. Documents' : null].filter(Boolean).join(' & ')}
-                  </strong>
-                  {' — '}
-                  {collection && !certDocs
-                    ? <>showing {data.total} of {collection.slugs.length} required items</>
-                    : <>showing {data.total} item{data.total === 1 ? '' : 's'}</>}
-                </span>
-                <Link
-                  href={`${home}#library`}
-                  style={{ color: tenant.primary, fontWeight: 600, textDecoration: 'underline', whiteSpace: 'nowrap' }}
-                >
-                  Show full library
-                </Link>
-              </div>
-            )}
-            <ResourceGrid
-              key={linkQuery}
-              initial={data.resources}
-              startPage={params.page ?? 1}
-              totalPages={data.total_pages}
-              perPage={params.per_page!}
-              apiQuery={apiQuery}
-              fallbackBase={home}
-              fallbackQuery={linkQuery}
-              total={data.total}
-              basePath={home}
-              naadacPill={v3.naadacPill}
-              completedIds={completedIds}
-            />
-          </div>
-        </div>
-      </section>
-
-      <AskLibrary basePath={home} surface={tenant.slug} accent={tenant.primary} pillBg={tenant.primary} pillText="#fff" />
+      {/* The curated library, shared with /<tenant>/library (8-31-26). Its
+          controls target the library page, so touching a filter or the search
+          box moves the visitor into the locked library view. */}
+      <TenantLibrarySection tenant={tenant} searchParams={searchParams} targetPath={`${home}/library`} />
     </div>
   );
 }

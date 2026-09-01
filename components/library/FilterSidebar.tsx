@@ -29,8 +29,8 @@ interface Props {
  * even after filtering churns the query string.
  */
 const RETURN_TENANTS: Record<string, { label: string; href: string }> = {
-  scarr:    { label: 'SCARR Library',    href: '/scarr#library' },
-  colorado: { label: 'Colorado Library', href: '/colorado#library' },
+  scarr:    { label: 'SCARR Library',    href: '/scarr/library' },
+  colorado: { label: 'Colorado Library', href: '/colorado/library' },
 };
 
 const LABEL_MAPS: Record<string, Record<string, string>> = {

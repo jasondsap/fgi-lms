@@ -555,11 +555,11 @@ const TENANTS: Record<string, TenantConfig> = {
           // The course landing page, not the LMS player (Jason, 8-30).
           href: '/scarr/resource/scarr-pre-certification-requirements',
         },
-        // Filters the library to the post-certification collection below
-        // (Jason, 8-25).
+        // Filters the library page to the post-certification collection
+        // (Jason, 8-25; /library page since 8-31).
         post: {
           label: 'Post-Certification Requirements',
-          href: '/scarr?collection=post-certification#library',
+          href: '/scarr/library?collection=post-certification',
         },
       },
       // Jason's post-certification list (8-25-26), in his order. A slug with

@@ -38,8 +38,8 @@ export function tenantSurface(slug: string): Surface | null {
     key: tenant.slug,
     basePath: `/${tenant.slug}`,
     tenant,
-    // Tenant libraries are a section of the landing page, not a separate route.
-    libraryHref: `/${tenant.slug}#library`,
+    // Dedicated tenant library page since 8-31-26 (was a landing-page section).
+    libraryHref: `/${tenant.slug}/library`,
     primary: tenant.primary,
   };
 }

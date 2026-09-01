@@ -390,7 +390,7 @@ function Programs({ progress, viewed, surface }: {
             </div>
             <ProgressBar pct={Math.round((done / collection.slugs.length) * 100)} accent={accent} />
             <div style={{ marginTop: '12px' }}>
-              <Link href={`/${tenant.slug}?collection=required-videos#library`} style={{ fontSize: '13px', fontWeight: 700, color: accent }}>
+              <Link href={`/${tenant.slug}/library?collection=required-videos`} style={{ fontSize: '13px', fontWeight: 700, color: accent }}>
                 View the series
               </Link>
             </div>

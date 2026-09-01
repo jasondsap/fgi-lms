@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import type { TenantConfig } from '@/lib/tenants';
 
 /*
@@ -27,23 +26,16 @@ export default function TenantHeaderV3({
   const home = `/${tenant.slug}`;
   const pathname = usePathname();
 
-  // "Library" is a hash link on the landing page; usePathname can't see the
-  // hash, so track it ourselves so the tab goes gold once the visitor is in
-  // the library (Jennifer, 8-25).
-  const [hash, setHash] = useState('');
-  useEffect(() => {
-    const read = () => setHash(window.location.hash);
-    read();
-    window.addEventListener('hashchange', read);
-    return () => window.removeEventListener('hashchange', read);
-  }, [pathname]);
-  const inLibrary = pathname === home && hash === '#library';
+  // "Library" is a real page since 8-31-26 (Jason: match FGI — the library
+  // locks in under the header until Home), so plain pathname matching works;
+  // the old #library hash tracking is gone with the hash links.
+  const inLibrary = pathname.startsWith(`${home}/library`);
 
   // The tenant's own site link joins the left nav (Jason, 8-30: every link
   // sits by the logo; only the account control lives at the right).
   const links = [
-    { label: 'Home', href: home, active: pathname === home && !inLibrary },
-    { label: 'Library', href: `${home}#library`, active: inLibrary },
+    { label: 'Home', href: home, active: pathname === home },
+    { label: 'Library', href: `${home}/library`, active: inLibrary },
     { label: v3.orgSiteLabel, href: v3.orgSiteUrl, active: false, external: true },
   ];
 
