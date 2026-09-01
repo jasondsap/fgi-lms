@@ -266,7 +266,7 @@ export default async function WebinarDetail(
                     until naadac_skill_groups is populated. */}
                 {skillGroups.length > 0 && (
                   <p style={{ ...PANEL_TEXT, marginTop: '1rem' }}>
-                    This course aligns with NAADAC Skill Group(s):<br />
+                    And aligns with NAADAC Skill Group(s):<br />
                     {skillGroups.join(', ')}
                   </p>
                 )}

@@ -17,6 +17,7 @@ import {
   type ActivityCompletion,
   type MoodleSection,
 } from '@/lib/moodle';
+import { getTenantConfig } from '@/lib/tenants';
 import type { CourseResource } from '@/lib/resources';
 
 // ---------------------------------------------------------------------------
@@ -117,6 +118,55 @@ export interface SyncInput {
 }
 
 /**
+ * Course → library mirror for the tenant certification series (Jason,
+ * 8-31-26): a "Part N" video page completed inside the pre-cert course (the
+ * watch-gated, authoritative copy) also stamps the matching standalone
+ * library video as viewed, so My Learning's "n of 7 viewed" line agrees with
+ * the course. One direction only — opening the library page never completes
+ * anything in the course, because the library has no 90% watch tracking.
+ * Never throws; a mirror failure must not break the player.
+ */
+async function mirrorRequiredVideoViews(
+  userId: string,
+  surface: string,
+  sections: MoodleSection[],
+  completion: ActivityCompletion[],
+): Promise<void> {
+  try {
+    const slugs = getTenantConfig(surface)?.v3?.collections?.['required-videos']?.slugs;
+    if (!slugs?.length) return;
+    const byCmid = new Map(completion.map((c) => [c.cmid, c]));
+    const watched: string[] = [];
+    for (const s of sections) {
+      for (const m of s.modules) {
+        if (m.modname !== 'page') continue;
+        const match = /^Part (\d+)\b/.exec(decodeEntities(m.name));
+        if (!match) continue;
+        // Match by part number in the slug, not list position, so the
+        // collection order can never mis-map a video.
+        const slug = slugs.find((sl) => sl.includes(`-part-${match[1]}-`));
+        if (slug && isDone(byCmid.get(m.id)?.state)) watched.push(slug);
+      }
+    }
+    if (watched.length === 0) return;
+    // One 'view' row per resource is all getViewedSlugs needs — skip any the
+    // learner already has, so repeated player loads don't grow the table.
+    await sql`
+      INSERT INTO user_resource_events (user_id, resource_id, event, surface)
+      SELECT ${userId}, r.id, 'view', ${surface}
+      FROM resources r
+      WHERE r.slug = ANY(${watched})
+        AND NOT EXISTS (
+          SELECT 1 FROM user_resource_events e
+          WHERE e.user_id = ${userId} AND e.resource_id = r.id
+        )
+    `;
+  } catch (e) {
+    console.warn('Required-video mirror skipped:', (e as Error).message);
+  }
+}
+
+/**
  * Persist the learner's state for one course. Cheap enough to run on every
  * player load: one upsert, plus one grade lookup only once the quiz has been
  * attempted (a grade cannot exist before that).
@@ -194,6 +244,7 @@ export async function syncCourseProgress(input: SyncInput): Promise<DerivedProgr
       is_naadac_ce     = COALESCE(user_course_progress.is_naadac_ce, EXCLUDED.is_naadac_ce),
       synced_at        = now()
   `;
+  await mirrorRequiredVideoViews(input.userId, input.surface, input.sections, input.completion);
   return d;
 }
 

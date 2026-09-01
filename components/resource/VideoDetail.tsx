@@ -173,7 +173,7 @@ export default async function VideoDetail(
                 </p>
                 {skillGroups.length > 0 && (
                   <p style={{ ...PANEL_TEXT, marginTop: '1rem' }}>
-                    This course aligns with NAADAC Skill Group(s):<br />
+                    And aligns with NAADAC Skill Group(s):<br />
                     {skillGroups.join(', ')}
                   </p>
                 )}
