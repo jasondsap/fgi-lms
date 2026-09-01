@@ -1,16 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Nine logos + the CTA on one 1320px line (Jason, 8-31) — widths shaved ~10%
+// from the six-logo era and the gaps tightened below to make room.
 const PARTNERS = [
-  { file: 'partner-naadac',     alt: 'NAADAC Approved Education Provider', width: 80,  height: 80  },
-  { file: 'partner-elevenlabs', alt: 'IIElevenLabs',                       width: 130, height: 48  },
-  { file: 'partner-par',        alt: 'PAR — People Advocating Recovery',   width: 110, height: 56  },
-  { file: 'partner-marr',       alt: 'MARR — Michigan Association of Recovery Resources', width: 110, height: 56 },
-  { file: 'partner-ohio-rh',    alt: 'Ohio Recovery Housing Colorado',     width: 100, height: 72  },
-  { file: 'partner-scarr',      alt: 'SCARR — South Carolina Alliance for Recovery Residences', width: 100, height: 72 },
-  { file: 'partner-made180',    alt: 'MADE180 Digital Solutions',          width: 145, height: 33  },
-  // TODO (Jason): the 8-10-26 mockup adds a seventh logo, Webberized. No
-  // artwork for it was supplied in the drop, so the row is still six wide.
+  { file: 'partner-naadac',     alt: 'NAADAC Approved Education Provider', width: 76,  height: 76  },
+  { file: 'partner-elevenlabs', alt: 'IIElevenLabs',                       width: 115, height: 42  },
+  { file: 'partner-par',        alt: 'PAR — People Advocating Recovery',   width: 100, height: 51  },
+  { file: 'partner-marr',       alt: 'MARR — Michigan Association of Recovery Resources', width: 100, height: 51 },
+  { file: 'partner-ohio-rh',    alt: 'Ohio Recovery Housing Colorado',     width: 92,  height: 66  },
+  { file: 'partner-scarr',      alt: 'SCARR — South Carolina Alliance for Recovery Residences', width: 92, height: 66 },
+  { file: 'partner-marshall',   alt: 'Marshall University',                width: 75,  height: 50  },
+  { file: 'partner-webberized', alt: 'Webberized',                         width: 56,  height: 60  },
+  { file: 'partner-made180',    alt: 'MADE180 Digital Solutions',          width: 130, height: 29  },
 ];
 
 export default function Partners() {
@@ -32,10 +34,10 @@ export default function Partners() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '2.5rem',
+          gap: '1.5rem',
           flexWrap: 'wrap',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
             {PARTNERS.map(({ file, alt, width, height }) => (
               <div key={file} style={{ flexShrink: 0 }}>
                 <Image
