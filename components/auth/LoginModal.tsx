@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   confirmResetAction, loginAction, requestResetAction,
 } from '@/components/auth/login-actions';
@@ -60,7 +60,12 @@ export default function LoginModal(
 ) {
   // Registration kill switch (lib/registration.ts): while closed, a request
   // to open on 'register' lands on Log In and the tab strip is hidden.
-  const startView: View = SELF_REGISTRATION_OPEN ? initialView : 'login';
+  // ?signup=staff (8-31-26) re-enables the form for this visit — the staff
+  // onboarding link. Cosmetic only: registerAction refuses any email that is
+  // not on the staff allowlist while the switch is closed.
+  const searchParams = useSearchParams();
+  const regOpen = SELF_REGISTRATION_OPEN || searchParams.get('signup') === 'staff';
+  const startView: View = regOpen ? initialView : 'login';
   const router = useRouter();
   const [open, setOpen] = useState(autoOpen);
   const [view, setView] = useState<View>(startView);
@@ -87,7 +92,7 @@ export default function LoginModal(
   }, [open, view]);
 
   const reset = (v: View) => {
-    setView(v === 'register' && !SELF_REGISTRATION_OPEN ? 'login' : v);
+    setView(v === 'register' && !regOpen ? 'login' : v);
     setError('');
     setNotice('');
   };
@@ -215,7 +220,7 @@ export default function LoginModal(
               </button>
             </div>
 
-            {SELF_REGISTRATION_OPEN && (view === 'login' || view === 'register') && (
+            {regOpen && (view === 'login' || view === 'register') && (
               <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
                 <button type="button" style={TAB(view === 'login')} onClick={() => reset('login')}>
                   Log In
@@ -271,7 +276,7 @@ export default function LoginModal(
                 </form>
               )}
 
-              {SELF_REGISTRATION_OPEN && view === 'register' && (
+              {regOpen && view === 'register' && (
                 <RegisterForm
                   surface={surface}
                   onSuccess={() => { setOpen(false); router.refresh(); }}

@@ -11,7 +11,7 @@ import { signIn } from '@/auth';
 import {
   CognitoAuthError, createConfirmedUser, PASSWORD_REGEX,
 } from '@/lib/cognito';
-import { createRegisteredUser } from '@/lib/users';
+import { createRegisteredUser, getAllowlistedRole } from '@/lib/users';
 import { REGISTRATION_CLOSED_MESSAGE, SELF_REGISTRATION_OPEN } from '@/lib/registration';
 import { USER_ROLE_LABELS, US_STATES, type UserRole } from '@/types';
 import type { AuthActionResult } from '@/components/auth/login-actions';
@@ -36,13 +36,17 @@ const VALID_ROLES = new Set(Object.keys(USER_ROLE_LABELS));
 const VALID_STATES = new Set(US_STATES.map((s) => s.code));
 
 export async function registerAction(payload: RegisterPayload): Promise<AuthActionResult> {
-  // Server-side half of the kill switch: hiding the tab isn't enough, the
-  // action is a public endpoint and must refuse on its own.
-  if (!SELF_REGISTRATION_OPEN) return { ok: false, error: REGISTRATION_CLOSED_MESSAGE };
-
   const firstName = payload.firstName?.trim() ?? '';
   const lastName = payload.lastName?.trim() ?? '';
   const email = payload.email?.trim().toLowerCase() ?? '';
+
+  // Server-side half of the kill switch: hiding the tab isn't enough, the
+  // action is a public endpoint and must refuse on its own. Emails on the
+  // staff allowlist (8-31-26) may register while the public switch is closed
+  // — their users row picks up the pre-provisioned role in createRegisteredUser.
+  if (!SELF_REGISTRATION_OPEN && !(email && await getAllowlistedRole(email))) {
+    return { ok: false, error: REGISTRATION_CLOSED_MESSAGE };
+  }
   const password = payload.password ?? '';
   const organization = payload.organization?.trim() ?? '';
   const state = payload.state ?? '';

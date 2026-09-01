@@ -28,19 +28,37 @@ export interface AppUser {
   updated_at: string;
 }
 
+/**
+ * Pre-provisioned access role for an email (8-31-26, Jason's staff list).
+ * Rows in `staff_allowlist` mean: when this person's account is created —
+ * self-registration or first hosted-UI sign-in — their users row starts with
+ * this role instead of 'learner'. Also lets a listed email register while the
+ * public self-registration kill switch is closed.
+ */
+export async function getAllowlistedRole(email: string): Promise<string | null> {
+  const rows = await sql`
+    SELECT role FROM staff_allowlist WHERE email = ${email.trim().toLowerCase()}
+  `;
+  return (rows[0]?.role as string) ?? null;
+}
+
 export async function upsertUser(input: {
   cognitoSub: string;
   email: string;
   givenName: string | null;
   familyName: string | null;
 }): Promise<AppUser> {
+  const allowRole = await getAllowlistedRole(input.email);
+  // A learner on the allowlist is upgraded; staff/admin are never downgraded.
   const rows = await sql`
-    INSERT INTO users (cognito_sub, email, given_name, family_name)
-    VALUES (${input.cognitoSub}, ${input.email}, ${input.givenName}, ${input.familyName})
+    INSERT INTO users (cognito_sub, email, given_name, family_name, role)
+    VALUES (${input.cognitoSub}, ${input.email}, ${input.givenName}, ${input.familyName},
+            ${allowRole ?? 'learner'})
     ON CONFLICT (cognito_sub) DO UPDATE SET
       email       = EXCLUDED.email,
       given_name  = COALESCE(EXCLUDED.given_name,  users.given_name),
       family_name = COALESCE(EXCLUDED.family_name, users.family_name),
+      role        = CASE WHEN users.role = 'learner' THEN EXCLUDED.role ELSE users.role END,
       updated_at  = now()
     RETURNING *
   `;
@@ -90,15 +108,16 @@ export async function createRegisteredUser(input: {
   roleOther: string | null;
   registeredSurface: string;
 }): Promise<AppUser> {
+  const allowRole = await getAllowlistedRole(input.email);
   const rows = await sql`
     INSERT INTO users (
       cognito_sub, email, given_name, family_name,
       organization, state, zip, county, role_other,
-      registered_surface, registration_completed_at
+      registered_surface, registration_completed_at, role
     ) VALUES (
       ${input.cognitoSub}, ${input.email}, ${input.givenName}, ${input.familyName},
       ${input.organization}, ${input.state}, ${input.zip}, ${input.county}, ${input.roleOther},
-      ${input.registeredSurface}, now()
+      ${input.registeredSurface}, now(), ${allowRole ?? 'learner'}
     )
     ON CONFLICT (cognito_sub) DO UPDATE SET
       email                     = EXCLUDED.email,
@@ -111,6 +130,7 @@ export async function createRegisteredUser(input: {
       role_other                = EXCLUDED.role_other,
       registered_surface        = COALESCE(users.registered_surface, EXCLUDED.registered_surface),
       registration_completed_at = COALESCE(users.registration_completed_at, now()),
+      role                      = CASE WHEN users.role = 'learner' THEN EXCLUDED.role ELSE users.role END,
       updated_at                = now()
     RETURNING *
   `;
