@@ -10,7 +10,7 @@ import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
 import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getLatestByType, getPublicResources } from '@/lib/resources';
-import { filterQuery } from '@/lib/query';
+import { filterQuery, loadedPages } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 // Resource Type is a multi-select in the sidebar, so this arrives as a string
@@ -42,6 +42,12 @@ export default async function HomePage({ searchParams }: PageProps) {
     page:     parseInt((searchParams.page as string)   || '1', 10),
     per_page: 12,
   };
+  // ?loaded=N (Back-navigation restore) — see /library; ?page keeps precedence.
+  const loaded = loadedPages(searchParams);
+  if (loaded > 1 && !searchParams.page) {
+    params.page = 1;
+    params.per_page = 12 * loaded;
+  }
 
   if (searchParams.audience) {
     params.audience = (
@@ -205,9 +211,8 @@ export default async function HomePage({ searchParams }: PageProps) {
             <ResourceGrid
               key={query}
               initial={data.resources}
-            startPage={params.page ?? 1}
-              totalPages={data.total_pages}
-              perPage={params.per_page!}
+              startPage={loaded > 1 && !searchParams.page ? loaded : (params.page ?? 1)}
+              perPage={12}
               apiQuery={query}
               fallbackBase="/"
               fallbackQuery={query}

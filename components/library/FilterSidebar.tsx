@@ -115,6 +115,7 @@ export default function FilterSidebar({
       }
     }
     params.set('page', '1');
+    params.delete('loaded'); // depth stamp belongs to the previous result set
     // scroll: false keeps the visitor where they are in the library instead
     // of snapping to the top of the page on every filter change.
     router.push(`${dest}?${params.toString()}`, { scroll: false });

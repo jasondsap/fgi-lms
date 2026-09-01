@@ -15,6 +15,7 @@ export default function SearchBar({ defaultValue, targetPath = '/' }: Props) {
     const params = new URLSearchParams(searchParams.toString());
     if (val) { params.set('search', val); } else { params.delete('search'); }
     params.set('page', '1');
+    params.delete('loaded'); // depth stamp belongs to the previous result set
     // scroll: false — the search bar sits above the results, so jumping to
     // the top of the page would force a scroll back down after every search.
     router.push(`${targetPath}?${params.toString()}`, { scroll: false });
@@ -25,6 +26,7 @@ export default function SearchBar({ defaultValue, targetPath = '/' }: Props) {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('search');
     params.set('page', '1');
+    params.delete('loaded');
     router.push(`${targetPath}?${params.toString()}`, { scroll: false });
   }
 

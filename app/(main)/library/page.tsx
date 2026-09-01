@@ -8,7 +8,7 @@ import { requireSignIn } from '@/lib/lockdown';
 import { getCompletedResourceIds } from '@/lib/progress';
 import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getPublicResources } from '@/lib/resources';
-import { filterQuery } from '@/lib/query';
+import { filterQuery, loadedPages } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
 // Resource Type is a multi-select in the sidebar, so this arrives as a string
@@ -33,6 +33,14 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     page:     parseInt((searchParams.page as string)   || '1', 10),
     per_page: 12,
   };
+  // ?loaded=N (Back-navigation restore): render pages 1..N in one go so the
+  // browser can put the visitor back where they were. ?page (no-JS fallback)
+  // keeps precedence.
+  const loaded = loadedPages(searchParams);
+  if (loaded > 1 && !searchParams.page) {
+    params.page = 1;
+    params.per_page = 12 * loaded;
+  }
 
   if (searchParams.audience) {
     params.audience = (
@@ -68,9 +76,8 @@ export default async function LibraryPage({ searchParams }: PageProps) {
           <ResourceGrid
             key={query}
             initial={data.resources}
-            startPage={params.page ?? 1}
-            totalPages={data.total_pages}
-            perPage={params.per_page!}
+            startPage={loaded > 1 && !searchParams.page ? loaded : (params.page ?? 1)}
+            perPage={12}
             apiQuery={query}
             fallbackBase="/library"
             fallbackQuery={query}

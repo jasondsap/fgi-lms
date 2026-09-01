@@ -8,12 +8,12 @@ interface Props {
   /** The server-rendered page of results. */
   initial: Resource[];
   /**
-   * Which page `initial` is. Normally 1, but a bookmarked or no-JS
-   * `?page=N` URL renders page N — the counter has to start there or the
-   * first click would fetch the wrong page.
+   * Which page the accumulated list ends at. Normally 1; a bookmarked or
+   * no-JS `?page=N` URL renders page N, and a `?loaded=N` restore renders
+   * pages 1..N in one go — either way the counter starts at N or the next
+   * click would fetch the wrong page.
    */
   startPage: number;
-  totalPages: number;
   perPage: number;
   /** Query string for /api/resources — filters plus tenant, no page/per_page. */
   apiQuery: string;
@@ -41,7 +41,7 @@ interface Props {
  * remounts this and resets the accumulated list.
  */
 export default function ResourceGrid({
-  initial, startPage, totalPages, perPage, apiQuery, fallbackBase, fallbackQuery, total,
+  initial, startPage, perPage, apiQuery, fallbackBase, fallbackQuery, total,
   basePath = '', naadacPill, completedIds = [],
 }: Props) {
   const [items, setItems] = useState<Resource[]>(initial);
@@ -50,7 +50,7 @@ export default function ResourceGrid({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const hasMore = page < totalPages;
+  const hasMore = items.length < total;
 
   function hrefFor(p: number) {
     const qs = new URLSearchParams(fallbackQuery);
@@ -77,6 +77,15 @@ export default function ResourceGrid({
         return [...prev, ...(data.resources ?? []).filter((r: Resource) => !seen.has(r.id))];
       });
       setPage(next);
+      // Stamp the depth into the URL (no navigation) so coming Back from a
+      // card server-renders everything that was on screen and the browser
+      // can restore the scroll position (user ask, 8-31-26). Keep Next's
+      // history state or the router loses its scroll bookkeeping.
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('loaded', String(next));
+        window.history.replaceState(window.history.state, '', url);
+      } catch { /* URL stamping is a convenience — never break Load More */ }
     } catch {
       setError('Could not load more resources. Please try again.');
     } finally {

@@ -8,7 +8,7 @@ import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
 import { canSeeInternal, getViewer } from '@/lib/viewer';
 import { getPublicResources } from '@/lib/resources';
-import { filterQuery } from '@/lib/query';
+import { filterQuery, loadedPages } from '@/lib/query';
 import type { TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
@@ -71,6 +71,16 @@ export default async function TenantLibrarySection({
   // as the Required Videos collection (Jason, 8-31-26).
   const certDocs = Boolean(params.type?.includes('handbook' as ResourceType));
 
+  // ?loaded=N (Back-navigation restore) — render pages 1..N in one go so the
+  // browser can restore scroll. ?page (no-JS fallback) keeps precedence, and
+  // a collection view is single-page so it ignores the stamp.
+  const loaded = loadedPages(searchParams);
+  const restoring = !collection && loaded > 1 && !searchParams.page;
+  if (restoring) {
+    params.page = 1;
+    params.per_page = 12 * loaded;
+  }
+
   params.includeInternal = canSeeInternal(await getViewer(), tenant.slug);
   const data = await getPublicResources(params);
 
@@ -121,9 +131,8 @@ export default async function TenantLibrarySection({
             <ResourceGrid
               key={linkQuery}
               initial={data.resources}
-              startPage={params.page ?? 1}
-              totalPages={data.total_pages}
-              perPage={params.per_page!}
+              startPage={restoring ? loaded : (params.page ?? 1)}
+              perPage={collection ? params.per_page! : 12}
               apiQuery={apiQuery}
               fallbackBase={targetPath}
               fallbackQuery={linkQuery}

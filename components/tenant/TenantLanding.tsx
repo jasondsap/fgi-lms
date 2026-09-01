@@ -192,7 +192,6 @@ export default async function TenantLanding({ tenant, searchParams }: Props) {
               key={linkQuery}
               initial={data.resources}
             startPage={params.page ?? 1}
-              totalPages={data.total_pages}
               perPage={params.per_page!}
               apiQuery={apiQuery}
               fallbackBase={home}
