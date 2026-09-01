@@ -118,7 +118,7 @@ export default function Footer() {
                 www.fletchergroup.org
               </Link>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '16px' }}>Need Platform Help?</span>
+                <span style={{ fontSize: '16px' }}>Learning Center Support</span>
                 <ContactButton fontSize="16px" />
               </div>
             </div>

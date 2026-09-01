@@ -177,7 +177,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       {/* ── Latest Highlights — overlaps the hero band ── */}
       <LatestHighlights tiles={highlights} />
 
-      {/* ── Need Platform Help? support bar ── */}
+      {/* ── Learning Center Support bar ── */}
       <section style={{
         background: 'var(--fgi-band)',
         padding: '1.4rem 2rem',
@@ -189,7 +189,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         flexWrap: 'wrap',
       }}>
         <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-          Need Platform Help?
+          Learning Center Support
         </span>
         <ContactButton />
       </section>
