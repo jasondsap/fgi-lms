@@ -176,7 +176,9 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               <img
                 src={v3.heroDots} alt=""
                 style={{
-                  position: 'absolute', top: '-40px', left: '60px',
+                  // Down-and-left so the ring almost centers on the card
+                  // (Jennifer via Jason, 8-31; was -40px/60px).
+                  position: 'absolute', top: '40px', left: '-20px',
                   width: '525px', height: 'auto', pointerEvents: 'none',
                   opacity: 0.38,
                 }}
