@@ -43,7 +43,7 @@ const CARDS: Card[] = [
     bullets: [
       'Course progress saves automatically — leave anytime and pick up right where you stopped.',
       'Complete every item in a course to earn your Certificate of Completion; look for the NAADAC CE badge for CE credit.',
-      'Find your progress, bookmarks, and CE transcript under My Learning in the account menu.',
+      'Find your progress, bookmarks, and CE transcript under My Resources in the account menu.',
       'Questions? Click the ? in the header anytime.',
     ],
   },
