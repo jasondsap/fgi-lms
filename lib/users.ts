@@ -147,6 +147,27 @@ export async function createRegisteredUser(input: {
 }
 
 /**
+ * One-time welcome cards (9-1-26 launch): show only to a signed-in user who
+ * has completed registration and never dismissed them. Single PK lookup,
+ * same cost profile as isRegistered.
+ */
+export async function needsWelcome(userId: string): Promise<boolean> {
+  const rows = await sql`
+    SELECT registration_completed_at, welcome_seen_at FROM users WHERE id = ${userId}
+  `;
+  const row = rows[0];
+  return Boolean(row?.registration_completed_at) && !row?.welcome_seen_at;
+}
+
+/** First dismissal wins — the cards never reappear, on any device. */
+export async function markWelcomeSeen(userId: string): Promise<void> {
+  await sql`
+    UPDATE users SET welcome_seen_at = now(), updated_at = now()
+    WHERE id = ${userId} AND welcome_seen_at IS NULL
+  `;
+}
+
+/**
  * Has this user completed registration? Called on every page load for a
  * signed-in user, so it stays a single indexed lookup by primary key.
  */
