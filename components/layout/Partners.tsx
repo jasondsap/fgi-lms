@@ -54,7 +54,7 @@ export default function Partners() {
               fontSize: '19px', fontWeight: 700, color: 'var(--fgi-navy)',
               lineHeight: 1.35, marginBottom: '0.9rem', maxWidth: '20ch',
             }}>
-              Interested in Partnering with us or Have New Resource Ideas?
+              Interested in Partnering or Have an Idea to Share?
             </div>
             <Link
               href="mailto:LC@fletchergroup.org"
