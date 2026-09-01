@@ -34,6 +34,9 @@ export default function RegisterForm({
     organization: '', state: '', zip: '', county: '', roleOther: '',
   });
   const [roles, setRoles] = useState<string[]>([]);
+  // "I am a…" starts collapsed to keep the form compact (Jason, 8-31);
+  // it springs open if they try to submit without picking one.
+  const [rolesOpen, setRolesOpen] = useState(false);
   const [error, setError] = useState('');
   const [pending, startTransition] = useTransition();
 
@@ -46,6 +49,7 @@ export default function RegisterForm({
 
   const submit = () => startTransition(async () => {
     setError('');
+    if (roles.length === 0) setRolesOpen(true);
     const res = await registerAction({ ...form, roles, surface });
     if (res.ok) {
       onSuccess();
@@ -129,26 +133,50 @@ export default function RegisterForm({
         <input id="reg-county" required value={form.county} onChange={set('county')} style={FIELD} />
       </div>
 
+      {/* Collapsible (Jason, 8-31) — the 7 checkboxes made the form long, so
+          they live behind a disclosure that opens on demand (and opens itself
+          if someone submits without picking one). */}
       <fieldset style={{ border: 'none', padding: 0, margin: '0 0 0.9rem' }}>
-        <legend style={{ ...LABEL, marginBottom: '6px' }}>
-          I am a… <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(select all that apply)</span>
-        </legend>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          {Object.entries(USER_ROLE_LABELS).map(([value, label]) => (
-            <label key={value} style={{
-              display: 'flex', alignItems: 'flex-start', gap: '8px',
-              fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer',
-            }}>
-              <input
-                type="checkbox"
-                checked={roles.includes(value)}
-                onChange={() => toggleRole(value)}
-                style={{ marginTop: '3px' }}
-              />
-              {label}
-            </label>
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => setRolesOpen((v) => !v)}
+          aria-expanded={rolesOpen}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            width: '100%', padding: '9px 12px', fontFamily: 'inherit', cursor: 'pointer',
+            border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)',
+            background: '#ffffff', textAlign: 'left',
+          }}
+        >
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            I am a…{' '}
+            <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>
+              (select all that apply{roles.length > 0 ? ` — ${roles.length} selected` : ''})
+            </span>
+          </span>
+          <svg width="14" height="9" viewBox="0 0 14 9" fill="none" aria-hidden
+            style={{ flexShrink: 0, transition: 'transform 0.15s', transform: rolesOpen ? 'rotate(180deg)' : 'none' }}>
+            <path d="M1 1l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        {rolesOpen && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '10px 4px 0' }}>
+            {Object.entries(USER_ROLE_LABELS).map(([value, label]) => (
+              <label key={value} style={{
+                display: 'flex', alignItems: 'flex-start', gap: '8px',
+                fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={roles.includes(value)}
+                  onChange={() => toggleRole(value)}
+                  style={{ marginTop: '3px' }}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        )}
         {roles.includes('other') && (
           <input
             aria-label="Other role"
@@ -165,17 +193,44 @@ export default function RegisterForm({
         </p>
       )}
 
-      <button
-        type="submit" disabled={pending}
-        style={{
-          display: 'block', width: '100%', padding: '11px 12px', border: 'none',
-          borderRadius: '999px', background: 'var(--fgi-blue)', color: '#ffffff',
-          fontSize: '15px', fontWeight: 700, fontFamily: 'inherit',
-          cursor: 'pointer', opacity: pending ? 0.6 : 1,
-        }}
-      >
-        {pending ? 'Creating your account…' : 'Create Account'}
-      </button>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button
+          type="submit" disabled={pending}
+          style={{
+            flex: 1, padding: '11px 12px', border: 'none',
+            borderRadius: '999px', background: 'var(--fgi-blue)', color: '#ffffff',
+            fontSize: '15px', fontWeight: 700, fontFamily: 'inherit',
+            cursor: 'pointer', opacity: pending ? 0.6 : 1,
+          }}
+        >
+          {pending ? 'Creating your account…' : 'Create Account'}
+        </button>
+        {/* Gold help escape hatch (Jason, 8-31) — mailto keeps it working for
+            someone stuck before they even have an account. */}
+        <a
+          href="mailto:LC@fletchergroup.org"
+          style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '11px 20px', borderRadius: '999px', textDecoration: 'none',
+            background: 'var(--fgi-gold)', color: 'var(--fgi-navy)',
+            fontSize: '15px', fontWeight: 700, whiteSpace: 'nowrap',
+          }}
+        >
+          Get Help
+        </a>
+      </div>
+
+      <p style={{
+        fontSize: '11.5px', lineHeight: 1.5, color: 'var(--text-muted)',
+        margin: '0.9rem 0 0',
+      }}>
+        Disclaimer: This Learning Resource Center is hosted by the Fletcher Group.
+        Fletcher Group does not share your data with third parties. If you are
+        registering via a partner organization&rsquo;s page, your information is also
+        made available to that partner only. Your email will be added to Fletcher
+        Group&rsquo;s mailing list to receive updates and other recovery ecosystem
+        support information. You can unsubscribe anytime via the link in those emails.
+      </p>
     </form>
   );
 }
