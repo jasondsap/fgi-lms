@@ -212,6 +212,25 @@ export async function createConfirmedUser(input: {
 }
 
 /**
+ * Delete a Cognito account (admin user deletion, 9-1-26). Returns whether
+ * the pool actually removed one — an already-gone account is fine (the Neon
+ * side still gets cleaned up), any other failure throws so the caller can
+ * refuse: deleting only the Neon row would let the person sign back in and
+ * upsert a fresh one.
+ */
+export async function deleteCognitoUser(email: string): Promise<boolean> {
+  try {
+    await client().send(new AdminDeleteUserCommand({
+      UserPoolId: poolId(), Username: email,
+    }));
+    return true;
+  } catch (e) {
+    if ((e as { name?: string }).name === 'UserNotFoundException') return false;
+    throw mapError(e);
+  }
+}
+
+/**
  * Start a password reset — Cognito emails the user a code. A nonexistent
  * address is swallowed so the form can't be used to probe which emails have
  * accounts.

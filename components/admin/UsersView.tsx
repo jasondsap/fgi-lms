@@ -9,8 +9,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AdminUserRow } from '@/lib/admin-users';
-import { updateUserAccessAction } from './admin-actions';
+import { deleteUserAction, updateUserAccessAction } from './admin-actions';
 import { roleConfig, SURFACE_OPTIONS, USER_ROLES } from './roles';
+
+const joined = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
 const CARD: React.CSSProperties = {
   background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
@@ -46,6 +49,8 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
   const [editSurface, setEditSurface] = useState('fgi');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  // Two-step inline confirm (no browser dialog): first click arms, second deletes.
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const q = search.trim().toLowerCase();
   const filtered = users.filter((u) => {
@@ -58,6 +63,19 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
     setEditRole(u.role);
     setEditSurface(u.registered_surface ?? 'fgi');
     setError('');
+    setConfirmDeleteId(null);
+  };
+
+  const remove = async (id: string) => {
+    if (saving) return;
+    setSaving(true);
+    setError('');
+    const result = await deleteUserAction(id);
+    setSaving(false);
+    setConfirmDeleteId(null);
+    if ('error' in result) { setError(result.error); return; }
+    setEditingId(null);
+    router.refresh();
   };
 
   const save = async () => {
@@ -157,6 +175,7 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
                     {' · '}
                     {u.registration_completed_at ? 'Registered' : 'Registration incomplete'}
                     {u.moodle_linked ? ' · LMS linked' : ''}
+                    {' · Joined '}{joined(u.created_at)}
                   </div>
                 </div>
 
@@ -186,6 +205,28 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
                     >
                       Cancel
                     </button>
+                    {u.role !== 'admin' && (confirmDeleteId === u.id ? (
+                      <button
+                        onClick={() => remove(u.id)}
+                        disabled={saving}
+                        style={{
+                          ...FIELD, cursor: saving ? 'default' : 'pointer', fontWeight: 700,
+                          background: '#c62828', color: '#fff', border: 'none',
+                          opacity: saving ? 0.55 : 1,
+                        }}
+                      >
+                        {saving ? 'Deleting…' : 'Really delete — this is permanent'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeleteId(u.id)}
+                        disabled={saving}
+                        title="Removes the account, sign-in, and learner data. Issued certificates stay valid."
+                        style={{ ...FIELD, cursor: 'pointer', fontWeight: 600, color: '#c62828' }}
+                      >
+                        Delete…
+                      </button>
+                    ))}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
