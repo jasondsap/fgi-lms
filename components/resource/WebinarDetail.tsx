@@ -107,8 +107,10 @@ export default async function WebinarDetail(
                 : RESOURCE_TYPE_LABELS.webinar}
             </div>
 
+            {/* 2rem (Jennifer 8-31): clear air between the ID line and the
+                description. */}
             {resource.description && (
-              <div style={{ marginTop: '1.25rem' }}>
+              <div style={{ marginTop: '2rem' }}>
                 <div style={{ ...PANEL_TITLE }}>Description</div>
                 <Clamp text={resource.description} accent={surface.primary} />
               </div>

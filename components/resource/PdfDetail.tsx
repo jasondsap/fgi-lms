@@ -121,8 +121,10 @@ export default async function PdfDetail(
               />
             )}
 
+            {/* 2rem (Jennifer 8-31): clear air between the ID line and the
+                description. */}
             {body && (
-              <div style={{ marginTop: '1.25rem' }}>
+              <div style={{ marginTop: '2rem' }}>
                 <div style={{
                   fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)',
                   marginBottom: '0.75rem',

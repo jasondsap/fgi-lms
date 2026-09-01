@@ -104,6 +104,11 @@ img { max-width: 100%; height: auto; display: block; }
 .shell-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 376px);
+  /* auto 1fr (Jennifer 8-31): the spanning side cell would otherwise
+     distribute its height across BOTH auto rows, opening a phantom gap
+     between the description (row 1) and the first body panel (row 2)
+     whenever the body is shorter than the rail. Row 2 takes all the slack. */
+  grid-template-rows: auto 1fr;
   column-gap: 64px;
   align-items: start;
 }
@@ -117,7 +122,7 @@ img { max-width: 100%; height: auto; display: block; }
 @media (max-width: 1000px) {
   /* Stacked: title, then illustration + rail, then the body — so the action
      button never lands under a full-height document viewer. */
-  .shell-grid { grid-template-columns: minmax(0, 1fr); }
+  .shell-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
   .shell-grid__side { grid-column: 1; grid-row: 2; margin-top: 1.25rem; }
   .shell-grid__body { grid-column: 1; grid-row: 3; }
 }

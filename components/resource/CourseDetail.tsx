@@ -91,8 +91,10 @@ export default async function CourseDetail(
               {resource.course_code ? `ID: ${resource.course_code}` : typeLabel}
             </div>
 
+            {/* 2rem (Jennifer 8-31): clear air between the ID line and the
+                description, landing its first line near the illustration top. */}
             {resource.description && (
-              <div style={{ marginTop: '1.25rem' }}>
+              <div style={{ marginTop: '2rem' }}>
                 <div style={{ ...PANEL_TITLE }}>Description</div>
                 <Clamp text={resource.description} accent={surface.primary} />
               </div>
