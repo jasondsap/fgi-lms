@@ -128,7 +128,7 @@ export default async function AccountView({ surface }: { surface: Surface }) {
         }}>
           <Stat label="Courses completed" value={completed.length} accent={accent} />
           <Stat label="In progress" value={inProgress.length} accent={accent} />
-          <Stat label="CE hours earned" value={fmtHours(ce.total)} accent={accent} />
+          <Stat label="CEs completed" value={fmtHours(ce.total)} accent={accent} />
           <Stat label="Certificates" value={certs.length} accent={accent} />
         </div>
 
