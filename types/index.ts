@@ -342,7 +342,9 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     param: 'audience',
     items: ['house_owner', 'peer_support', 'community', 'criminal_justice',
             'clinical', 'medical', 'workforce'],
-    excludeOnTenant: ['criminal_justice', 'clinical', 'medical', 'workforce'],
+    // Hidden on Colorado/SCARR entirely (9-2-26, Jason) — the trimmed tenant
+    // item list it used to carry is gone with it.
+    hideOnTenant: true,
   },
   {
     title: 'I Want To Learn About…',
@@ -352,8 +354,8 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
       'workforce', 'research', 'reentry', 'funding',
       'self_care', 'mental_health', 'recovery_ecosystems',
     ],
-    excludeOnTenant: ['workforce', 'reentry', 'funding', 'mental_health'],
-    tenantLabels: { research: 'Research & Data' },
+    // Hidden on Colorado/SCARR entirely (9-2-26, Jason), same as "I Am A…".
+    hideOnTenant: true,
   },
   {
     title: 'Recovery House Models',
