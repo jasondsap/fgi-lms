@@ -78,12 +78,17 @@ export const HELP_TOPICS: HelpTopic[] = [
     ],
     tips: [
       'Describe the subject, not the exact title — "naloxone training" works even if the title says PAR.',
+      'Have a resource ID? Every resource page shows one (for example "ID: ka7386"). Type the ID into the search box and that resource comes back first.',
       'If a keyword search comes up short, try Ask Fletch and describe your situation in a full sentence instead.',
     ],
     faqs: [
       {
         q: 'Do I need the exact title?',
         a: 'No. Search matches related word forms and tolerates typos, and every course carries keyword tags for common synonyms and abbreviations.',
+      },
+      {
+        q: 'Can I search by resource ID?',
+        a: 'Yes. Each resource has a six-character ID (two letters and four digits) shown on its page. Enter it in the search box, or give it to Ask Fletch, to go straight to that resource.',
       },
     ],
   },
@@ -101,6 +106,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     ],
     tips: [
       'Full sentences beat keywords — Fletch matches your situation, not just words.',
+      'Give Fletch a resource ID (the "ID: …" code on any resource page) and it returns that exact resource.',
       'Fletch only recommends real items from your library, so every card is safe to click.',
       'Fletch will say plainly when the library doesn’t cover something rather than guessing.',
     ],

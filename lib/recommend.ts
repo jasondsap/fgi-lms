@@ -21,6 +21,8 @@ export interface CatalogEntry {
   type: string;
   duration_minutes: number | null;
   is_naadac_ce: boolean;
+  /** The six-character code shown as "ID: …" on the resource page (e.g. ka7386). */
+  course_code: string | null;
 }
 
 export interface Catalog {
@@ -28,6 +30,8 @@ export interface Catalog {
   text: string;
   /** Slug -> entry, used to validate what the model returns. */
   bySlug: Map<string, CatalogEntry>;
+  /** Lower-cased course_code -> entry, for visitors who ask by ID (9-2-26). */
+  byCode: Map<string, CatalogEntry>;
 }
 
 /**
@@ -40,7 +44,7 @@ export interface Catalog {
 export async function getCatalog(surface: string): Promise<Catalog> {
   const rows = (await sql`
     SELECT r.slug, r.title, r.type::text AS type, r.description,
-           r.duration_minutes, r.is_naadac_ce, r.search_keywords
+           r.duration_minutes, r.is_naadac_ce, r.search_keywords, r.course_code
     FROM resources r
     WHERE r.published = TRUE AND r.internal = FALSE
       AND btrim(coalesce(r.description, '')) <> ''
@@ -59,18 +63,24 @@ export async function getCatalog(surface: string): Promise<Catalog> {
     || a.type.localeCompare(b.type) || a.title.localeCompare(b.title));
 
   const bySlug = new Map<string, CatalogEntry>();
+  const byCode = new Map<string, CatalogEntry>();
   const lines: string[] = [];
 
   for (const r of rows) {
-    bySlug.set(r.slug, {
+    const entry: CatalogEntry = {
       slug: r.slug,
       title: r.title,
       type: r.type,
       duration_minutes: r.duration_minutes,
       is_naadac_ce: r.is_naadac_ce,
-    });
+      course_code: r.course_code ?? null,
+    };
+    bySlug.set(r.slug, entry);
+    if (entry.course_code) byCode.set(entry.course_code.toLowerCase(), entry);
     const bits = [
       r.slug,
+      // The visible "ID: …" code, so a visitor can ask Fletch by ID (9-2-26).
+      entry.course_code ? `id:${entry.course_code}` : '',
       `L${RESOURCE_TYPE_TIERS[r.type as ResourceType] ?? 4} ` + r.type + (r.is_naadac_ce ? ' (NAADAC CE)' : ''),
       r.duration_minutes ? `${r.duration_minutes} min` : '',
       `${r.title} — ${r.description.replace(/\s+/g, ' ').trim()}`,
@@ -81,7 +91,7 @@ export async function getCatalog(surface: string): Promise<Catalog> {
     lines.push(bits.join(' | '));
   }
 
-  return { text: lines.join('\n'), bySlug };
+  return { text: lines.join('\n'), bySlug, byCode };
 }
 
 /** Human-facing label per resource type, mirroring the library's own wording. */

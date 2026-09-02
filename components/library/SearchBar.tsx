@@ -38,7 +38,7 @@ export default function SearchBar({ defaultValue, targetPath = '/' }: Props) {
             ref={inputRef}
             type="text"
             defaultValue={defaultValue}
-            placeholder="Keyword Search"
+            placeholder="Keyword or ID Search"
             style={{
               width: '100%', padding: '9px 14px 9px 38px', fontSize: '14px',
               border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',

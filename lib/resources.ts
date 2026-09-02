@@ -104,6 +104,20 @@ export async function getPublicResources(
   if (search) {
     const words = search.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).slice(0, 6);
     const HAY = "title || ' ' || array_to_string(search_keywords, ' ') || ' ' || description";
+
+    // ID lookup (9-2-26, Jason): every resource carries a six-character code
+    // (two letters + four digits, e.g. ka7386) printed as "ID: …" on its page,
+    // and CE courses also have a numeric Moodle course id. Either pasted into
+    // the search box — alone or as "ID: ka7386" — is an exact match that ORs
+    // with the keyword conditions and pins the hit to the top. Both tokens are
+    // regex-validated and bound; the SQL text sees only placeholders.
+    const codeTok = search.toLowerCase().match(/\b([a-z]{2}[0-9]{4})\b/)?.[1] ?? null;
+    const moodleTok = /^\s*(?:id\s*[:#]?\s*)?([0-9]{1,6})\s*$/i.exec(search)?.[1] ?? null;
+    const idConds: string[] = [];
+    if (codeTok) idConds.push(`lower(course_code) = ${bind(codeTok)}`);
+    if (moodleTok) idConds.push(`moodle_course_id = ${bind(parseInt(moodleTok, 10))}`);
+    const idClause = idConds.length > 0 ? `(${idConds.join(' OR ')})` : '';
+
     if (words.length > 0) {
       const wordConds = words.map((w) => {
         const ph = bind(w);
@@ -113,7 +127,8 @@ export async function getPublicResources(
         // "-ction/-tion" title (medication, certification, inspection…) and
         // pulled in 14 junk rows; real typo matches all score ≥ 0.50.
       });
-      conditions.push(`(${wordConds.join(' AND ')})`);
+      const wordClause = `(${wordConds.join(' AND ')})`;
+      conditions.push(idClause ? `(${idClause} OR ${wordClause})` : wordClause);
       // Ordering (Jennifer's hierarchy, 8-31-26): importance level first — but
       // any searched word appearing in the title itself elevates the result one
       // level (floor 1). Within a level, relevance blends the types: weighted
@@ -125,7 +140,9 @@ export async function getPublicResources(
           OR word_similarity(${ph}, title) > 0.45`;
       }).join(' OR ');
       const qph = bind(search);
-      searchRank = `GREATEST(${TIER_SQL} - CASE WHEN (${titleHit}) THEN 1 ELSE 0 END, 1) ASC,
+      // An exact ID hit outranks everything, including the tier.
+      const idRank = idClause ? `CASE WHEN ${idClause} THEN 0 ELSE 1 END ASC, ` : '';
+      searchRank = `${idRank}GREATEST(${TIER_SQL} - CASE WHEN (${titleHit}) THEN 1 ELSE 0 END, 1) ASC,
         (ts_rank_cd(
           setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
           setweight(to_tsvector('english', array_to_string(search_keywords, ' ')), 'B') ||
