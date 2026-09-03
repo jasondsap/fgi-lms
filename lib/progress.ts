@@ -15,6 +15,7 @@ import {
   getCourseContents,
   getUserGradeItems,
   type ActivityCompletion,
+  type MoodleModule,
   type MoodleSection,
 } from '@/lib/moodle';
 import { getTenantConfig } from '@/lib/tenants';
@@ -125,6 +126,15 @@ export interface SyncInput {
  * the course. One direction only — opening the library page never completes
  * anything in the course, because the library has no 90% watch tracking.
  * Never throws; a mirror failure must not break the player.
+ *
+ * 9-2-26 (Jason): the same pass also marks the library video COMPLETE — the
+ * checkmark badge on its card — when the Part carries no quiz of its own, or
+ * that quiz is passed. "Its own quiz" means a quiz module sitting between
+ * this Part and the next one in course order (the build shape is lesson →
+ * handouts → next lesson). A quiz after the last Part, like the Colorado
+ * certification-prerequisites quiz, is course-level and never holds the
+ * videos back. Completion is a second event ('complete') alongside 'view',
+ * so "viewed" and "completed" stay separately answerable.
  */
 async function mirrorRequiredVideoViews(
   userId: string,
@@ -136,31 +146,48 @@ async function mirrorRequiredVideoViews(
     const slugs = getTenantConfig(surface)?.v3?.collections?.['required-videos']?.slugs;
     if (!slugs?.length) return;
     const byCmid = new Map(completion.map((c) => [c.cmid, c]));
+    const modules = sections.flatMap((s) => s.modules);
     const watched: string[] = [];
-    for (const s of sections) {
-      for (const m of s.modules) {
-        if (m.modname !== 'page') continue;
-        const match = /^Part (\d+)\b/.exec(decodeEntities(m.name));
-        if (!match) continue;
-        // Match by part number in the slug, not list position, so the
-        // collection order can never mis-map a video.
-        const slug = slugs.find((sl) => sl.includes(`-part-${match[1]}-`));
-        if (slug && isDone(byCmid.get(m.id)?.state)) watched.push(slug);
+    const finished: string[] = [];
+    for (let i = 0; i < modules.length; i++) {
+      const m = modules[i];
+      if (m.modname !== 'page') continue;
+      const match = /^Part (\d+)\b/.exec(decodeEntities(m.name));
+      if (!match) continue;
+      // Match by part number in the slug, not list position, so the
+      // collection order can never mis-map a video.
+      const slug = slugs.find((sl) => sl.includes(`-part-${match[1]}-`));
+      if (!slug || !isDone(byCmid.get(m.id)?.state)) continue;
+      watched.push(slug);
+      // Walk forward to the next Part; any completion-tracked quiz on the way
+      // belongs to this one. Reaching the end without another Part means any
+      // quiz found is course-level, so it is ignored.
+      let quizzes: MoodleModule[] = [];
+      let nextPart = false;
+      for (let j = i + 1; j < modules.length; j++) {
+        const n = modules[j];
+        if (n.modname === 'page' && /^Part \d+\b/.test(decodeEntities(n.name))) { nextPart = true; break; }
+        if (n.modname === 'quiz' && (n.completion ?? 0) > 0) quizzes.push(n);
       }
+      if (!nextPart) quizzes = [];
+      if (quizzes.every((q) => isDone(byCmid.get(q.id)?.state))) finished.push(slug);
     }
     if (watched.length === 0) return;
-    // One 'view' row per resource is all getViewedSlugs needs — skip any the
+    // One row per (resource, event) is all the lookups need — skip any the
     // learner already has, so repeated player loads don't grow the table.
-    await sql`
-      INSERT INTO user_resource_events (user_id, resource_id, event, surface)
-      SELECT ${userId}, r.id, 'view', ${surface}
-      FROM resources r
-      WHERE r.slug = ANY(${watched})
-        AND NOT EXISTS (
-          SELECT 1 FROM user_resource_events e
-          WHERE e.user_id = ${userId} AND e.resource_id = r.id
-        )
-    `;
+    for (const [event, list] of [['view', watched], ['complete', finished]] as const) {
+      if (list.length === 0) continue;
+      await sql`
+        INSERT INTO user_resource_events (user_id, resource_id, event, surface)
+        SELECT ${userId}, r.id, ${event}, ${surface}
+        FROM resources r
+        WHERE r.slug = ANY(${list})
+          AND NOT EXISTS (
+            SELECT 1 FROM user_resource_events e
+            WHERE e.user_id = ${userId} AND e.resource_id = r.id AND e.event = ${event}
+          )
+      `;
+    }
   } catch (e) {
     console.warn('Required-video mirror skipped:', (e as Error).message);
   }
@@ -353,11 +380,19 @@ export async function getUserProgress(userId: string): Promise<CourseProgressRow
   })) as CourseProgressRow[];
 }
 
-/** Resource ids the learner has completed — the library cards' checkmark. */
+/**
+ * Resource ids the learner has completed — the library cards' checkmark.
+ * Courses complete through their progress row; standalone videos complete
+ * through the 'complete' event the pre-cert mirror writes (9-2-26, see
+ * mirrorRequiredVideoViews) — they are never Moodle courses themselves.
+ */
 export async function getCompletedResourceIds(userId: string): Promise<string[]> {
   const rows = await sql`
     SELECT resource_id FROM user_course_progress
     WHERE user_id = ${userId} AND completed_at IS NOT NULL
+    UNION
+    SELECT resource_id FROM user_resource_events
+    WHERE user_id = ${userId} AND event = 'complete' AND resource_id IS NOT NULL
   `;
   return rows.map((r) => r.resource_id as string);
 }
