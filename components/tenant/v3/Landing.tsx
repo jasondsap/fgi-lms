@@ -227,15 +227,20 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
           alignItems: 'stretch',
         }}>
           {/* Jennifer's Mockup A (8-31-26): the white box gets a rounded
-              outline in the tenant frame colour with a dot grid peeking out
-              from behind its top-left corner (CO red, SCARR yellow). */}
+              outline in the tenant frame colour with a dot triangle in its
+              top-left corner (CO red, SCARR yellow). 9-3-26: the triangle now
+              sits ON TOP of the box and runs across the white — nine dots along
+              the top edge, nine down the left, hypotenuse top-right → bottom-left
+              — instead of stopping at the border. The box's extra top/left
+              padding keeps the heading clear of the triangle's lower rows. */}
           <div style={{ position: 'relative' }}>
             {v3.certBoxFrame && (
               <span aria-hidden style={{
-                position: 'absolute', top: '-16px', left: '-16px',
-                width: '80px', height: '80px',
+                position: 'absolute', top: '-16px', left: '-16px', zIndex: 1,
+                width: '117px', height: '117px', pointerEvents: 'none',
                 backgroundImage: `radial-gradient(circle, ${v3.certBoxFrame} 2.5px, transparent 3px)`,
                 backgroundSize: '13px 13px', backgroundPosition: '0 0',
+                clipPath: 'polygon(0 0, 100% 0, 0 100%)',
               }} />
             )}
             <div style={{
@@ -243,7 +248,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
               background: '#ffffff',
               borderRadius: v3.certBoxFrame ? '18px' : '10px',
               border: v3.certBoxFrame ? `2px solid ${v3.certBoxFrame}` : undefined,
-              padding: '1.9rem 2.1rem',
+              padding: v3.certBoxFrame ? '2.3rem 2.1rem 1.9rem 2.75rem' : '1.9rem 2.1rem',
             }}>
             <h2 style={{
               fontSize: '20px', fontWeight: 700, color: '#111111', marginBottom: '1.1rem',
