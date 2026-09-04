@@ -285,13 +285,15 @@ export interface FilterItemSpec {
 
 /**
  * The portals' "Documents" filter (Jennifer, 9-3-26) is one checkbox that
- * covers every document-style type except the certification paperwork
- * (`handbook`, which stays under Certification Info as "Cert. Documents").
- * `document` is a filter value, not a stored type — getPublicResources
- * expands it to this list, the way `naadac_ce` maps onto is_naadac_ce.
+ * covers every document-style type. Her tag crosswalk lists each
+ * certification document under both "Cert. Documents" and "Document", so
+ * `handbook` is included; Cert. Documents (Certification Info group) stays
+ * the narrower view. `document` is a filter value, not a stored type —
+ * getPublicResources expands it to this list, the way `naadac_ce` maps onto
+ * is_naadac_ce.
  */
 export const DOCUMENT_TYPES: ResourceType[] = [
-  'guidebook', 'toolkit', 'paper', 'whitepaper', 'infographic',
+  'handbook', 'guidebook', 'toolkit', 'paper', 'whitepaper', 'infographic',
 ];
 
 export interface FilterGroupSpec {
@@ -359,20 +361,26 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     param: 'audience',
     items: ['house_owner', 'peer_support', 'community', 'criminal_justice',
             'clinical', 'medical', 'workforce'],
-    // Hidden on Colorado/SCARR entirely (9-2-26, Jason) — the trimmed tenant
-    // item list it used to carry is gone with it.
-    hideOnTenant: true,
+    // Hidden on the portals 9-2, back 9-3-26 with Jennifer's crosswalk
+    // ("portal item filter - tag crosswalk.xlsm"): the portals use exactly
+    // four audiences. Tags applied by scripts/seed-portal-tags.js.
+    excludeOnTenant: ['criminal_justice', 'medical', 'workforce'],
   },
   {
     title: 'I Want To Learn About…',
     param: 'topic',
     items: [
       'establishing_rh', 'rh_management', 'operations', 'recovery_support',
+      // Portals list Social Model here (the FGI library keeps it under
+      // Recovery House Models, which is hidden on portals).
+      { param: 'topic', value: 'social_model', label: 'Social Model Recovery', tenantOnly: true },
       'workforce', 'research', 'reentry', 'funding',
       'self_care', 'mental_health', 'recovery_ecosystems',
     ],
-    // Hidden on Colorado/SCARR entirely (9-2-26, Jason), same as "I Am A…".
-    hideOnTenant: true,
+    // Hidden on the portals 9-2, back 9-3-26 with Jennifer's crosswalk: the
+    // portals use eight topics (the seven below plus Social Model).
+    excludeOnTenant: ['workforce', 'reentry', 'mental_health', 'recovery_ecosystems'],
+    tenantLabels: { research: 'Research & Data' },
   },
   {
     title: 'Recovery House Models',
