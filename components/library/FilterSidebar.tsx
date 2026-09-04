@@ -167,7 +167,8 @@ export default function FilterSidebar({
               label: (isTenant && g.tenantLabels?.[i]) || g.labels?.[i] || labels[i] || i,
             }
           : i))
-        .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)));
+        .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)))
+        .filter(i => isTenant || !('tenantOnly' in i && i.tenantOnly));
       return { title: g.title, items };
     })
     .filter(g => g.items.length > 0);

@@ -13,7 +13,7 @@ import { getPresignedUrl, getPresignedDownloadUrl } from './s3';
 import type {
   Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial, ResourceType,
 } from '@/types';
-import { RESOURCE_TYPE_TIERS } from '@/types';
+import { DOCUMENT_TYPES, RESOURCE_TYPE_TIERS } from '@/types';
 
 // Jennifer's four-level content hierarchy (8-31-26) as a SQL CASE. Built from
 // the hardcoded RESOURCE_TYPE_TIERS map in types/index.ts — type names and
@@ -84,8 +84,16 @@ export async function getPublicResources(
     // `naadac_ce` is a filter option, not a stored type: CE courses are
     // `course` rows with is_naadac_ce = TRUE. Fold it into the OR so the
     // "NAADAC CE" checkbox matches them (it matched nothing before 8-25).
+    //
+    // `document` (portals' "Documents" checkbox, 9-3-26) is likewise not a
+    // stored type: it stands for every document-style type except the
+    // certification paperwork — see DOCUMENT_TYPES in types/index.ts.
     const wantsNaadac = typeArr.includes('naadac_ce' as ResourceType);
-    const storedTypes = typeArr.filter((t) => t !== 'naadac_ce');
+    const wantsDocs = typeArr.includes('document' as ResourceType);
+    const storedTypes: ResourceType[] = [
+      ...typeArr.filter((t) => t !== 'naadac_ce' && (t as string) !== 'document'),
+      ...(wantsDocs ? DOCUMENT_TYPES : []),
+    ];
     const typeClauses: string[] = [];
     if (storedTypes.length > 0) typeClauses.push(`type::text = ANY(${bind(storedTypes)}::text[])`);
     if (wantsNaadac) typeClauses.push('is_naadac_ce = TRUE');

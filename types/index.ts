@@ -279,7 +279,20 @@ export interface FilterItemSpec {
   param: 'type' | 'audience' | 'topic' | 'collection';
   value: string;
   label: string;
+  /** Render only on a tenant portal (the portals' "Documents" checkbox). */
+  tenantOnly?: boolean;
 }
+
+/**
+ * The portals' "Documents" filter (Jennifer, 9-3-26) is one checkbox that
+ * covers every document-style type except the certification paperwork
+ * (`handbook`, which stays under Certification Info as "Cert. Documents").
+ * `document` is a filter value, not a stored type — getPublicResources
+ * expands it to this list, the way `naadac_ce` maps onto is_naadac_ce.
+ */
+export const DOCUMENT_TYPES: ResourceType[] = [
+  'guidebook', 'toolkit', 'paper', 'whitepaper', 'infographic',
+];
 
 export interface FilterGroupSpec {
   title: string;
@@ -332,9 +345,13 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     items: [
       'webinar', 'podcast', 'toolkit', 'guidebook', 'newsletter',
       'video', 'paper', 'infographic', 'success_story', 'non_fgi',
+      // Portals get one umbrella checkbox instead of the FGI type list
+      // (Jennifer, 9-3-26) — see DOCUMENT_TYPES.
+      { param: 'type', value: 'document', label: 'Documents', tenantOnly: true },
     ],
     // Tenant portals keep only what the tenants actually publish
-    // (Jennifer's SCARR page changes, 8-25): webinars, guides, videos.
+    // (Jennifer's SCARR page changes, 8-25): webinars, videos — plus the
+    // umbrella "Documents" item above.
     excludeOnTenant: ['podcast', 'toolkit', 'guidebook', 'newsletter', 'paper', 'infographic', 'success_story', 'non_fgi'],
   },
   {

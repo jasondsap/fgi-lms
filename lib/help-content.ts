@@ -126,6 +126,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     quickStart: [
       'Use the Resource Type section of the filter bar to show only the formats you want.',
       'The colored label on each card tells you the format before you open it.',
+      'On a certification portal, Resource Type lists Webinar, Video, and Documents — Documents gathers every guide, brief, paper, and infographic in one tick (certification paperwork stays under Cert. Documents).',
     ],
     tips: [
       'A yellow NAADAC CE pill on a card means completing it can earn continuing-education credit.',
