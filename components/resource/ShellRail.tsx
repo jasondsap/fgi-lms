@@ -119,7 +119,7 @@ export default function ShellRail(
         </div>
       )}
 
-      <FeedbackModal slug={slug} surface={surface.key} accent={surface.primary} />
+      <FeedbackModal slug={slug} surface={surface.key} accent={surface.primary} button={surface.feedbackButton} />
 
       <Link href={surface.libraryHref} style={{
         display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '999px',

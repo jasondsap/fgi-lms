@@ -9,6 +9,8 @@ interface Props {
   surface: string;
   /** Surface accent, used for the focused/selected states. */
   accent: string;
+  /** Pill colours — see Surface.feedbackButton. */
+  button: { bg: string; fg: string };
 }
 
 /** Marks this resource as already evaluated in this browser. */
@@ -24,7 +26,7 @@ const doneKey = (slug: string) => `fgi-eval:${slug}`;
  * because most visitors are anonymous: it exists to stop the same person being
  * asked twice on the same machine, and nothing more rides on it.
  */
-export default function FeedbackModal({ slug, surface, accent }: Props) {
+export default function FeedbackModal({ slug, surface, accent, button }: Props) {
   const [open, setOpen]         = useState(false);
   const [done, setDone]         = useState(false);   // submitted, this session
   const [already, setAlready]   = useState(false);   // submitted, earlier visit
@@ -74,7 +76,7 @@ export default function FeedbackModal({ slug, surface, accent }: Props) {
         onClick={() => setOpen(true)}
         style={{
           display: 'block', width: '100%', border: 'none',
-          background: 'var(--fgi-amber)', color: '#ffffff',
+          background: button.bg, color: button.fg,
           padding: '10px 22px', borderRadius: '999px',
           fontWeight: 700, fontSize: '16px', fontFamily: 'inherit',
         }}

@@ -344,6 +344,7 @@ export default async function PodcastDetail(
               <PodcastFeedbackModal
                 embedUrl={PODCAST_FEEDBACK_EMBED_URL}
                 fallbackUrl={PODCAST_FEEDBACK_FORM_URL}
+                button={surface.feedbackButton}
               />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
                 <a

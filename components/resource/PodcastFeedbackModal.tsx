@@ -12,9 +12,12 @@ import { useEffect, useRef, useState } from 'react';
 export default function PodcastFeedbackModal({
   embedUrl,
   fallbackUrl,
+  button,
 }: {
   embedUrl: string;
   fallbackUrl: string;
+  /** Pill colours — see Surface.feedbackButton. */
+  button: { bg: string; fg: string };
 }) {
   const [open, setOpen] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -39,7 +42,7 @@ export default function PodcastFeedbackModal({
         onClick={() => setOpen(true)}
         style={{
           display: 'block', width: '100%', border: 'none',
-          background: 'var(--fgi-amber)', color: '#ffffff',
+          background: button.bg, color: button.fg,
           padding: '10px 22px', borderRadius: '999px',
           fontWeight: 700, fontSize: '16px', fontFamily: 'inherit', cursor: 'pointer',
         }}

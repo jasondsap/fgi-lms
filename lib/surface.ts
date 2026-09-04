@@ -20,7 +20,14 @@ export interface Surface {
   libraryHref: string;
   /** Primary button/link colour for this surface. */
   primary: string;
+  /**
+   * "Share Your Feedback" pill on resource pages. FGI amber; tenants reuse
+   * their Contact-pill colours (CO #ffd100, SCARR #f5d300 — Jason 9-4-26).
+   */
+  feedbackButton: { bg: string; fg: string };
 }
+
+const FGI_FEEDBACK_BUTTON = { bg: 'var(--fgi-amber)', fg: '#ffffff' };
 
 export const FGI_SURFACE: Surface = {
   key: 'fgi',
@@ -28,6 +35,7 @@ export const FGI_SURFACE: Surface = {
   tenant: null,
   libraryHref: '/library',
   primary: 'var(--fgi-blue)',
+  feedbackButton: FGI_FEEDBACK_BUTTON,
 };
 
 /** Returns null for an unknown slug so routes can 404. */
@@ -41,5 +49,6 @@ export function tenantSurface(slug: string): Surface | null {
     // Dedicated tenant library page since 8-31-26 (was a landing-page section).
     libraryHref: `/${tenant.slug}/library`,
     primary: tenant.primary,
+    feedbackButton: tenant.v3?.contactButton ?? FGI_FEEDBACK_BUTTON,
   };
 }
