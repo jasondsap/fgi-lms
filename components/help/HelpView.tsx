@@ -127,7 +127,7 @@ export default function HelpView({
   return (
     <div style={{ maxWidth: '980px', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
 
-      {/* ── Hero (Fletch image removed per Jason, 8-31-26) ── */}
+      {/* ── Hero — no Fletch here on purpose (Jason 8-31-26, reaffirmed 9-3-26) ── */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '34px', fontWeight: 700, color: 'var(--fgi-navy)', margin: 0 }}>
           Help Center
@@ -149,12 +149,14 @@ export default function HelpView({
         </div>
       </div>
 
-      {/* ── Ask Fletch callout ── */}
+      {/* ── Ask Fletch callout (thinking-owl Fletch, 9-3-26) ── */}
       <div style={{
         ...CARD, borderLeft: '4px solid var(--fgi-blue)',
         display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap',
         padding: '14px 18px', marginBottom: '2rem',
       }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/fletch/fletch-thinking.webp" alt="" style={{ height: '76px', width: 'auto', flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: '240px' }}>
           <div style={{ fontWeight: 700, fontSize: '15px' }}>Prefer to just ask?</div>
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>

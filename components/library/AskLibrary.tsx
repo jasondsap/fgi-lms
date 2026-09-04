@@ -125,7 +125,8 @@ export default function AskLibrary({
   }
 
   if (!open) {
-    // Mascot artwork removed per Jason 8-31-26 — the pill stands alone.
+    // Fletch the owl (new character art, 9-3-26) perches on the pill's top
+    // edge; the whole thing is one button so his feathers are clickable too.
     return (
       <button
         onClick={() => setOpen(true)}
@@ -136,6 +137,15 @@ export default function AskLibrary({
           fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/fletch/fletch-hello.webp"
+          alt=""
+          style={{
+            width: '92px', height: 'auto', marginBottom: '-12px', marginRight: '10px',
+            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))', pointerEvents: 'none',
+          }}
+        />
         <span style={{
           background: pillBg, color: pillText,
           borderRadius: '999px', padding: '13px 22px',
@@ -166,6 +176,12 @@ export default function AskLibrary({
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/fletch/fletch-hello.webp"
+            alt=""
+            style={{ width: '44px', height: 'auto', flexShrink: 0 }}
+          />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: '15px' }}>Ask Fletch</div>
             <div style={{ fontSize: '12px', opacity: 0.9 }}>
@@ -208,6 +224,12 @@ export default function AskLibrary({
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', background: 'var(--body-bg)' }}>
         {turns.length === 0 && (
           <div style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-hello.webp"
+              alt=""
+              style={{ width: '120px', height: 'auto', display: 'block', margin: '4px auto 10px' }}
+            />
             <p style={{ marginBottom: '12px' }}>
               {mode === 'help'
                 ? <>Hi, I&#39;m Fletch! Ask me how to do anything here and I&#39;ll walk you through it.</>
@@ -300,6 +322,12 @@ export default function AskLibrary({
 
         {loading && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 2px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-searching.webp"
+              alt=""
+              style={{ width: '60px', height: 'auto' }}
+            />
             <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
               {mode === 'help' ? 'Fletch is checking the guide…' : 'Fletch is looking through the library…'}
             </span>
@@ -307,6 +335,12 @@ export default function AskLibrary({
         )}
         {error && (
           <div role="alert" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-break.webp"
+              alt=""
+              style={{ width: '64px', height: 'auto', flexShrink: 0 }}
+            />
             <div style={{
               fontSize: '13px', color: '#8a1c1c', background: '#fdf0f0',
               border: '1px solid #f2d4d4', borderRadius: 'var(--radius-md)', padding: '9px 12px',

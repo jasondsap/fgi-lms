@@ -119,6 +119,12 @@ export default function ReportProblemModal({
 
         {doneId ? (
           <div style={{ padding: '28px 24px', textAlign: 'center' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fletch/fletch-notes.webp"
+              alt=""
+              style={{ height: '100px', width: 'auto', margin: '0 auto 10px', display: 'block' }}
+            />
             <p style={{ fontWeight: 700, fontSize: '16px', margin: '0 0 4px' }}>
               Ticket submitted — we&#39;ll follow up here.
             </p>
