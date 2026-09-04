@@ -35,7 +35,7 @@ interface Props {
 }
 
 const STARTERS = [
-  'I run a recovery house and neighbours are pushing back',
+  'I run a recovery house and neighbors are pushing back',
   'I need to train new peer support staff',
   'How do I fund a new recovery residence?',
 ];
