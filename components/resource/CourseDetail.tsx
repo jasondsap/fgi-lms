@@ -111,6 +111,8 @@ export default async function CourseDetail(
           />
           <ShellRail
             slug={resource.slug}
+            title={resource.title}
+            description={resource.description}
             surface={surface}
             facts={facts}
             presenters={presenters}

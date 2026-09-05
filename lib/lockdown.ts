@@ -9,9 +9,18 @@
 import { redirect } from 'next/navigation';
 import { authEnabled, getSession } from '@/auth';
 
-/** Bounce signed-out visitors to the surface landing page with the modal up. */
-export async function requireSignIn(homePath: string = '/'): Promise<void> {
+/**
+ * Bounce signed-out visitors to the surface landing page with the modal up.
+ *
+ * `nextPath` (9-5-26, Rachael's share-a-link ticket): the page the visitor was
+ * trying to reach. Resource and course pages pass their own path so a shared
+ * deep link survives the sign-in — LoginModal pushes there once the session
+ * exists instead of leaving the newcomer on the landing page.
+ */
+export async function requireSignIn(homePath: string = '/', nextPath?: string): Promise<void> {
   if (!authEnabled) return; // local dev without Cognito env stays browsable
   const session = await getSession();
-  if (!session?.user?.id) redirect(`${homePath}?signin=1`);
+  if (session?.user?.id) return;
+  const next = nextPath ? `&next=${encodeURIComponent(nextPath)}` : '';
+  redirect(`${homePath}?signin=1${next}`);
 }

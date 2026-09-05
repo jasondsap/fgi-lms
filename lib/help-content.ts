@@ -150,6 +150,34 @@ export const HELP_TOPICS: HelpTopic[] = [
     faqs: [],
   },
 
+  {
+    id: 'share-resource',
+    category: 'Finding Resources',
+    name: 'Sharing a Resource',
+    description:
+      'Every resource has its own web address, so you can send a client or colleague straight to one item. The Share This Resource button on a resource page copies that link or opens an email in your own mail app with the title, a short description and the link already filled in.',
+    quickStart: [
+      'Open the resource and click Share This Resource in the right-hand column.',
+      'Choose Copy link to paste it anywhere, or Email this link to open a ready-made email — add the recipient and send.',
+      'On a phone, More ways to share opens your device’s share sheet (text message, Teams, etc.).',
+    ],
+    tips: [
+      'The person you send it to will be asked to sign in or create a free account before the resource opens — the page shows them the title and description first, so they know what they’re getting.',
+      'Share from the library you’re in: a link copied on a certification portal opens in that portal’s colours.',
+      'Copying the address from your browser’s address bar works just as well.',
+    ],
+    faqs: [
+      {
+        q: 'Can I send it to more than one person?',
+        a: 'Yes — Email this link opens your own email program, so add as many recipients as you like before sending.',
+      },
+      {
+        q: 'Nothing happened when I clicked Email this link.',
+        a: 'Your browser has no email program set up. Use Copy link instead and paste it into an email yourself.',
+      },
+    ],
+  },
+
   // ── Courses & CE Credits ──────────────────────────────────────────────────
   {
     id: 'course-player',

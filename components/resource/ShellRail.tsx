@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import FeedbackModal from '@/components/resource/FeedbackModal';
+import SharePill from '@/components/resource/SharePill';
 import RelatedList from '@/components/resource/RelatedList';
 import type { RelatedItem } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
@@ -21,6 +22,9 @@ export const RAIL_BUTTON = {
 
 interface Props {
   slug: string;
+  /** For the Share pill's email note. */
+  title: string;
+  description?: string | null;
   surface: Surface;
   /** Primary call to action — Download, Start Webinar, Open Resource. */
   action?: React.ReactNode;
@@ -39,7 +43,7 @@ interface Props {
  * differing top section as a node.
  */
 export default function ShellRail(
-  { slug, surface, action, facts = [], presenters = [], related, extras }: Props,
+  { slug, title, description, surface, action, facts = [], presenters = [], related, extras }: Props,
 ) {
   // One globe link per organisation — co-presenters from the same org (e.g.
   // the PPW webinar's two PEARL Program speakers) used to list it twice. A
@@ -120,6 +124,8 @@ export default function ShellRail(
       )}
 
       <FeedbackModal slug={slug} surface={surface.key} accent={surface.primary} button={surface.feedbackButton} />
+
+      <SharePill title={title} description={description} accent={surface.primary} />
 
       <Link href={surface.libraryHref} style={{
         display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '999px',

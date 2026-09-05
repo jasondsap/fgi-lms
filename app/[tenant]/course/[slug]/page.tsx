@@ -15,7 +15,7 @@ export default async function TenantCoursePage(
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
-  await requireSignIn(surface.basePath);
+  await requireSignIn(surface.basePath, `${surface.basePath}/course/${params.slug}`);
   return (
     <>
       <CourseView slug={params.slug} surface={surface} openCmid={parseCm(searchParams?.cm)} />

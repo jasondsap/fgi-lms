@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import LoginModal from '@/components/auth/LoginModal';
+import { safeNextPath } from '@/lib/next-path';
 
 /**
  * Signed-out lockdown, client half (Jason, 8-31-26): the landing page is the
@@ -26,7 +27,10 @@ export default function SignedOutGate({ surface = 'fgi' }: { surface?: string })
   // below) so it reopens after being dismissed.
   const [prompt, setPrompt] = useState(0);
 
-  // A lockdown redirect (?signin=1) opens the modal on arrival.
+  // A lockdown redirect (?signin=1) opens the modal on arrival; its `next` is
+  // where the visitor was headed (a shared resource link), honoured after
+  // sign-in. Read once — the param disappears with the first navigation.
+  const [next] = useState(() => safeNextPath(searchParams.get('next')));
   useEffect(() => {
     if (searchParams.get('signin')) setPrompt((n) => n || 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,5 +74,5 @@ export default function SignedOutGate({ surface = 'fgi' }: { surface?: string })
   }, []);
 
   if (!prompt) return null;
-  return <LoginModal key={prompt} trigger="none" autoOpen surface={surface} />;
+  return <LoginModal key={prompt} trigger="none" autoOpen surface={surface} next={next ?? undefined} />;
 }

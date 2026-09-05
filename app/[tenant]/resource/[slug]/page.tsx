@@ -9,7 +9,7 @@ export default async function TenantResourcePage(
 ) {
   const surface = tenantSurface(params.tenant);
   if (!surface) notFound();
-  await requireSignIn(surface.basePath);
+  await requireSignIn(surface.basePath, `${surface.basePath}/resource/${params.slug}`);
   return (
     <>
       <ResourceDetail slug={params.slug} surface={surface} />

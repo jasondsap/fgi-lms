@@ -11,7 +11,7 @@ export default async function CoursePlayerPage(
     searchParams?: { cm?: string | string[] };
   },
 ) {
-  await requireSignIn('/');
+  await requireSignIn('/', `/course/${params.slug}`);
   return (
     <CourseView slug={params.slug} surface={FGI_SURFACE} openCmid={parseCm(searchParams?.cm)} />
   );

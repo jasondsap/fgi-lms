@@ -150,6 +150,8 @@ export default async function PdfDetail(
           )}
           <ShellRail
             slug={resource.slug}
+            title={resource.title}
+            description={resource.description}
             surface={surface}
             presenters={presenters}
             related={related}

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
 import AudioPlayer, { ListenNowButton, TrailerButton } from '@/components/resource/AudioPlayer';
+import SharePill from '@/components/resource/SharePill';
 import PodcastFeedbackModal from '@/components/resource/PodcastFeedbackModal';
 import RelatedList from '@/components/resource/RelatedList';
 import { getRelatedResources } from '@/lib/resources';
@@ -346,6 +347,9 @@ export default async function PodcastDetail(
                 fallbackUrl={PODCAST_FEEDBACK_FORM_URL}
                 button={surface.feedbackButton}
               />
+              <div style={{ marginTop: '12px' }}>
+                <SharePill title={resource.title} description={resource.description} accent={surface.primary} />
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
                 <a
                   href={`mailto:${PODCAST_EMAIL}`}

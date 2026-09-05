@@ -128,6 +128,8 @@ export default async function WebinarDetail(
           />
           <ShellRail
             slug={resource.slug}
+            title={resource.title}
+            description={resource.description}
             surface={surface}
             facts={facts}
             presenters={presenters}

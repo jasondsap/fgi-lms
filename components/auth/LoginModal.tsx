@@ -45,6 +45,7 @@ export default function LoginModal(
     trigger = 'pill',
     triggerLabel,
     accent = 'var(--fgi-blue)',
+    next,
   }: {
     color?: string;
     surface?: string;
@@ -56,6 +57,8 @@ export default function LoginModal(
     trigger?: 'pill' | 'cta' | 'none';
     triggerLabel?: string;
     accent?: string;
+    /** Same-site path to land on after sign-in (a shared deep link). */
+    next?: string;
   },
 ) {
   // Registration kill switch (lib/registration.ts): while closed, a request
@@ -91,6 +94,13 @@ export default function LoginModal(
     };
   }, [open, view]);
 
+  // After a successful sign-in: continue to the shared link if there is one,
+  // otherwise re-render the current page signed in.
+  const arrive = () => {
+    if (next) router.push(next);
+    else router.refresh();
+  };
+
   const reset = (v: View) => {
     setView(v === 'register' && !regOpen ? 'login' : v);
     setError('');
@@ -103,7 +113,7 @@ export default function LoginModal(
     if (res.ok) {
       setOpen(false);
       setPassword('');
-      router.refresh();
+      arrive();
     } else {
       setError(res.error);
     }
@@ -128,7 +138,7 @@ export default function LoginModal(
       setCode('');
       setNewPassword('');
       setPassword('');
-      router.refresh();
+      arrive();
     } else {
       setError(res.error);
     }
@@ -279,7 +289,7 @@ export default function LoginModal(
               {regOpen && view === 'register' && (
                 <RegisterForm
                   surface={surface}
-                  onSuccess={() => { setOpen(false); router.refresh(); }}
+                  onSuccess={() => { setOpen(false); arrive(); }}
                   switchToLogin={() => reset('login')}
                 />
               )}
