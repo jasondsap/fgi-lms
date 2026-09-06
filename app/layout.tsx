@@ -44,8 +44,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
         />
         {/* Header/Footer are provided per route group (FGI surfaces vs tenant
-            pages) so tenant landing pages can supply their own chrome. */}
-        {children}
+            pages) so tenant landing pages can supply their own chrome.
+            .page-clip (9-5-26): iOS Safari lets a finger pan the whole page
+            sideways whenever anything pokes past the viewport, and overflow
+            on <body> alone does not stop it — clipping a wrapper does. */}
+        <div className="page-clip">{children}</div>
         {/* Blocks the site until a signed-in user completes registration */}
         <RegistrationGate />
         {/* One-time launch welcome cards — after registration, once per account */}

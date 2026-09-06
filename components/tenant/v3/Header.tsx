@@ -131,7 +131,7 @@ export default function TenantHeaderV3({
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0, marginLeft: 'auto' }}>
+      <div className="site-actions" style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginLeft: 'auto' }}>
         {/* Help Center in the tenant's own chrome (Jason, 8-31-26: Home must
             lead back to the portal, never to FGI). */}
         <Link

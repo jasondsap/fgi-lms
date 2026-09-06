@@ -162,8 +162,11 @@ img { max-width: 100%; height: auto; display: block; }
    ============================================================================= */
 
 /* Nothing on the site may scroll the page sideways. `clip` doesn't create a
-   scroll container, so the sticky header keeps working. */
-body { overflow-x: clip; }
+   scroll container, so the sticky header keeps working. Mobile Safari ignores
+   overflow on the viewport itself when content is wider than the screen (the
+   page still pans), so the wrapper in app/layout.tsx carries it too. */
+html, body { overflow-x: clip; }
+.page-clip { overflow-x: clip; }
 
 /* Horizontal page gutter shared by full-width sections. */
 .gutter { padding-left: 2rem; padding-right: 2rem; }
@@ -172,6 +175,7 @@ body { overflow-x: clip; }
 .site-header { position: relative; }
 .site-header-inner { height: 92px; }
 .site-nav--fgi { margin-left: 5rem; }
+.site-actions { gap: 18px; }
 .nav-burger { display: none; }
 .nav-panel {
   display: none;
@@ -266,7 +270,8 @@ body { overflow-x: clip; }
 }
 @media (max-width: 900px) {
   .hero-title { font-size: 40px; }
-  .home-hero-grid, .tenant-hero-grid, .cert-band-grid { grid-template-columns: 1fr; gap: 1rem; }
+  /* minmax(0, …): a long unbreakable line must not widen the column past the phone. */
+  .home-hero-grid, .tenant-hero-grid, .cert-band-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
   .home-hero-copy { padding-top: 2rem; padding-bottom: 0; max-width: none; }
   .home-hero-art { max-width: 520px; margin: 0 auto; }
   .highlights { margin-top: 1.5rem; }
@@ -356,4 +361,13 @@ body { overflow-x: clip; }
   }
   .shell-lobe-bar { padding-top: 12px !important; padding-bottom: 12px !important; }
   .tenant-footer-lobe { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+}
+
+/* ---- Very small phones (iPhone SE / 320-360) ------------------------------- */
+@media (max-width: 400px) {
+  .site-logo img { width: 148px; }
+  .tenant-logo img { max-width: 124px; }
+  .site-actions { gap: 10px; }
+  .tenant-lobe-logo img { height: 44px; }
+  .tenant-lobe-bar { padding-left: 1rem; }
 }

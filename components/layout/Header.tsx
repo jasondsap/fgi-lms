@@ -39,7 +39,7 @@ export default function Header() {
         <NavLinks />
 
         {/* Help + account area (help "?" icon: Jason, 8-31-26) */}
-        <div style={{ flexShrink: 0, marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '18px' }}>
+        <div className="site-actions" style={{ flexShrink: 0, marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
           <Link
             href="/help"
             aria-label="Help Center"
