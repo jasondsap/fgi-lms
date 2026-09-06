@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: 'Fletcher Group Learning Resource Center',
     type: 'website',
+    // Link-preview card (Jason, 9-5-26): without an explicit image, iMessage
+    // and friends grabbed the first large picture on the page — the hero's
+    // water ripple. 1200x630, logo on brand navy; built by hand in PIL.
+    images: [{ url: '/images/og/fgi-share.png', width: 1200, height: 630, alt: 'Fletcher Group Learning Resource Center' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/images/og/fgi-share.png'],
   },
 };
 
