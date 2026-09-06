@@ -39,14 +39,13 @@ export default function LatestHighlights({
   if (!tiles.length) return null;
 
   return (
-    <div style={{
+    <div className="highlights gutter" style={{
       position: 'relative',
       zIndex: 2,
       // Full page width (Jennifer 8-30: "expand it to the left") — wider tiles
-      // wrap less, so the panel is shorter.
+      // wrap less, so the panel is shorter. The hero overlap (margin) and the
+      // phone stacking live in globals.css.
       maxWidth: 'var(--max-width)',
-      margin: '-95px auto 0',
-      padding: '0 2rem',
     }}>
       <div style={{
         background: '#ffffff',
@@ -67,11 +66,7 @@ export default function LatestHighlights({
           </h2>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${tiles.length}, 1fr)`,
-          gap: '1.25rem',
-        }}>
+        <div className="highlights-grid" style={{ '--cols': tiles.length } as React.CSSProperties}>
           {tiles.map(tile => (
             <Link
               key={tile.label}

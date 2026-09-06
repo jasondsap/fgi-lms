@@ -10,11 +10,9 @@ export default function PresenterCard(
   { presenter: p, accent }: { presenter: Presenter; accent: string },
 ) {
   return (
-    <div style={{
+    <div className={p.org_logo_url ? 'presenter-grid presenter-grid--logo' : 'presenter-grid'} style={{
       background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: '8px',
-      padding: '1.5rem', display: 'grid',
-      gridTemplateColumns: p.org_logo_url ? '140px 1fr 180px' : '140px 1fr',
-      gap: '1.75rem', alignItems: 'start',
+      padding: '1.5rem',
     }}>
       <div>
         {p.photo_url ? (

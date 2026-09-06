@@ -131,8 +131,9 @@ export default function AskLibrary({
       <button
         onClick={() => setOpen(true)}
         aria-label="Ask Fletch"
+        className="fletch-launcher"
         style={{
-          position: 'fixed', bottom: '24px', right: '24px', zIndex: 200,
+          position: 'fixed', zIndex: 200,
           background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'flex-end',
         }}
@@ -141,15 +142,15 @@ export default function AskLibrary({
         <img
           src="/images/fletch/fletch-hello.webp"
           alt=""
+          className="fletch-launcher__owl"
           style={{
-            width: '92px', height: 'auto', marginBottom: '-12px', marginRight: '10px',
+            height: 'auto', marginBottom: '-12px', marginRight: '10px',
             filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.25))', pointerEvents: 'none',
           }}
         />
-        <span style={{
+        <span className="fletch-launcher__pill" style={{
           background: pillBg, color: pillText,
-          borderRadius: '999px', padding: '13px 22px',
-          fontSize: '15px', fontWeight: 600,
+          borderRadius: '999px', fontWeight: 600,
           boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
         }}>
           Ask Fletch
@@ -162,8 +163,9 @@ export default function AskLibrary({
     <div
       role="dialog"
       aria-label="Ask Fletch"
+      className="fletch-panel"
       style={{
-        position: 'fixed', bottom: '24px', right: '24px', zIndex: 200,
+        position: 'fixed', zIndex: 200,
         width: 'min(420px, calc(100vw - 32px))', maxHeight: 'min(620px, calc(100vh - 48px))',
         display: 'flex', flexDirection: 'column',
         background: '#fff', border: '1px solid var(--border-color)',

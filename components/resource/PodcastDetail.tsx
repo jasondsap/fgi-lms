@@ -202,10 +202,7 @@ export default async function PodcastDetail(
               <div style={{ fontSize: '24px', fontWeight: 700, marginBottom: '1rem' }}>
                 Your Host
               </div>
-              <div style={{
-                display: 'grid', gridTemplateColumns: '150px 1fr 180px',
-                gap: '1.75rem', alignItems: 'start',
-              }}>
+              <div className="host-grid">
                 <Image
                   src={PODCAST_HOST.photo} alt={PODCAST_HOST.name}
                   width={150} height={225}

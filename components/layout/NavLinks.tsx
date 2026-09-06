@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import MailingListModal from './MailingListModal';
+import { NAV_LINKS } from '@/lib/nav-links';
 
 /*
  * Header navigation. Client-side only because the 8-10-26 mockup marks the
@@ -13,19 +14,13 @@ import MailingListModal from './MailingListModal';
 /** Mailing List Sign Up pill in the header — off for now (Jason, 8-30-26). */
 const SHOW_MAILING_LIST = false;
 
-const LINKS = [
-  { label: 'Home',         href: '/' },
-  { label: 'Library',      href: '/library' },
-  { label: 'Fletcher Web', href: 'https://www.fletchergroup.org', external: true },
-  { label: 'Consultation Request', href: 'https://airtable.com/appDb16SxhhHo4TeX/page3ondJkFAWb73q/form', external: true },
-];
 
 export default function NavLinks() {
   const pathname = usePathname();
 
   return (
     // Links sit next to the logo; the account control alone goes to the far right (Jason, 8-30).
-    <nav aria-label="Main navigation" style={{ marginLeft: '5rem' }}>
+    <nav aria-label="Main navigation" className="site-nav site-nav--fgi">
       <ul style={{
         display: 'flex',
         gap: '2.25rem',
@@ -34,7 +29,7 @@ export default function NavLinks() {
         margin: 0,
         padding: 0,
       }}>
-        {LINKS.map(({ label, href, external }) => {
+        {NAV_LINKS.map(({ label, href, external }) => {
           const active = !external && pathname === href;
           return (
             <li key={label}>

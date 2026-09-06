@@ -260,17 +260,10 @@ export default function CoursePlayer({
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      height: 'calc(100vh - 80px)', // header is 80px, sticky
-      background: 'var(--body-bg)',
-    }}>
-      {/* ── Sidebar ── */}
-      <aside style={{
-        width: '320px',
-        flexShrink: 0,
+    <div className="course-player" style={{ background: 'var(--body-bg)' }}>
+      {/* ── Sidebar (phones: a scrollable band above the activity — globals.css) ── */}
+      <aside className="course-sidebar" style={{
         background: '#ffffff',
-        borderRight: '1px solid var(--border-color)',
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',

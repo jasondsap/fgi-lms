@@ -58,7 +58,7 @@ function Dot({ cx, cy, r, color }: { cx: number; cy: number; r: number; color: s
 
 export default function HeroVisual() {
   return (
-    <div style={{ position: 'relative', width: '100%', aspectRatio: `${W} / ${H}` }}>
+    <div className="home-hero-art" style={{ position: 'relative', width: '100%', aspectRatio: `${W} / ${H}` }}>
 
       {/* Water ripple — sits behind everything else. The asset is cropped to
           the swirl's own alpha bounds, so `width` IS the swirl diameter: 350

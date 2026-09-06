@@ -54,23 +54,18 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
     <div>
       {/* ── Hero: copy left, Latest Highlights card over the dot spray right ── */}
       <section style={{ background: tenant.primary }}>
-        <div style={{
+        <div className="gutter" style={{
           background: v3.heroBg,
           borderBottomRightRadius: '60px',
-          padding: '0 2rem',
           overflow: 'hidden',
         }}>
-          <div style={{
-            maxWidth: 'var(--max-width)', margin: '0 auto',
-            display: 'grid', gridTemplateColumns: '1fr 560px', gap: '2.5rem',
-            alignItems: 'start',
-          }}>
-            <div style={{ maxWidth: '530px', padding: '3.25rem 0 3rem' }}>
+          <div className="tenant-hero-grid" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+            <div className="tenant-hero-copy">
               <div style={{ fontSize: '24px', color: tenant.primary, lineHeight: 1.2, marginBottom: '2px' }}>
                 Learning Resource Center
               </div>
-              <h1 style={{
-                fontSize: '52px', fontWeight: 700, color: tenant.primary,
+              <h1 className="hero-title" style={{
+                fontWeight: 700, color: tenant.primary,
                 margin: '0 0 1.9rem', lineHeight: 1.1,
                 textShadow: '3px 3px 0 rgba(0,25,112,0.13)',
               }}>
@@ -113,7 +108,7 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
             {/* Right: the highlights card floats on the halftone spray, with
                 bubbles showing on BOTH sides of the card (Jennifer's mockup;
                 Jason, 8-21: card ~15% narrower, bubbles larger and left). */}
-            <div style={{ position: 'relative', minHeight: '560px' }}>
+            <div className="tenant-hero-art">
               {/* Ring centered behind the card — its open side sits upper-left
                   and the dense arc lower-right, as in the mockup. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -137,10 +132,9 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
                 position: 'absolute', right: '-6px', top: '190px',
                 width: '15px', height: '15px', borderRadius: '50%', background: tenant.accent,
               }} />
-              <div style={{
+              <div className="tenant-hero-card" style={{
                 position: 'relative', background: '#ffffff',
                 borderRadius: '22px', boxShadow: '0 10px 34px rgba(4,30,66,0.18)',
-                width: '340px', margin: '3.4rem 5.6rem 0 auto',
                 padding: '1.3rem 1.35rem 1.5rem',
               }}>
                 <div style={{
@@ -220,12 +214,8 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
       </section>
 
       {/* ── Certification band (full-bleed navy) ── */}
-      <section style={{ background: tenant.primary, padding: '2.5rem 2rem' }}>
-        <div style={{
-          maxWidth: 'var(--max-width)', margin: '0 auto',
-          display: 'grid', gridTemplateColumns: '1fr 460px', gap: '1.5rem',
-          alignItems: 'stretch',
-        }}>
+      <section className="gutter" style={{ background: tenant.primary, paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
+        <div className="cert-band-grid" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           {/* Jennifer's Mockup A (8-31-26): the white box gets a rounded
               outline in the tenant frame colour with a dot triangle in its
               top-left corner (CO red, SCARR yellow). 9-3-26: the triangle now
@@ -285,14 +275,11 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
       </section>
 
       {/* ── Support bar ── */}
-      <section style={{
+      <section className="gutter" style={{
         background: v3.supportBar.bg, color: v3.supportBar.fg,
-        padding: '1.25rem 2rem',
+        paddingTop: '1.25rem', paddingBottom: '1.25rem',
       }}>
-        <div style={{
-          maxWidth: 'var(--max-width)', margin: '0 auto',
-          display: 'grid', gridTemplateColumns: 'auto auto 1fr', gap: '2rem', alignItems: 'center',
-        }}>
+        <div className="support-grid" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '18px', fontWeight: 700 }}>{v3.supportBar.heading ?? 'Need Platform Help?'}</span>
             {/* Opens the Question/Problem ticket modal (8-31-26) — signed-out

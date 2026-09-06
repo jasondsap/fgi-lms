@@ -158,8 +158,8 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
     const edgePad = 'max(2rem, calc((100vw - var(--max-width)) / 2))';
     return (
       <footer style={{ background: lobe.bg, color: '#ffffff' }}>
-        <div style={{ display: 'flex', alignItems: 'stretch', paddingLeft: edgePad }}>
-          <div style={{ display: 'flex', alignItems: 'center', paddingRight: '26px', flexShrink: 0 }}>
+        <div className="shell-lobe" style={{ display: 'flex', alignItems: 'stretch', paddingLeft: edgePad }}>
+          <div style={{ display: 'flex', alignItems: 'center', paddingRight: '26px', flexShrink: 0, paddingTop: '10px', paddingBottom: '10px' }}>
             <Image
               src={lobe.logo}
               alt={tenant.logoAlt}
@@ -167,14 +167,11 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
               style={{ width: '120px', height: 'auto' }}
             />
           </div>
-          <div style={{
+          <div className="tenant-footer-grid tenant-footer-lobe" style={{
             flex: 1, minWidth: 0,
             background: tenant.primary,
             borderRadius: '999px 0 0 999px',
-            padding: '2.25rem 0 2rem 4.5rem',
             paddingRight: edgePad,
-            display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
-            alignItems: 'start',
           }}>
             {contact}
             {right}
@@ -185,12 +182,8 @@ export default function TenantFooterV3({ tenant }: { tenant: TenantConfig }) {
   }
 
   return (
-    <footer style={{ background: tenant.primary, color: '#ffffff', padding: '2.25rem 2rem 2rem' }}>
-      <div style={{
-        maxWidth: 'var(--max-width)', margin: '0 auto',
-        display: 'grid', gridTemplateColumns: '1fr auto', gap: '2rem',
-        alignItems: 'start',
-      }}>
+    <footer className="gutter" style={{ background: tenant.primary, color: '#ffffff', paddingTop: '2.25rem', paddingBottom: '2rem' }}>
+      <div className="tenant-footer-grid" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
         {/* Left: lockup, then the contact block aligned under it. */}
         <div>
           <Image

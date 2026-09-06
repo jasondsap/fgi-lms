@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import type { TenantConfig } from '@/lib/tenants';
+import MobileNav, { type MobileNavLink } from '@/components/layout/MobileNav';
 
 /*
  * v3 tenant header (8-19-26 SCARR mockup): brand-navy bar with the logo mark
@@ -46,10 +47,24 @@ export default function TenantHeaderV3({
     maxWidth: '170px', textDecoration: 'none',
   };
 
+  // Phone/tablet panel (9-5-26): the same links, then Help, then the cert pills.
+  const mobileLinks: MobileNavLink[] = [
+    ...links,
+    { label: 'Help Center', href: `${home}/help` },
+    {
+      label: v3.certButtons.pre.label, href: v3.certButtons.pre.href ?? '#',
+      pill: { bg: tenant.accent, fg: '#000000' }, disabled: !v3.certButtons.pre.href,
+    },
+    ...(v3.certButtons.post ? [{
+      label: v3.certButtons.post.label, href: v3.certButtons.post.href ?? '#',
+      pill: { bg: '#ffffff', fg: '#000000' }, disabled: !v3.certButtons.post.href,
+    }] : []),
+  ];
+
   // Everything to the right of the logo — shared by both layouts.
   const inner = (
     <>
-      <nav aria-label="Main navigation">
+      <nav aria-label="Main navigation" className="site-nav">
         <ul style={{
           display: 'flex', gap: '2rem', listStyle: 'none',
           alignItems: 'center', margin: 0, padding: 0,
@@ -77,7 +92,7 @@ export default function TenantHeaderV3({
 
       {/* Certification pills sit centred in the space between the nav and the
           org-site link (Jennifer, 8-25). */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+      <div className="tenant-cert-pills" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
         {v3.certButtons.pre.href ? (
           <Link
             href={v3.certButtons.pre.href}
@@ -116,7 +131,7 @@ export default function TenantHeaderV3({
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0, marginLeft: 'auto' }}>
         {/* Help Center in the tenant's own chrome (Jason, 8-31-26: Home must
             lead back to the portal, never to FGI). */}
         <Link
@@ -133,6 +148,7 @@ export default function TenantHeaderV3({
           ?
         </Link>
         {authNav}
+        <MobileNav links={mobileLinks} bg={tenant.primary} accent={tenant.accent} />
       </div>
     </>
   );
@@ -140,13 +156,14 @@ export default function TenantHeaderV3({
   if (v3.lobe) {
     const edgePad = 'max(2rem, calc((100vw - var(--max-width)) / 2))';
     return (
-      <header style={{ background: v3.lobe.bg, borderBottom: `5px solid ${tenant.accent}` }}>
-        <div style={{
-          display: 'flex', alignItems: 'stretch', height: '92px',
+      <header className="site-header" style={{ background: v3.lobe.bg, borderBottom: `5px solid ${tenant.accent}` }}>
+        <div className="site-header-inner" style={{
+          display: 'flex', alignItems: 'stretch',
           paddingLeft: edgePad,
         }}>
           <Link
             href={home}
+            className="tenant-lobe-logo"
             style={{
               display: 'flex', alignItems: 'center',
               paddingRight: '26px', flexShrink: 0,
@@ -157,16 +174,16 @@ export default function TenantHeaderV3({
               alt={tenant.logoAlt}
               width={300} height={300}
               priority
-              style={{ height: '78px', width: 'auto' }}
+              style={{ width: 'auto' }}
             />
           </Link>
 
-          <div style={{
+          <div className="tenant-lobe-bar" style={{
             flex: 1, minWidth: 0,
             background: tenant.primary, color: '#ffffff',
             borderRadius: '999px 0 0 999px',
-            display: 'flex', alignItems: 'center', gap: '1.75rem',
-            paddingLeft: '3rem', paddingRight: edgePad,
+            display: 'flex', alignItems: 'center',
+            paddingRight: edgePad,
           }}>
             {inner}
           </div>
@@ -176,12 +193,12 @@ export default function TenantHeaderV3({
   }
 
   return (
-    <header style={{ background: tenant.primary, borderBottom: `5px solid ${tenant.accent}` }}>
-      <div style={{
-        maxWidth: 'var(--max-width)', margin: '0 auto', padding: '0 2rem',
-        minHeight: '92px', display: 'flex', alignItems: 'center', gap: '1.75rem',
+    <header className="site-header gutter" style={{ background: tenant.primary, borderBottom: `5px solid ${tenant.accent}` }}>
+      <div className="site-header-inner" style={{
+        maxWidth: 'var(--max-width)', margin: '0 auto',
+        display: 'flex', alignItems: 'center', gap: '1.75rem',
       }}>
-        <Link href={home} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <Link href={home} className="tenant-logo" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           <Image
             src={v3.headerLogo.src}
             alt={tenant.logoAlt}

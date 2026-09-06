@@ -83,17 +83,12 @@ export default function Footer() {
         color: '#ffffff',
         borderTop: '6px solid var(--fgi-teal)',
       }}>
-        <div style={{
+        <div className="gutter" style={{
           maxWidth: 'var(--max-width)',
           margin: '0 auto',
-          padding: '2.5rem 2rem 2rem',
+          paddingTop: '2.5rem', paddingBottom: '2rem',
         }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '0.8fr 1.7fr 1.1fr',
-            gap: '2rem',
-            alignItems: 'start',
-          }}>
+          <div className="footer-grid">
 
             {/* Col 1 — logo + tagline + site URL */}
             <div>
@@ -125,11 +120,10 @@ export default function Footer() {
 
             {/* Col 2 — Follow Us stacked over the podcast platforms; the
                 outline hugs the content per Jennifer's 8-17-26 feedback. */}
-            <div style={{
+            <div className="footer-col--center" style={{
               border: '1.5px solid #ffffff',
               borderRadius: 'var(--radius-lg)',
               padding: '1.25rem 1.75rem 1.35rem',
-              justifySelf: 'center',
               display: 'flex', flexDirection: 'column', gap: '1.25rem',
               alignItems: 'center',
             }}>
@@ -178,7 +172,7 @@ export default function Footer() {
             </div>
 
             {/* Col 3 — office location (Florida removed per Jason, 8-20-26) */}
-            <div style={{ fontSize: '16px', lineHeight: 1.7, justifySelf: 'end' }}>
+            <div className="footer-col--end" style={{ fontSize: '16px', lineHeight: 1.7 }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <InlineGlyph path={MAP_PIN} />

@@ -90,8 +90,8 @@ export default async function TenantLibrarySection({
   return (
     <>
       {/* ── Curated library (unchanged per Jason, 8-21) ── */}
-      <section id="library" style={{ background: '#ffffff', padding: '2.25rem 2rem 4rem', scrollMarginTop: '90px' }}>
-        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+      <section id="library" className="gutter" style={{ background: '#ffffff', paddingTop: '2.25rem', paddingBottom: '4rem', scrollMarginTop: '90px' }}>
+        <div className="library-layout" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
             <FilterSidebar
               total={data.total} targetPath={targetPath} isTenant

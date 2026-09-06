@@ -60,11 +60,8 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
 
   return (
-    <div style={{ background: '#ffffff', padding: '2rem 2rem 4rem' }}>
-      <div style={{
-        maxWidth: 'var(--max-width)', margin: '0 auto',
-        display: 'flex', gap: '2rem', alignItems: 'flex-start',
-      }}>
+    <div className="gutter" style={{ background: '#ffffff', paddingTop: '2rem', paddingBottom: '4rem' }}>
+      <div className="library-layout" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
         <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
           <FilterSidebar total={data.total} targetPath="/library" />
         </Suspense>

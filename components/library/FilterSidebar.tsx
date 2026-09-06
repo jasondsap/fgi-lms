@@ -99,6 +99,22 @@ export default function FilterSidebar({
   const searchParams = useSearchParams();
   const dest = targetPath || pathname;
 
+  // Phone/tablet (9-5-26): the sidebar is a full-screen drawer behind a
+  // "Filters" pill. CSS (.filter-sidebar--open) does the layout; this just
+  // tracks open state and locks the page scroll while it's up.
+  const [drawer, setDrawer] = useState(false);
+  useEffect(() => {
+    if (!drawer) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawer(false); };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [drawer]);
+
   const toggle = useCallback((key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (key === 'collection') {
@@ -173,13 +189,18 @@ export default function FilterSidebar({
     })
     .filter(g => g.items.length > 0);
 
+  const activeCount = active.type.length + active.audience.length + active.topic.length
+    + active.collection.length;
+
   return (
-    <aside style={{
-      width: '252px', flexShrink: 0, background: 'var(--card-bg)',
-      border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-      padding: '1.15rem 1.25rem', position: 'sticky', top: '110px',
-      maxHeight: 'calc(100vh - 130px)', overflowY: 'auto',
-    }}>
+    <>
+    <button type="button" className="filter-toggle" onClick={() => setDrawer(true)} aria-expanded={drawer}>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
+        <path d="M3 6h18M6 12h12M10 18h4" />
+      </svg>
+      Filters{activeCount ? ` (${activeCount})` : ''}
+    </button>
+    <aside className={`filter-sidebar${drawer ? ' filter-sidebar--open' : ''}`}>
       <div style={{
         display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
         gap: '8px', marginBottom: '6px',
@@ -195,6 +216,20 @@ export default function FilterSidebar({
           }}>Clear all</button>
         ) : null}
       </div>
+      {drawer && (
+        <button
+          type="button"
+          onClick={() => setDrawer(false)}
+          aria-label="Close filters"
+          style={{
+            position: 'absolute', top: '10px', right: '14px', width: '36px', height: '36px',
+            border: 'none', background: 'transparent', fontSize: '26px', lineHeight: 1,
+            color: 'var(--text-secondary)',
+          }}
+        >
+          ×
+        </button>
+      )}
 
       {groups.map(group => (
         <FilterGroup
@@ -240,6 +275,11 @@ export default function FilterSidebar({
           </a>
         </FilterGroup>
       )}
+
+      <button type="button" className="filter-close" onClick={() => setDrawer(false)}>
+        Show {total} result{total === 1 ? '' : 's'}
+      </button>
     </aside>
+    </>
   );
 }

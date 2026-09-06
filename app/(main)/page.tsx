@@ -100,22 +100,14 @@ export default async function HomePage({ searchParams }: PageProps) {
   return (
     <div>
       {/* ── Hero (8-10-26 mockup) ── */}
-      <section style={{
+      <section className="gutter" style={{
         background: 'var(--fgi-hero)',
         borderBottomRightRadius: '60px',
-        padding: '0 2rem',
       }}>
-        <div style={{
-          maxWidth: 'var(--max-width)',
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1fr 620px',
-          gap: '4rem',
-          alignItems: 'start',
-        }}>
+        <div className="home-hero-grid" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           {/* Left: welcome copy. The mockup gives the artwork the full height of
               the blue band, so the top padding lives on this column only. */}
-          <div style={{ maxWidth: '530px', paddingTop: '3.75rem', paddingBottom: '2rem' }}>
+          <div className="home-hero-copy">
             <div style={{
               fontSize: '24px', fontWeight: 400, color: 'var(--fgi-navy)',
               lineHeight: 1.2, marginBottom: '2px',
@@ -123,8 +115,8 @@ export default async function HomePage({ searchParams }: PageProps) {
               Learning Resource Center
             </div>
 
-            <h1 style={{
-              fontSize: '52px', fontWeight: 700, color: 'var(--fgi-navy)',
+            <h1 className="hero-title" style={{
+              fontWeight: 700, color: 'var(--fgi-navy)',
               margin: '0 0 1.9rem', lineHeight: 1.1,
               textShadow: '3px 3px 0 rgba(22,61,91,0.13)',
             }}>
@@ -178,9 +170,9 @@ export default async function HomePage({ searchParams }: PageProps) {
       <LatestHighlights tiles={highlights} />
 
       {/* ── Learning Center Support bar ── */}
-      <section style={{
+      <section className="gutter" style={{
         background: 'var(--fgi-band)',
-        padding: '1.4rem 2rem',
+        paddingTop: '1.4rem', paddingBottom: '1.4rem',
         marginTop: '0.5rem',
         display: 'flex',
         alignItems: 'center',
@@ -195,11 +187,8 @@ export default async function HomePage({ searchParams }: PageProps) {
       </section>
 
       {/* ── Library ── */}
-      <section style={{ background: '#ffffff', padding: '2.25rem 2rem 4rem' }}>
-        <div style={{
-          maxWidth: 'var(--max-width)', margin: '0 auto',
-          display: 'flex', gap: '2rem', alignItems: 'flex-start',
-        }}>
+      <section className="gutter" style={{ background: '#ffffff', paddingTop: '2.25rem', paddingBottom: '4rem' }}>
+        <div className="library-layout" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           <Suspense fallback={<div style={{ width: '220px', flexShrink: 0 }} />}>
             <FilterSidebar total={data.total} targetPath="/" />
           </Suspense>

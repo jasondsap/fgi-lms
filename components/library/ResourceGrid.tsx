@@ -108,10 +108,7 @@ export default function ResourceGrid({
 
   return (
     <>
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '1.25rem', marginBottom: '2rem',
-      }}>
+      <div className="resource-grid">
         {items.map((resource) => (
           <ResourceCard
             key={resource.id}

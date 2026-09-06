@@ -85,7 +85,7 @@ export default function ShellFooter({
   );
 
   const contact = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px 18px', flexWrap: 'wrap' }}>
       <span style={{ fontSize: '17px' }}>{supportLabel}</span>
       <ContactButton
         label="Contact" fontSize="16px"
@@ -112,20 +112,20 @@ export default function ShellFooter({
     const edgePad = 'max(2rem, calc((100vw - var(--max-width)) / 2))';
     return (
       <footer style={{ background: lobeBg, color: '#ffffff' }}>
-        <div style={{
+        <div className="shell-lobe" style={{
           display: 'flex', alignItems: 'stretch', minHeight: '80px',
           paddingLeft: edgePad,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', paddingRight: '24px', flexShrink: 0 }}>
             {logo}
           </div>
-          <div style={{
+          <div className="shell-lobe-bar" style={{
             flex: 1, minWidth: 0,
             background: bg,
             borderRadius: '999px 0 0 999px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             gap: '1.5rem 2.5rem', flexWrap: 'wrap',
-            padding: '12px 0 12px 3rem', paddingRight: edgePad,
+            paddingRight: edgePad,
           }}>
             {contact}
             {site}

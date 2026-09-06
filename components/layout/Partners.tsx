@@ -17,9 +17,9 @@ const PARTNERS = [
 
 export default function Partners() {
   return (
-    <section style={{
+    <section className="gutter" style={{
       background: '#ffffff',
-      padding: '2.75rem 2rem 3rem',
+      paddingTop: '2.75rem', paddingBottom: '3rem',
     }}>
       <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
         <h2 style={{
