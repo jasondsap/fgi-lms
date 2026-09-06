@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import AuthNav from '@/components/layout/AuthNav';
 import TenantHeader from '@/components/tenant/TenantHeader';
@@ -14,6 +15,25 @@ import { canEnterPortal, getViewer, viewerHome } from '@/lib/viewer';
  * route claimed (/library, /resource, /course, /admin, /api all win first).
  * Anything that isn't a known tenant slug 404s.
  */
+/**
+ * Link-preview card per portal (Jason, 9-6-26): every page under /colorado or
+ * /scarr unfurls with that portal's logo card instead of the FGI one. Pages
+ * keep setting their own <title>; og:title follows it.
+ */
+export function generateMetadata({ params }: { params: { tenant: string } }): Metadata {
+  const tenant = getTenantConfig(params.tenant);
+  if (!tenant) return {};
+  const image = `/images/og/${tenant.slug}-share.png`;
+  return {
+    openGraph: {
+      siteName: `${tenant.name} — Learning Center`,
+      type: 'website',
+      images: [{ url: image, width: 1200, height: 630, alt: tenant.logoAlt }],
+    },
+    twitter: { card: 'summary_large_image', images: [image] },
+  };
+}
+
 export default async function TenantLayout({
   children,
   params,
