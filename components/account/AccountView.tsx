@@ -276,17 +276,17 @@ export default async function AccountView({ surface }: { surface: Surface }) {
         )}
 
         {/* ---------------------------------------------------------------- */}
-        {/* Saved + recently viewed                                           */}
+        {/* Favorites + recently viewed                                       */}
         {/* ---------------------------------------------------------------- */}
         {(bookmarks.length > 0 || recent.length > 0) && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
             {bookmarks.length > 0 && (
               <section style={{ ...CARD, margin: 0 }}>
-                <h2 style={H2}>Saved resources</h2>
+                <h2 style={H2}>Favorites</h2>
                 <ResourceList
                   items={bookmarks.map((b) => ({ key: b.resource_id, slug: b.slug, title: b.title, type: b.type, when: b.created_at }))}
                   basePath={surface.basePath}
-                  whenLabel="Saved"
+                  whenLabel="Added"
                 />
               </section>
             )}

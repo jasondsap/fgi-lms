@@ -292,7 +292,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Your Account',
     name: 'My Learning',
     description:
-      'My Learning (in your account menu) is your personal dashboard: courses in progress with completion percentages, finished courses, total CE hours, your bookmarks, and a downloadable transcript of everything you’ve completed.',
+      'My Learning (in your account menu) is your personal dashboard: courses in progress with completion percentages, finished courses, total CE hours, your favorites, and a downloadable transcript of everything you’ve completed.',
     quickStart: [
       'Click your initials at the top right, then My Learning.',
       'Review in-progress courses and jump back in from there.',
@@ -306,13 +306,13 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: 'bookmarks',
     category: 'Your Account',
-    name: 'Bookmarks',
+    name: 'Favorites',
     description:
-      'The bookmark button on any resource page saves it to your list, so you can find it again without searching. Your bookmarks live on the My Learning page.',
+      'The Save to Favorites button on any resource page adds it to your Favorites list, so you can find it again without searching. Your favorites live on the My Learning page.',
     quickStart: [
-      'Open a resource and click the bookmark button.',
-      'Find everything you’ve saved under My Learning → Bookmarks.',
-      'Click the bookmark button again to remove one.',
+      'Open a resource and click Save to Favorites (bottom right).',
+      'Find everything you’ve saved under My Learning → Favorites.',
+      'Click the button again to remove one.',
     ],
     tips: [],
     faqs: [],

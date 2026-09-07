@@ -3,8 +3,8 @@ import { useState, useTransition } from 'react';
 import { toggleBookmarkAction } from './account-actions';
 
 /**
- * "Save to My Learning" pill, pinned bottom-right of every resource shell
- * (8-29-26). Pinned rather than placed inside each of the five shells so it
+ * "Save to Favorites" pill (Jennifer, 9-7-26; was "Save to My Learning"),
+ * pinned bottom-right of every resource shell (8-29-26). Pinned rather than placed inside each of the five shells so it
  * ships once; move it into the shells' title areas if Jennifer prefers.
  */
 export default function BookmarkButton({
@@ -40,7 +40,7 @@ export default function BookmarkButton({
             textDecoration: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.12)',
           }}
         >
-          View saved
+          View favorites
         </a>
       )}
       <button
@@ -59,7 +59,7 @@ export default function BookmarkButton({
         }}
       >
         <span aria-hidden="true" style={{ fontSize: '16px', lineHeight: 1 }}>{saved ? '★' : '☆'}</span>
-        {saved ? 'Saved' : 'Save to My Learning'}
+        {saved ? 'In Favorites' : 'Save to Favorites'}
       </button>
     </div>
   );
