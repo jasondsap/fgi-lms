@@ -184,7 +184,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Courses & CE Credits',
     name: 'Taking a Course',
     description:
-      'Courses open in the course player: lessons listed in the sidebar, the current item in the main pane. Work top to bottom — completed items get a checkmark, and your progress is saved to My Learning automatically.',
+      'Courses open in the course player: lessons listed in the sidebar, the current item in the main pane. Work top to bottom — completed items get a checkmark, and your progress is saved to My Resources automatically.',
     quickStart: [
       'Open a course from the library and click its start button.',
       'Pick a lesson from the sidebar (or just start at the top).',
@@ -219,7 +219,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       'Download your certificate from the course player — it’s your CE documentation.',
     ],
     tips: [
-      'Your CE hours also total up on your My Learning page.',
+      'Your CE hours also total up on your My Resources page.',
     ],
     faqs: [],
   },
@@ -266,7 +266,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Your Account',
     name: 'Signing In',
     description:
-      'The Sign In button at the top right opens the sign-in window. Once signed in, it becomes a circle with your initials — that’s your account menu, with My Learning and Sign Out.',
+      'The Sign In button at the top right opens the sign-in window. Once signed in, it becomes a circle with your initials — that’s your account menu, with My Resources and Sign Out.',
     quickStart: [
       'Click Sign In at the top right.',
       'Enter your email and password.',
@@ -290,16 +290,16 @@ export const HELP_TOPICS: HelpTopic[] = [
   {
     id: 'my-learning',
     category: 'Your Account',
-    name: 'My Learning',
+    name: 'My Resources',
     description:
-      'My Learning (in your account menu) is your personal dashboard: courses in progress with completion percentages, finished courses, total CE hours, your favorites, and a downloadable transcript of everything you’ve completed.',
+      'My Resources (in your account menu) is your personal dashboard: courses in progress with completion percentages, finished courses, total CE hours, your favorites, and a downloadable transcript of everything you’ve completed.',
     quickStart: [
-      'Click your initials at the top right, then My Learning.',
+      'Click your initials at the top right, then My Resources.',
       'Review in-progress courses and jump back in from there.',
       'Download your transcript (CSV) for records or reporting.',
     ],
     tips: [
-      'On a certification-portal account, My Learning also tracks your required-video series as a program with its own progress bar.',
+      'On a certification-portal account, My Resources also tracks your required-video series as a program with its own progress bar.',
     ],
     faqs: [],
   },
@@ -308,10 +308,10 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Your Account',
     name: 'Favorites',
     description:
-      'The Save to Favorites button on any resource page adds it to your Favorites list, so you can find it again without searching. Your favorites live on the My Learning page.',
+      'The Save to Favorites button on any resource page adds it to your Favorites list, so you can find it again without searching. Your favorites live on the My Resources page.',
     quickStart: [
       'Open a resource and click Save to Favorites (bottom right).',
-      'Find everything you’ve saved under My Learning → Favorites.',
+      'Find everything you’ve saved under My Resources → Favorites.',
       'Click the button again to remove one.',
     ],
     tips: [],
@@ -373,7 +373,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     ],
     tips: [
       'A locked video’s tooltip says exactly what to finish first.',
-      'Your progress through the series also appears on My Learning as a program.',
+      'Your progress through the series also appears on My Resources as a program.',
     ],
     faqs: [],
   },
@@ -399,7 +399,7 @@ export const GENERAL_FAQS: HelpFaq[] = [
   },
   {
     q: 'Does my progress carry across the Fletcher Group site and my portal?',
-    a: 'Yes — it’s one account. Courses you complete show up on My Learning regardless of which library you started from.',
+    a: 'Yes — it’s one account. Courses you complete show up on My Resources regardless of which library you started from.',
   },
   {
     q: 'A page or video isn’t loading properly.',

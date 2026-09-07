@@ -3,7 +3,7 @@ import AccountView from '@/components/account/AccountView';
 import { requireSignIn } from '@/lib/lockdown';
 import { FGI_SURFACE } from '@/lib/surface';
 
-export const metadata: Metadata = { title: 'My Learning — FGI Learning Resource Center' };
+export const metadata: Metadata = { title: 'My Resources — FGI Learning Resource Center' };
 
 // Per-learner page: never cached, always the current session's data.
 export const dynamic = 'force-dynamic';
