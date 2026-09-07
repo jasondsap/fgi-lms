@@ -289,7 +289,7 @@ export default function LoginModal(
               {regOpen && view === 'register' && (
                 <RegisterForm
                   surface={surface}
-                  onSuccess={() => { setOpen(false); arrive(); }}
+                  onSuccess={(home) => { setOpen(false); if (home) router.push(home); else arrive(); }}
                   switchToLogin={() => reset('login')}
                 />
               )}

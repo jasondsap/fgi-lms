@@ -1,6 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { registerAction } from '@/components/auth/register-actions';
+import { portalForState } from '@/lib/state-portals';
 import { USER_ROLE_LABELS, US_STATES } from '@/types';
 
 /**
@@ -26,7 +27,8 @@ export default function RegisterForm({
   surface, onSuccess, switchToLogin,
 }: {
   surface: string;
-  onSuccess: () => void;
+  /** `home` is set when the account was stamped with a state portal instead. */
+  onSuccess: (home?: string) => void;
   switchToLogin: () => void;
 }) {
   const [form, setForm] = useState({
@@ -39,6 +41,11 @@ export default function RegisterForm({
   const [rolesOpen, setRolesOpen] = useState(false);
   const [error, setError] = useState('');
   const [pending, startTransition] = useTransition();
+  // State-portal offer (9-7-26): on the FGI form, picking SC or CO opens a
+  // panel under the State field with a pre-ticked "register me with the
+  // portal" box. Ticked = the account belongs to the portal.
+  const [joinStatePortal, setJoinStatePortal] = useState(true);
+  const statePortal = surface === 'fgi' ? portalForState(form.state) : null;
 
   const set = (key: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -50,9 +57,11 @@ export default function RegisterForm({
   const submit = () => startTransition(async () => {
     setError('');
     if (roles.length === 0) setRolesOpen(true);
-    const res = await registerAction({ ...form, roles, surface });
+    const res = await registerAction({
+      ...form, roles, surface, joinStatePortal: Boolean(statePortal) && joinStatePortal,
+    });
     if (res.ok) {
-      onSuccess();
+      onSuccess(res.home);
     } else {
       setError(res.error);
       if (res.error.includes('already exists')) switchToLoginSoon();
@@ -127,6 +136,47 @@ export default function RegisterForm({
             value={form.zip} onChange={set('zip')} style={FIELD} />
         </div>
       </div>
+
+      {statePortal && (
+        <div
+          role="region"
+          aria-label={`${statePortal.stateName} Learning Center`}
+          style={{
+            margin: '-0.2rem 0 1rem', padding: '12px 14px 12px',
+            background: 'var(--fgi-tile)', border: '1px solid rgba(37,126,164,0.35)',
+            borderLeft: '4px solid var(--fgi-blue)', borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--fgi-navy)', marginBottom: '4px' }}>
+            {statePortal.stateName} has its own Learning Center
+          </div>
+          <p style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)', margin: '0 0 10px' }}>
+            {statePortal.partner}, our {statePortal.stateName} partner, has a dedicated Learning
+            Resource Center hosted by Fletcher Group. It includes the full Fletcher Group library
+            plus {statePortal.stateName} certification information and state-specific resources.
+            Same account, same password &mdash; you&rsquo;ll just use{' '}
+            <strong style={{ whiteSpace: 'nowrap' }}>{statePortal.link}</strong> from now on.
+          </p>
+          <label style={{
+            display: 'flex', alignItems: 'flex-start', gap: '8px',
+            fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', cursor: 'pointer',
+          }}>
+            <input
+              type="checkbox"
+              checked={joinStatePortal}
+              onChange={(e) => setJoinStatePortal(e.target.checked)}
+              style={{ marginTop: '3px', accentColor: 'var(--fgi-blue)' }}
+            />
+            <span>
+              Register me with the {statePortal.portalName}{' '}
+              <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(recommended)</span>
+            </span>
+          </label>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', paddingLeft: '24px' }}>
+            Uncheck to register with the Fletcher Group library only.
+          </div>
+        </div>
+      )}
 
       <div style={ROW}>
         <label style={LABEL} htmlFor="reg-county">County</label>
@@ -203,7 +253,9 @@ export default function RegisterForm({
             cursor: 'pointer', opacity: pending ? 0.6 : 1,
           }}
         >
-          {pending ? 'Creating your account…' : 'Create Account'}
+          {pending
+            ? 'Creating your account…'
+            : statePortal && joinStatePortal ? `Create Account & Go to ${statePortal.partner}` : 'Create Account'}
         </button>
         {/* Gold help escape hatch (Jason, 8-31) — mailto keeps it working for
             someone stuck before they even have an account. */}

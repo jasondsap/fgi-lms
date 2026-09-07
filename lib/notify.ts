@@ -13,6 +13,8 @@
 /** Who hears about new support tickets. Code-as-config for now (Jason 8-31:
     "email Jennifer and I for now") — move to an env list when the LC@ team
     takes over the queue. */
+import type { StatePortal } from '@/lib/state-portals';
+
 export const TICKET_NOTIFY_TO = ['jason@made180.com', 'jwhite@fletchergroup.org'];
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://fgilearn.org';
@@ -55,6 +57,48 @@ export async function sendEmail(input: {
     console.error('[notify] send failed:', err);
     return false;
   }
+}
+
+/**
+ * Someone registering on FGI from South Carolina / Colorado chose their state
+ * portal instead (lib/state-portals.ts). Hand them the link they should use
+ * from now on — same account, same password.
+ */
+export async function notifyPortalWelcome(input: {
+  toEmail: string;
+  firstName: string;
+  portal: StatePortal;
+}): Promise<void> {
+  const { portal } = input;
+  const url = `${BASE_URL}/${portal.slug}`;
+  await sendEmail({
+    to: [input.toEmail],
+    subject: `Your ${portal.portalName} link`,
+    html: `
+    <div style="font-family: 'Open Sans', Arial, sans-serif; color: #1d2b38; line-height: 1.6; max-width: 560px;">
+      <h2 style="margin: 0 0 10px; font-size: 19px; color: #163d5b;">Welcome to the ${esc(portal.portalName)}</h2>
+      <p style="margin: 0 0 14px; font-size: 14px;">Hi ${esc(input.firstName)},</p>
+      <p style="margin: 0 0 14px; font-size: 14px;">
+        Your account is registered with the ${esc(portal.portalName)}, the ${esc(portal.stateName)}
+        Learning Resource Center run with ${esc(portal.partnerLong)} (${esc(portal.partner)}) and hosted by
+        Fletcher Group. It includes the full Fletcher Group library plus ${esc(portal.stateName)}
+        certification information and state-specific resources.
+      </p>
+      <p style="margin: 0 0 14px; font-size: 14px;">
+        Same email, same password &mdash; just use this link from now on:
+      </p>
+      <p style="margin: 0 0 18px;">
+        <a href="${url}" style="background: #0e72a2; color: #ffffff; padding: 10px 22px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">${esc(portal.link)}</a>
+      </p>
+      <p style="margin: 0 0 14px; font-size: 13px; color: #5f6e7c;">
+        Bookmark it, or save it to your phone's home screen. If you ever land on fgilearn.org
+        instead, signing in will bring you back to your portal.
+      </p>
+      <p style="margin: 16px 0 0; font-size: 12px; color: #5f6e7c;">
+        Fletcher Group Learning Resource Center &middot; Learning Center Support &middot; LC@fletchergroup.org
+      </p>
+    </div>`,
+  });
 }
 
 /** The submitter's ticket URL: their portal chrome if they live on one. */

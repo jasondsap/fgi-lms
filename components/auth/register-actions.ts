@@ -12,9 +12,10 @@ import {
   CognitoAuthError, createConfirmedUser, PASSWORD_REGEX,
 } from '@/lib/cognito';
 import { createRegisteredUser, getAllowlistedRole } from '@/lib/users';
+import { notifyPortalWelcome } from '@/lib/notify';
 import { REGISTRATION_CLOSED_MESSAGE, SELF_REGISTRATION_OPEN } from '@/lib/registration';
+import { portalForState } from '@/lib/state-portals';
 import { USER_ROLE_LABELS, US_STATES, type UserRole } from '@/types';
-import type { AuthActionResult } from '@/components/auth/login-actions';
 
 export interface RegisterPayload {
   firstName: string;
@@ -29,13 +30,23 @@ export interface RegisterPayload {
   roleOther: string;
   /** Which portal the modal was opened on — validated against the whitelist. */
   surface: string;
+  /**
+   * FGI form only (9-7-26): the person picked a state that has its own portal
+   * and left "Register me with the … Learning Center" ticked. The account is
+   * stamped with that portal instead of fgi.
+   */
+  joinStatePortal?: boolean;
 }
+
+export type RegisterResult =
+  | { ok: true; /** Where to land after sign-in when the surface was switched. */ home?: string }
+  | { ok: false; error: string };
 
 const SURFACES = new Set(['fgi', 'colorado', 'scarr']);
 const VALID_ROLES = new Set(Object.keys(USER_ROLE_LABELS));
 const VALID_STATES = new Set(US_STATES.map((s) => s.code));
 
-export async function registerAction(payload: RegisterPayload): Promise<AuthActionResult> {
+export async function registerAction(payload: RegisterPayload): Promise<RegisterResult> {
   const firstName = payload.firstName?.trim() ?? '';
   const lastName = payload.lastName?.trim() ?? '';
   const email = payload.email?.trim().toLowerCase() ?? '';
@@ -54,7 +65,11 @@ export async function registerAction(payload: RegisterPayload): Promise<AuthActi
   const county = payload.county?.trim() ?? '';
   const roles = (payload.roles ?? []).filter((r): r is UserRole => VALID_ROLES.has(r));
   const roleOther = payload.roleOther?.trim() || null;
-  const surface = SURFACES.has(payload.surface) ? payload.surface : 'fgi';
+  let surface = SURFACES.has(payload.surface) ? payload.surface : 'fgi';
+  // State-portal switch: only from the FGI form, only for SC / CO, only when
+  // the box stayed ticked. Re-validated here — the client is just a hint.
+  const statePortal = surface === 'fgi' && payload.joinStatePortal ? portalForState(payload.state) : null;
+  if (statePortal) surface = statePortal.slug;
 
   if (!firstName || !lastName) return { ok: false, error: 'Enter your first and last name.' };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: 'Enter a valid email address.' };
@@ -99,9 +114,15 @@ export async function registerAction(payload: RegisterPayload): Promise<AuthActi
     console.error('registerAction: Neon write failed', e);
   }
 
+  // Courtesy email with the portal link — best-effort, never blocks sign-in.
+  if (statePortal) {
+    notifyPortalWelcome({ toEmail: email, firstName, portal: statePortal }).catch((e) =>
+      console.error('registerAction: portal welcome email failed', e));
+  }
+
   try {
     await signIn('credentials', { email, password, redirect: false });
-    return { ok: true };
+    return statePortal ? { ok: true, home: `/${statePortal.slug}` } : { ok: true };
   } catch (e) {
     if (e instanceof AuthError) {
       return { ok: false, error: 'Your account was created — use Log In to continue.' };
