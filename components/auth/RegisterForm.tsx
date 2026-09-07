@@ -1,6 +1,7 @@
 'use client';
 import { useState, useTransition } from 'react';
 import { registerAction } from '@/components/auth/register-actions';
+import { suggestEmail } from '@/lib/email-typos';
 import { portalForState } from '@/lib/state-portals';
 import { USER_ROLE_LABELS, US_STATES } from '@/types';
 
@@ -23,6 +24,47 @@ const LABEL = {
 
 const ROW = { marginBottom: '0.9rem' } as const;
 
+const MISMATCH = {
+  fontSize: '12.5px', color: '#b13f08', fontWeight: 600, marginTop: '4px',
+} as const;
+
+/** Password input with a show/hide eye (9-7-26). */
+function PasswordField({ id, value, onChange, onBlur, autoComplete, shown, toggle, invalid = false }: {
+  id: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: () => void; autoComplete: string; shown: boolean; toggle: () => void; invalid?: boolean;
+}) {
+  return (
+    <div style={{ position: 'relative' }}>
+      <input id={id} type={shown ? 'text' : 'password'} autoComplete={autoComplete} required
+        value={value} onChange={onChange} onBlur={onBlur} aria-invalid={invalid}
+        style={{ ...FIELD, paddingRight: '44px', borderColor: invalid ? '#b13f08' : undefined }} />
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={shown ? 'Hide password' : 'Show password'}
+        aria-pressed={shown}
+        style={{
+          position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
+          width: '32px', height: '32px', border: 'none', background: 'transparent',
+          color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        {shown ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8a21.8 21.8 0 015.06-6.06M9.9 4.24A10.94 10.94 0 0112 4c7 0 11 8 11 8a21.8 21.8 0 01-4.17 5.19M14.12 14.12a3 3 0 11-4.24-4.24" />
+            <path d="M1 1l22 22" />
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export default function RegisterForm({
   surface, onSuccess, switchToLogin,
 }: {
@@ -32,9 +74,18 @@ export default function RegisterForm({
   switchToLogin: () => void;
 }) {
   const [form, setForm] = useState({
-    firstName: '', lastName: '', email: '', password: '',
+    firstName: '', lastName: '', email: '', confirmEmail: '', password: '', confirmPassword: '',
     organization: '', state: '', zip: '', county: '', roleOther: '',
   });
+  // Typed-twice checks (Jason, 9-7-26: mistyped emails were getting through —
+  // the Cognito account is created already confirmed, so nothing else catches
+  // them). Mismatch messages show once the second field has been left.
+  const [touched, setTouched] = useState({ confirmEmail: false, confirmPassword: false });
+  const [showPw, setShowPw] = useState(false);
+  const emailMismatch = form.confirmEmail !== '' && form.confirmEmail.trim().toLowerCase() !== form.email.trim().toLowerCase();
+  const pwMismatch = form.confirmPassword !== '' && form.confirmPassword !== form.password;
+  const suggestion = suggestEmail(form.email);
+  const blocked = emailMismatch || pwMismatch;
   const [roles, setRoles] = useState<string[]>([]);
   // "I am a…" starts collapsed to keep the form compact (Jason, 8-31);
   // it springs open if they try to submit without picking one.
@@ -57,6 +108,11 @@ export default function RegisterForm({
   const submit = () => startTransition(async () => {
     setError('');
     if (roles.length === 0) setRolesOpen(true);
+    if (blocked) {
+      setTouched({ confirmEmail: true, confirmPassword: true });
+      setError(emailMismatch ? 'The email addresses don\u2019t match.' : 'The passwords don\u2019t match.');
+      return;
+    }
     const res = await registerAction({
       ...form, roles, surface, joinStatePortal: Boolean(statePortal) && joinStatePortal,
     });
@@ -105,15 +161,60 @@ export default function RegisterForm({
         <label style={LABEL} htmlFor="reg-email">Email</label>
         <input id="reg-email" type="email" autoComplete="email" required
           value={form.email} onChange={set('email')} style={FIELD} />
+        {suggestion && (
+          <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Did you mean{' '}
+            <button
+              type="button"
+              onClick={() => setForm((f) => ({ ...f, email: suggestion }))}
+              style={{
+                border: 'none', background: 'none', padding: 0, fontFamily: 'inherit',
+                fontSize: 'inherit', fontWeight: 700, color: 'var(--fgi-blue)', textDecoration: 'underline',
+              }}
+            >
+              {suggestion}
+            </button>
+            ?
+          </div>
+        )}
       </div>
 
       <div style={ROW}>
-        <label style={LABEL} htmlFor="reg-password">Password</label>
-        <input id="reg-password" type="password" autoComplete="new-password" required
-          value={form.password} onChange={set('password')} style={FIELD} />
-        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-          At least 8 characters, with upper and lower case letters, a number, and a symbol.
+        <label style={LABEL} htmlFor="reg-email2">Confirm Email</label>
+        <input id="reg-email2" type="email" autoComplete="off" required
+          value={form.confirmEmail} onChange={set('confirmEmail')}
+          onBlur={() => setTouched((t) => ({ ...t, confirmEmail: true }))}
+          aria-invalid={touched.confirmEmail && emailMismatch}
+          style={{ ...FIELD, borderColor: touched.confirmEmail && emailMismatch ? '#b13f08' : undefined }} />
+        {touched.confirmEmail && emailMismatch && (
+          <div style={MISMATCH} role="alert">These email addresses don&rsquo;t match.</div>
+        )}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 12px' }}>
+        <div style={ROW}>
+          <label style={LABEL} htmlFor="reg-password">Password</label>
+          <PasswordField id="reg-password" autoComplete="new-password"
+            value={form.password} onChange={set('password')}
+            shown={showPw} toggle={() => setShowPw((v) => !v)} />
         </div>
+        <div style={ROW}>
+          <label style={LABEL} htmlFor="reg-password2">Confirm Password</label>
+          <PasswordField id="reg-password2" autoComplete="new-password"
+            value={form.confirmPassword} onChange={set('confirmPassword')}
+            onBlur={() => setTouched((t) => ({ ...t, confirmPassword: true }))}
+            invalid={touched.confirmPassword && pwMismatch}
+            shown={showPw} toggle={() => setShowPw((v) => !v)} />
+        </div>
+      </div>
+      <div style={{ marginTop: '-0.6rem', marginBottom: '0.9rem' }}>
+        {touched.confirmPassword && pwMismatch ? (
+          <div style={MISMATCH} role="alert">These passwords don&rsquo;t match.</div>
+        ) : (
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+            At least 8 characters, with upper and lower case letters, a number, and a symbol.
+          </div>
+        )}
       </div>
 
       <div style={ROW}>
@@ -245,12 +346,12 @@ export default function RegisterForm({
 
       <div style={{ display: 'flex', gap: '10px' }}>
         <button
-          type="submit" disabled={pending}
+          type="submit" disabled={pending || blocked}
           style={{
             flex: 1, padding: '11px 12px', border: 'none',
             borderRadius: '999px', background: 'var(--fgi-blue)', color: '#ffffff',
             fontSize: '15px', fontWeight: 700, fontFamily: 'inherit',
-            cursor: 'pointer', opacity: pending ? 0.6 : 1,
+            cursor: pending || blocked ? 'default' : 'pointer', opacity: pending || blocked ? 0.6 : 1,
           }}
         >
           {pending

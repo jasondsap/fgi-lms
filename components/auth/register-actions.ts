@@ -21,7 +21,10 @@ export interface RegisterPayload {
   firstName: string;
   lastName: string;
   email: string;
+  /** Typed-twice check (9-7-26). Optional so older clients still submit. */
+  confirmEmail?: string;
   password: string;
+  confirmPassword?: string;
   organization: string;
   state: string;
   zip: string;
@@ -73,6 +76,12 @@ export async function registerAction(payload: RegisterPayload): Promise<Register
 
   if (!firstName || !lastName) return { ok: false, error: 'Enter your first and last name.' };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: 'Enter a valid email address.' };
+  if (payload.confirmEmail !== undefined && payload.confirmEmail.trim().toLowerCase() !== email) {
+    return { ok: false, error: 'The email addresses don\u2019t match.' };
+  }
+  if (payload.confirmPassword !== undefined && payload.confirmPassword !== password) {
+    return { ok: false, error: 'The passwords don\u2019t match.' };
+  }
   if (!PASSWORD_REGEX.test(password)) {
     return { ok: false, error: 'Password needs at least 8 characters, with upper and lower case letters, a number, and a symbol.' };
   }
