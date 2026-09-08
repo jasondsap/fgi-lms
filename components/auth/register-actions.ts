@@ -12,7 +12,7 @@ import {
   CognitoAuthError, createConfirmedUser, PASSWORD_REGEX,
 } from '@/lib/cognito';
 import { createRegisteredUser, getAllowlistedRole } from '@/lib/users';
-import { notifyPortalWelcome } from '@/lib/notify';
+import { notifyWelcome, type WelcomeSurface } from '@/lib/notify';
 import { REGISTRATION_CLOSED_MESSAGE, SELF_REGISTRATION_OPEN } from '@/lib/registration';
 import { portalForState } from '@/lib/state-portals';
 import { USER_ROLE_LABELS, US_STATES, type UserRole } from '@/types';
@@ -123,11 +123,13 @@ export async function registerAction(payload: RegisterPayload): Promise<Register
     console.error('registerAction: Neon write failed', e);
   }
 
-  // Courtesy email with the portal link — best-effort, never blocks sign-in.
-  if (statePortal) {
-    notifyPortalWelcome({ toEmail: email, firstName, portal: statePortal }).catch((e) =>
-      console.error('registerAction: portal welcome email failed', e));
-  }
+  // Welcome email for the surface they registered on (Jennifer's 9-4-26 copy)
+  // — best-effort, never blocks sign-in.
+  notifyWelcome({
+    toEmail: email, firstName,
+    surface: surface as WelcomeSurface,
+    switchedToPortal: Boolean(statePortal),
+  }).catch((e) => console.error('registerAction: welcome email failed', e));
 
   try {
     await signIn('credentials', { email, password, redirect: false });
