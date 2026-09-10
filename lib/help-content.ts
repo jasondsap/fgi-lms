@@ -57,6 +57,7 @@ export const HELP_TOPICS: HelpTopic[] = [
       'Boxes within a section add together — ticking Webinars and Podcasts shows both.',
       'The first screen mixes every resource type so you get a sample of the whole library; once you filter or search, newest items come first.',
       'On a certification portal, a Certification Info section sits at the top of the filter bar.',
+      'Scrolled a long way down? A round arrow button appears in the bottom-left corner of every page — click it to jump back to the top.',
     ],
     faqs: [
       {

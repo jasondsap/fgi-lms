@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import RegistrationGate from '@/components/account/RegistrationGate';
 import WelcomeGate from '@/components/welcome/WelcomeGate';
+import BackToTop from '@/components/layout/BackToTop';
 
 // SEO (Jason, 8-31-26: Google was showing random page fragments): the title
 // matches how people actually search ("Fletcher Group … Resource Center"),
@@ -61,6 +62,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RegistrationGate />
         {/* One-time launch welcome cards — after registration, once per account */}
         <WelcomeGate />
+        {/* Floating back-to-top (Jennifer, 9-10-26) — bottom-left, opposite Fletch */}
+        <BackToTop />
         {/* Vercel Web Analytics (Jason, 8-31-26) — data appears on the Vercel
             dashboard's Analytics tab once Web Analytics is ENABLED there. */}
         <Analytics />

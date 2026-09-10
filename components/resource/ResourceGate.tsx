@@ -70,7 +70,7 @@ export default function ResourceGate(
             {SELF_REGISTRATION_OPEN ? (
               <>
                 Create a free Learning Resource Center account to view courses, videos,
-                documents, and more. Already have one? Log in and you&rsquo;ll land right
+                documents, and more. Already have one? Sign in and you&rsquo;ll land right
                 back here.
               </>
             ) : (

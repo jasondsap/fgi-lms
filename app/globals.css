@@ -326,6 +326,14 @@ html, body { overflow-x: clip; }
   .fletch-panel { bottom: 10px; right: 10px; }
 }
 
+/* ---- Back to top (9-10-26) — bottom-left, same edge offsets as Fletch ----- */
+.back-to-top { bottom: 24px; left: 24px; background: #ffffff; color: var(--fgi-navy); }
+.back-to-top:hover { background: var(--fgi-navy); color: #ffffff; }
+.back-to-top:focus-visible { outline: 3px solid var(--fgi-blue); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .back-to-top { bottom: 14px; left: 12px; }
+}
+
 /* ---- Podcast host card --------------------------------------------------- */
 .host-grid { display: grid; grid-template-columns: 150px 1fr 180px; gap: 1.75rem; align-items: start; }
 @media (max-width: 900px) { .host-grid { grid-template-columns: 150px 1fr; } .host-grid > :last-child { grid-column: 1 / -1; } }

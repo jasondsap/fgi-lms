@@ -136,7 +136,7 @@ export async function registerAction(payload: RegisterPayload): Promise<Register
     return statePortal ? { ok: true, home: `/${statePortal.slug}` } : { ok: true };
   } catch (e) {
     if (e instanceof AuthError) {
-      return { ok: false, error: 'Your account was created — use Log In to continue.' };
+      return { ok: false, error: 'Your account was created — use Sign In to continue.' };
     }
     throw e;
   }

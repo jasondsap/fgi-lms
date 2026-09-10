@@ -1,6 +1,6 @@
 /**
  * Self-registration kill switch (8-28-26). While this is `false`, the auth
- * modal hides the "New? Create Account" tab, the content gate opens on Log In
+ * modal hides the "New? Create Account" tab, the content gate opens on Sign In
  * with account-required copy instead of "Create a Free Account", and
  * `registerAction` refuses to create accounts (staff-allowlisted emails
  * excepted) — so only people who already hold a username + password can get
@@ -15,4 +15,4 @@ export const SELF_REGISTRATION_OPEN = true;
 
 /** Copy shown in place of the signup CTA while registration is closed. */
 export const REGISTRATION_CLOSED_MESSAGE =
-  'New account sign-ups are temporarily paused. If you already have an account, log in to continue.';
+  'New account sign-ups are temporarily paused. If you already have an account, sign in to continue.';

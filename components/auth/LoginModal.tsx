@@ -145,7 +145,7 @@ export default function LoginModal(
   });
 
   const TITLES: Record<View, string> = {
-    login: 'Log In',
+    login: 'Sign In',
     register: 'Create Your Account',
     forgot: 'Reset Your Password',
     reset: 'Enter Your Reset Code',
@@ -171,7 +171,7 @@ export default function LoginModal(
             whiteSpace: 'nowrap',
           }}
         >
-          {triggerLabel ?? 'Log In'}
+          {triggerLabel ?? 'Sign In'}
         </button>
       )}
       {trigger === 'cta' && (
@@ -185,7 +185,7 @@ export default function LoginModal(
             whiteSpace: 'nowrap',
           }}
         >
-          {triggerLabel ?? (SELF_REGISTRATION_OPEN ? 'Create a Free Account' : 'Log In')}
+          {triggerLabel ?? (SELF_REGISTRATION_OPEN ? 'Create a Free Account' : 'Sign In')}
         </button>
       )}
 
@@ -233,7 +233,7 @@ export default function LoginModal(
             {regOpen && (view === 'login' || view === 'register') && (
               <div style={{ display: 'flex', borderBottom: '1px solid var(--border-color)' }}>
                 <button type="button" style={TAB(view === 'login')} onClick={() => reset('login')}>
-                  Log In
+                  Sign In
                 </button>
                 <button type="button" style={TAB(view === 'register')} onClick={() => reset('register')}>
                   New? Create Account
@@ -281,7 +281,7 @@ export default function LoginModal(
                   </button>
                   {error && <ErrorLine text={error} />}
                   <button type="submit" disabled={pending} style={{ ...PRIMARY_BTN, opacity: pending ? 0.6 : 1 }}>
-                    {pending ? 'Logging in…' : 'Log In'}
+                    {pending ? 'Signing in…' : 'Sign In'}
                   </button>
                 </form>
               )}
@@ -335,7 +335,7 @@ export default function LoginModal(
                   </div>
                   {error && <ErrorLine text={error} />}
                   <button type="submit" disabled={pending} style={{ ...PRIMARY_BTN, opacity: pending ? 0.6 : 1 }}>
-                    {pending ? 'Resetting…' : 'Reset Password & Log In'}
+                    {pending ? 'Resetting…' : 'Reset Password & Sign In'}
                   </button>
                   <BackLink onClick={() => reset('forgot')} label="Didn’t get a code? Send another" />
                 </form>
