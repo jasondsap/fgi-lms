@@ -370,17 +370,19 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     title: 'I Want To Learn About…',
     param: 'topic',
     items: [
-      'establishing_rh', 'rh_management', 'operations', 'recovery_support',
-      // Portals list Social Model here (the FGI library keeps it under
-      // Recovery House Models, which is hidden on portals).
-      { param: 'topic', value: 'social_model', label: 'Social Model Recovery', tenantOnly: true },
+      'establishing_rh', 'rh_management', 'operations',
+      // Social Model sits here on every surface (Jennifer, 9-10-26: back
+      // under Learn About on FGI, just above Recovery Support Services). FGI
+      // also lists it under Recovery House Models below; same tag, same
+      // filter, two boxes. Portals were already listing it here (9-3).
+      'social_model', 'recovery_support',
       'workforce', 'research', 'reentry', 'funding',
       'self_care', 'mental_health', 'recovery_ecosystems',
     ],
     // Hidden on the portals 9-2, back 9-3-26 with Jennifer's crosswalk: the
     // portals use eight topics (the seven below plus Social Model).
     excludeOnTenant: ['workforce', 'reentry', 'mental_health', 'recovery_ecosystems'],
-    tenantLabels: { research: 'Research & Data' },
+    tenantLabels: { research: 'Research & Data', social_model: 'Social Model Recovery' },
   },
   {
     title: 'Recovery House Models',
