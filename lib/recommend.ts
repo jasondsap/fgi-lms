@@ -51,7 +51,7 @@ export async function getCatalog(surface: string): Promise<Catalog> {
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${surface}
+        WHERE rv.resource_id = r.id AND t.slug = ${surface} AND rv.internal = FALSE
       )
     ORDER BY r.type, r.title
   `) as unknown as Array<CatalogEntry & { description: string; search_keywords: string[] }>;

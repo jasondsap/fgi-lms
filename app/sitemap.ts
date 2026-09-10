@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         AND EXISTS (
           SELECT 1 FROM resource_visibility rv
           JOIN tenants t ON t.id = rv.tenant_id
-          WHERE rv.resource_id = r.id AND t.slug = 'fgi'
+          WHERE rv.resource_id = r.id AND t.slug = 'fgi' AND rv.internal = FALSE
         )
       ORDER BY r.published_at DESC NULLS LAST
     `;

@@ -156,7 +156,7 @@ export default function ResourceCard({ resource, basePath = '', naadacPill, comp
             {typeLabel}
           </span>
           {resource.internal && (
-            <span title="Visible to administrators only" style={{
+            <span title="Internal on this library — hidden from learners here" style={{
               alignSelf: 'flex-start', marginTop: '-6px', marginBottom: '12px',
               background: '#b13f08', color: '#ffffff', fontSize: '12px', fontWeight: 700,
               lineHeight: 1.2, padding: '4px 11px', borderRadius: '999px', letterSpacing: '0.03em',

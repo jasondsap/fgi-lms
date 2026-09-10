@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { authEnabled, getSession } from '@/auth';
 import { getUserById } from '@/lib/users';
 import { getCourseResource, isVisibleOnSurface } from '@/lib/resources';
-import { getViewer } from '@/lib/viewer';
+import { canSeeInternal, getViewer } from '@/lib/viewer';
 import {
   moodleEnabled,
   ensureMoodleUser,
@@ -143,9 +143,12 @@ export default async function CourseView(
 
   // Surface enforcement (8-31-26): the player opens a course only on a
   // surface it's allow-listed for — a tenant-only course 404s from the wrong
-  // chrome. Admins bypass (they may open anything from anywhere).
+  // chrome. Admins bypass (they may open anything from anywhere). Internal
+  // courses (global, or on this surface — 9-10-26) open only for viewers
+  // who may see them, same rule as the resource page.
   const viewer = await getViewer();
-  if (viewer.role !== 'admin' && !(await isVisibleOnSurface(slug, surface.key))) notFound();
+  if (viewer.role !== 'admin'
+    && !(await isVisibleOnSurface(slug, surface.key, canSeeInternal(viewer, surface.key)))) notFound();
 
   // Course pages require login; bounce to the resource page, which carries
   // the sign-in gate. Also used while auth/Moodle env is unconfigured.

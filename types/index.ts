@@ -97,7 +97,9 @@ export interface Resource {
   vimeo_id: string | null;
   external_url: string | null;
   is_naadac_ce: boolean;
-  /** Hidden from ordinary learners; cards show an Internal pill (8-29-26). */
+  /** Hidden from ordinary learners; cards show an Internal pill (8-29-26).
+      In list responses this is per-surface: true when the row is internal
+      everywhere OR flagged internal on the requested surface (9-10-26). */
   internal?: boolean;
   audience_tags: AudienceTag[];
   topic_tags: TopicTag[];

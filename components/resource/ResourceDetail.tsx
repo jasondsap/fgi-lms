@@ -46,15 +46,18 @@ export default async function ResourceDetail(
   // Surface enforcement (8-31-26): the detail page opens a resource only on
   // a surface it's allow-listed for — a tenant-only item 404s from the wrong
   // chrome; FGI-shared content stays open everywhere. Admins bypass.
+  // Internal rows (8-29-26; per-surface since 9-10-26): admins, FGI staff on
+  // the FGI library, and the tenant's own admins only — enforced inside
+  // isVisibleOnSurface for everyone but admins.
   const viewer = await getViewer();
-  if (viewer.role !== 'admin' && !(await isVisibleOnSurface(slug, surface.key))) notFound();
+  const seesInternal = canSeeInternal(viewer, surface.key);
+  if (viewer.role !== 'admin' && !(await isVisibleOnSurface(slug, surface.key, seesInternal))) notFound();
 
   // Query the DB directly — a server component must never fetch its own API
   // route at runtime (see docs/CLAUDE.md architecture notes).
   const resource = await getResourceBySlug(slug);
   if (!resource) notFound();
-  // Internal rows (8-29-26): admins and the tenant's own admins only.
-  if (resource.internal && !canSeeInternal(viewer, surface.key)) notFound();
+  if (resource.internal && !seesInternal) notFound();
 
   // My Learning (8-29-26): record the view and find out whether the learner
   // has saved this resource. Both are one cheap query; logging never throws.

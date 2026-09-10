@@ -202,15 +202,20 @@ export async function getPublicResources(
   // only if it has a resource_visibility row for that surface's tenant. The
   // main site is the 'fgi' surface; tenant pages use their own slug. A resource
   // shared across surfaces simply has a row per surface.
+  //
+  // Per-surface internal (9-10-26, Jason: Cultural Humility an4384 is staff-
+  // only on FGI but open on SCARR and Colorado): a visibility row can itself
+  // be flagged `internal`, which hides the resource from learners on that one
+  // surface only. The global resources.internal flag (8-29-26) still hides a
+  // row everywhere. Same viewer rule for both — see lib/viewer.ts.
   const surface = tenant || 'fgi';
-  {
-    const ph = bind(surface);
-    conditions.push(`EXISTS (
+  const surfacePh = bind(surface);
+  conditions.push(`EXISTS (
       SELECT 1 FROM resource_visibility rv
       JOIN tenants t ON t.id = rv.tenant_id
-      WHERE rv.resource_id = resources.id AND t.slug = ${ph}
+      WHERE rv.resource_id = resources.id AND t.slug = ${surfacePh}${
+        params.includeInternal ? '' : ' AND rv.internal = FALSE'}
     )`);
-  }
 
   // A visitor who hasn't searched or ticked a filter gets the stratified view;
   // anyone who has expressed intent gets newest-first, which is what they want.
@@ -247,6 +252,14 @@ export async function getPublicResources(
       id, title, slug, type, description, duration_minutes,
       thumbnail_url, vimeo_id, external_url,
       is_naadac_ce, internal, audience_tags, topic_tags, published_at`;
+  // What the card's INTERNAL pill reflects: internal everywhere, or internal
+  // on this surface. Only for the SELECT against `resources` itself — the
+  // outer select of the stratified view reads the plain column back.
+  const SELECT_COLUMNS = COLUMNS.replace(' internal,', ` (internal OR EXISTS (
+        SELECT 1 FROM resource_visibility rv
+        JOIN tenants t ON t.id = rv.tenant_id
+        WHERE rv.resource_id = resources.id AND t.slug = ${surfacePh} AND rv.internal
+      )) AS internal,`);
 
   // Default view: Jennifer's hierarchy levels in order, round-robin across
   // types within each level so a level reads as a blend rather than one type's
@@ -271,7 +284,7 @@ export async function getPublicResources(
     ? `
     SELECT ${COLUMNS}, total_count
     FROM (
-      SELECT ${COLUMNS},
+      SELECT ${SELECT_COLUMNS},
         COUNT(*) OVER() AS total_count,
         ${TIER_SQL} AS tier,
         ROW_NUMBER() OVER (PARTITION BY type ORDER BY md5(id::text || ${seedPh})) AS type_rank,
@@ -283,7 +296,7 @@ export async function getPublicResources(
     LIMIT ${limitPh} OFFSET ${offsetPh}
   `
     : `
-    SELECT ${COLUMNS},
+    SELECT ${SELECT_COLUMNS},
       COUNT(*) OVER() AS total_count
     FROM resources
     WHERE ${where}
@@ -323,7 +336,7 @@ export async function getRelatedWebinars(
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug} AND rv.internal = FALSE
       )
     ORDER BY r.published_at DESC NULLS LAST, r.id DESC
     LIMIT ${limit}
@@ -386,7 +399,7 @@ export async function getRelatedResources(
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug} AND rv.internal = FALSE
       )
     ORDER BY rr.position, r.published_at DESC NULLS LAST
     LIMIT ${limit}
@@ -419,7 +432,7 @@ export async function getRelatedResources(
         AND EXISTS (
           SELECT 1 FROM resource_visibility rv
           JOIN tenants t ON t.id = rv.tenant_id
-          WHERE rv.resource_id = r.id AND t.slug = $4
+          WHERE rv.resource_id = r.id AND t.slug = $4 AND rv.internal = FALSE
         )
       ORDER BY score DESC, r.published_at DESC NULLS LAST
       LIMIT 20`,
@@ -465,7 +478,7 @@ export async function getOtherEpisodes(
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug} AND rv.internal = FALSE
       )
     ORDER BY r.published_at DESC NULLS LAST, r.id DESC
     LIMIT ${limit}
@@ -518,7 +531,7 @@ export async function getVideoSeries(
       AND EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug}
+        WHERE rv.resource_id = r.id AND t.slug = ${tenantSlug} AND rv.internal = FALSE
       )
   `;
   const items: VideoSeriesItem[] = [];
@@ -607,7 +620,7 @@ export async function getLatestByType(type: ResourceType): Promise<LatestItem | 
         AND EXISTS (
           SELECT 1 FROM resource_visibility rv
           JOIN tenants t ON t.id = rv.tenant_id
-          WHERE rv.resource_id = r.id AND t.slug = 'fgi'
+          WHERE rv.resource_id = r.id AND t.slug = 'fgi' AND rv.internal = FALSE
         )
       ORDER BY r.published_at DESC NULLS LAST, r.id DESC
       LIMIT 1`,
@@ -652,18 +665,28 @@ export async function getCourseResource(slug: string): Promise<CourseResource | 
  * resource_visibility row there, so a tenant-only item 404s from any other
  * chrome — FGI-shared content (a row per surface) stays open everywhere.
  * Admins bypass in the callers.
+ *
+ * Internal rows (global `resources.internal`, or `resource_visibility.internal`
+ * on this surface, 9-10-26) count as not visible unless the caller passes
+ * `includeInternal` — i.e. canSeeInternal(viewer, surface) from lib/viewer.ts.
+ * The two fragments are constants; slug and surface bind as $1/$2.
  */
-export async function isVisibleOnSurface(slug: string, surfaceKey: string): Promise<boolean> {
-  const rows = await sql`
-    SELECT 1 FROM resources r
-    WHERE r.slug = ${slug} AND r.published = TRUE
-      AND EXISTS (
-        SELECT 1 FROM resource_visibility rv
-        JOIN tenants t ON t.id = rv.tenant_id
-        WHERE rv.resource_id = r.id AND t.slug = ${surfaceKey}
-      )
-    LIMIT 1
-  `;
+export async function isVisibleOnSurface(
+  slug: string, surfaceKey: string, includeInternal = false,
+): Promise<boolean> {
+  const rows = await sql(
+    `SELECT 1 FROM resources r
+      WHERE r.slug = $1 AND r.published = TRUE
+        ${includeInternal ? '' : 'AND r.internal = FALSE'}
+        AND EXISTS (
+          SELECT 1 FROM resource_visibility rv
+          JOIN tenants t ON t.id = rv.tenant_id
+          WHERE rv.resource_id = r.id AND t.slug = $2
+            ${includeInternal ? '' : 'AND rv.internal = FALSE'}
+        )
+      LIMIT 1`,
+    [slug, surfaceKey],
+  );
   return Boolean(rows[0]);
 }
 
