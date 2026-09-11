@@ -20,6 +20,12 @@ interface Props {
   fgiLibraryLabel?: string;
   /** Open the other-library link in a new tab (the tenant → FGI direction). */
   fgiLibraryNewTab?: boolean;
+  /**
+   * Render every group open and non-collapsible (Jennifer, 9-10-26, SCARR:
+   * "see everything; nothing collapsible"). Set per tenant via
+   * `TenantV3.filterBarStatic`.
+   */
+  alwaysOpen?: boolean;
 }
 
 /**
@@ -45,9 +51,23 @@ const LABEL_MAPS: Record<string, Record<string, string>> = {
  * visible after the filter navigation re-renders the sidebar.
  */
 function FilterGroup({
-  title, defaultOpen = false, children,
-}: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  title, defaultOpen = false, alwaysOpen = false, children,
+}: { title: string; defaultOpen?: boolean; alwaysOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
+
+  if (alwaysOpen) {
+    return (
+      <div style={{ borderBottom: '1px solid var(--border-color)' }}>
+        <h3 style={{
+          margin: 0, padding: '13px 0 8px', fontSize: '15px', fontWeight: 700,
+          color: 'var(--text-primary)',
+        }}>
+          {title}
+        </h3>
+        <div style={{ paddingBottom: '12px' }}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -93,6 +113,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
 
 export default function FilterSidebar({
   total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel, fgiLibraryNewTab = false,
+  alwaysOpen = false,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -236,6 +257,7 @@ export default function FilterSidebar({
           key={group.title}
           title={group.title}
           defaultOpen={group.items.some(i => active[i.param].includes(i.value))}
+          alwaysOpen={alwaysOpen}
         >
           {group.items.map(item => (
             <CheckItem
@@ -251,7 +273,7 @@ export default function FilterSidebar({
       {/* Tenant side: "Fletcher Group Library", into a new tab. Accordion like
           the filter groups above (Jason, 8-31-26). */}
       {fgiLibraryHref && (
-        <FilterGroup title="Other Libraries">
+        <FilterGroup title="Other Libraries" alwaysOpen={alwaysOpen}>
           <a
             href={fgiLibraryHref}
             target={fgiLibraryNewTab ? '_blank' : undefined}

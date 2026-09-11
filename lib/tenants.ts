@@ -154,6 +154,12 @@ export interface TenantV3 {
    * visible.
    */
   collections?: Record<string, { label: string; slugs: string[] }>;
+  /**
+   * Library filter bar: every group open and non-collapsible (Jennifer,
+   * 9-10-26, for SCARR: "see everything; nothing collapsible"). Unset =
+   * the accordion the FGI library and Colorado use.
+   */
+  filterBarStatic?: boolean;
   heroBg: string;
   /**
    * Optional smaller-print paragraph between the hero copy and the
@@ -606,6 +612,7 @@ const TENANTS: Record<string, TenantConfig> = {
           ],
         },
       },
+      filterBarStatic: true,
       heroBg: '#f6f7f8',
       // Jennifer's own halftone ring ("scarr - f5d300.png", filename is the
       // hex), alpha-cropped so the CSS width IS the ring diameter.
