@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import PresenterBio from '@/components/resource/PresenterBio';
 import type { Presenter } from '@/types';
+import { linkLabel } from '@/lib/link-label';
 
 /**
  * Headshot + bio band, shared by the webinar layout (4-21-26 mockup) and the
@@ -59,7 +60,7 @@ export default function PresenterCard(
               href={p.org_url} target="_blank" rel="noopener noreferrer"
               style={{ display: 'block', marginTop: '8px', fontSize: '13px', color: accent }}
             >
-              {p.org_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+              {linkLabel(p.org_url)}
             </a>
           )}
           {/* Second affiliation (8-29-26): e.g. Jac Charlier is TASC's
@@ -70,7 +71,7 @@ export default function PresenterCard(
               title={p.org2_name ?? undefined}
               style={{ display: 'block', marginTop: '4px', fontSize: '13px', color: accent }}
             >
-              {p.org2_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+              {linkLabel(p.org2_url)}
             </a>
           )}
         </div>

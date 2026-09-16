@@ -16,6 +16,7 @@ import {
 } from '@/lib/podcast';
 import type { Surface } from '@/lib/surface';
 import type { Resource } from '@/types';
+import { linkLabel } from '@/lib/link-label';
 
 /** Same drawing as the library card and the mockup's headphones-and-mic art. */
 const PODCAST_ILLUSTRATION = '/images/category-cards/podcast.webp';
@@ -328,7 +329,7 @@ export default async function PodcastDetail(
                         <circle cx="12" cy="12" r="10" />
                         <path d="M2 12h20M12 2a15 15 0 010 20a15 15 0 010-20" />
                       </svg>
-                      <span>{p.org_url!.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                      <span>{linkLabel(p.org_url!)}</span>
                     </a>
                   ))}
                 </div>

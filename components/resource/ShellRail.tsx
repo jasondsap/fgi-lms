@@ -5,6 +5,7 @@ import RelatedList from '@/components/resource/RelatedList';
 import type { RelatedItem } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import type { Presenter } from '@/types';
+import { linkLabel } from '@/lib/link-label';
 
 export const RAIL_LABEL = {
   fontSize: '11px', fontWeight: 700, textTransform: 'uppercase' as const,
@@ -107,7 +108,7 @@ export default function ShellRail(
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20M12 2a15 15 0 010 20a15 15 0 010-20" />
                 </svg>
-                <span>{link.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                <span>{linkLabel(link.url)}</span>
               </a>
             ))}
           </div>
