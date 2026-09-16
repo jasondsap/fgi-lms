@@ -17,6 +17,13 @@
 //
 // Guests upsert into `presenters` by lower(name) — the same table the
 // webinars use, so a repeat guest keeps one row. Idempotent on slug.
+//
+// 9-16-26: episodes released after the first load arrive one folder at a
+// time (Ep 4 came via docs/Burndown Work/podcast/…), so an episode may carry
+// an absolute `dir` that overrides DIR, and `--only <slug>` limits a run to
+// one episode instead of re-uploading every MP3. New rows also get a
+// course_code (two letters + four digits, the site-wide "ID:" convention)
+// because the original load predates that column being populated.
 require('dotenv').config({ path: '.env.local' });
 const fs = require('fs');
 const path = require('path');
@@ -34,6 +41,8 @@ const s3 = new S3Client({
 const BUCKET = process.env.S3_BUCKET_NAME;
 const DIR = path.join(__dirname, '..', 'docs', 'final build', 'Podcast', 'Podcasts');
 const dry = process.argv.includes('--dry');
+const onlyIdx = process.argv.indexOf('--only');
+const only = onlyIdx !== -1 ? process.argv[onlyIdx + 1] : null;
 
 const GUESTS = {
   ernie: {
@@ -95,6 +104,42 @@ const GUESTS = {
     org_name: "SAMHSA Office of Recovery",
     org_logo_url: null,
     org_url: 'https://www.samhsa.gov/about/offices-centers/or',
+  },
+  brandee: {
+    name: 'Brandee Izquierdo',
+    credentials: 'PhD',
+    // Title per the Ep 4 Information.docx; the org's legal name is plural
+    // ("Trusts") even though the docx writes "Trust".
+    title: 'Director of Behavioral Health, The Pew Charitable Trusts',
+    // Bio from her Pew expert page (the docx's Guest Link) — the docx has no
+    // bio text, same gap as Ernie's.
+    bio: 'Brandee Izquierdo, Ph.D., oversees Pew\'s behavioral health ' +
+      'portfolio, which includes the substance use prevention and treatment ' +
+      'initiative and the suicide risk reduction project. In this role, she ' +
+      'leads researchers and advocates working at the state and federal ' +
+      'levels to expand access to evidence-based treatment for substance use ' +
+      'disorders and improve suicide prevention interventions in hospitals ' +
+      'and health systems.\n' +
+      'Before joining Pew, Izquierdo held several leadership roles, including ' +
+      'executive director of the Stop the Addiction Fatality Epidemic Project ' +
+      'and director of advocacy and outreach at Faces & Voices of Recovery. ' +
+      'She also served as the associate director of special populations with ' +
+      'Behavioral Health System Baltimore and as director of consumer affairs ' +
+      'for Maryland\'s Behavioral Health Administration. This career path, ' +
+      'focused on expanding access to behavioral health and recovery services ' +
+      'while ensuring that communities are educated and able to cultivate ' +
+      'equitable, culturally inclusive care, has been driven by Izquierdo\'s ' +
+      'professional knowledge of behavioral health services and personal ' +
+      'lived expertise as a woman in recovery.\n' +
+      'Izquierdo holds a bachelor\'s degree in government and public policy, ' +
+      'a master\'s in public administration, and a doctorate in public ' +
+      'administration with a focus on organizational change management ' +
+      'within behavioral health and criminal justice systems, all from the ' +
+      'University of Baltimore.',
+    photo_url: '/images/presenters/brandee-izquierdo.webp',
+    org_name: 'The Pew Charitable Trusts',
+    org_logo_url: '/images/presenters/org-pew-charitable-trusts.webp',
+    org_url: 'https://www.pew.org/en/about/experts/brandee-izquierdo',
   },
 };
 
@@ -190,7 +235,44 @@ const EPISODES = [
       'Listen in for a conversation about turning recovery from an individual ' +
       'journey into a community-supported recovery pathway.',
   },
+  {
+    slug: 'recovery-ecosystem-radio-episode-4',
+    title: 'Episode 4: Systems, Data, and the Social-Experiential Model',
+    // Released 9-16-26 via docs/Burndown Work (not the final-build tree). The
+    // MP3 is byte-identical to the copy in "Jennifer's working folder".
+    dir: path.join(__dirname, '..', 'docs', 'Burndown Work', 'podcast',
+                   'OneDrive_2026-09-16 (1)', 'Episode 4 Brandee Izquierdo'),
+    file: '00 Recovery Ecosystem Podcast - Ep4 1st EDIT_ Brandee Izquierdo.mp3',
+    duration: 43, released: '2026-09-15',
+    tags: ['recovery_ecosystems', 'social_model', 'research', 'reentry'],
+    guest: 'brandee',
+    description:
+      'Tony sits down with Dr. Brandee Izquierdo, Director of Behavioral ' +
+      'Health at The Pew Charitable Trusts, to explore how lived experience, ' +
+      'policy, data, and recovery housing can strengthen recovery ecosystems.\n' +
+      'Together, they discuss the Social-Experiential Model of Recovery, the ' +
+      'role of recovery homes, support for unhoused and justice-involved ' +
+      'individuals, and how communities can use data for improvement rather ' +
+      'than surveillance.\n' +
+      'This conversation reminds us that recovery is more than treatment or ' +
+      'crisis response. It is about building a full life across Health, Home, ' +
+      'Purpose, and Community.',
+  },
 ];
+
+// Site-wide resource ID: two lowercase letters + four digits, unique across
+// `resources.course_code` (the 8-20-26 convention; see docs §6at).
+async function newCourseCode() {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  for (let i = 0; i < 50; i++) {
+    const code = letters[Math.floor(Math.random() * 26)] +
+      letters[Math.floor(Math.random() * 26)] +
+      String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+    const [hit] = await sql`SELECT 1 FROM resources WHERE course_code = ${code}`;
+    if (!hit) return code;
+  }
+  throw new Error('could not find a free course_code');
+}
 
 async function upsertGuest(guest) {
   const [existing] = await sql`
@@ -215,15 +297,18 @@ async function upsertGuest(guest) {
 }
 
 async function main() {
-  for (const ep of EPISODES) {
-    const file = path.join(DIR, ep.file);
+  const episodes = only ? EPISODES.filter((ep) => ep.slug === only) : EPISODES;
+  if (only && episodes.length === 0) throw new Error(`no episode with slug ${only}`);
+
+  for (const ep of episodes) {
+    const file = path.join(ep.dir || DIR, ep.file);
     if (!fs.existsSync(file)) throw new Error(`missing MP3: ${file}`);
   }
 
   const summary = [];
 
-  for (const ep of EPISODES) {
-    const file = path.join(DIR, ep.file);
+  for (const ep of episodes) {
+    const file = path.join(ep.dir || DIR, ep.file);
     const s3Key = `podcasts/${ep.slug}.mp3`;
     const mb = (fs.statSync(file).size / 1024 / 1024).toFixed(1);
 
@@ -246,7 +331,15 @@ async function main() {
           s3_key = EXCLUDED.s3_key, duration_minutes = EXCLUDED.duration_minutes,
           topic_tags = EXCLUDED.topic_tags, published = EXCLUDED.published,
           published_at = EXCLUDED.published_at, updated_at = now()
-        RETURNING id`;
+        RETURNING id, course_code`;
+
+      if (!resource.course_code) {
+        const code = await newCourseCode();
+        await sql`UPDATE resources SET course_code = ${code} WHERE id = ${resource.id}`;
+        ep.code = code;
+      } else {
+        ep.code = resource.course_code;
+      }
 
       await sql`INSERT INTO resource_visibility (resource_id, tenant_id)
                 SELECT ${resource.id}, id FROM tenants WHERE slug = 'fgi'
@@ -266,6 +359,7 @@ async function main() {
       min: ep.duration,
       released: ep.released,
       guest: ep.guest ? GUESTS[ep.guest].name : '—',
+      code: ep.code || (dry ? '(dry)' : '—'),
     });
   }
 
