@@ -463,7 +463,11 @@ export async function toggleBookmark(userId: string, resourceId: string): Promis
 // Library activity
 // ---------------------------------------------------------------------------
 
-export type ResourceEvent = 'view' | 'course_open';
+/**
+ * view / course_open / complete are written server-side; share and download
+ * arrive from the client through logResourceEventAction (9-17-26).
+ */
+export type ResourceEvent = 'view' | 'course_open' | 'complete' | 'share' | 'download';
 
 /** Never throws — a logging failure must not 500 a page. */
 export async function logResourceEvent(

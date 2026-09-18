@@ -2,8 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { copyText } from '@/lib/copy-text';
+import { logResourceEventAction } from './activity-actions';
 
 interface Props {
+  resourceId: string;
+  /** Surface key (fgi / colorado / scarr) stamped on the share event. */
+  surfaceKey: string;
   title: string;
   description?: string | null;
   /** Surface primary colour — outline pill, like "Back to Library". */
@@ -22,7 +26,7 @@ interface Props {
  * Colorado user hands out the Colorado copy and the client lands in Colorado
  * chrome instead of a surface-enforcement 404.
  */
-export default function SharePill({ title, description, accent }: Props) {
+export default function SharePill({ resourceId, surfaceKey, title, description, accent }: Props) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [canShare, setCanShare] = useState(false);
@@ -52,7 +56,12 @@ export default function SharePill({ title, description, accent }: Props) {
   const blurb = (description || '').replace(/\s+/g, ' ').trim();
   const short = blurb.length > 220 ? `${blurb.slice(0, 217).trimEnd()}…` : blurb;
 
+  // Every share path logs one 'share' event (Jennifer, 9-17-26) — copy,
+  // mail, or the device sheet. Fire-and-forget.
+  const track = () => { void logResourceEventAction(resourceId, 'share', surfaceKey); };
+
   const copy = async () => {
+    track();
     const url = pageUrl();
     await copyText(url);
     setCopied(true);
@@ -61,6 +70,7 @@ export default function SharePill({ title, description, accent }: Props) {
   };
 
   const mailto = () => {
+    track();
     const url = pageUrl();
     const subject = `${title} — Fletcher Group Learning Resource Center`;
     const body = [
@@ -79,6 +89,7 @@ export default function SharePill({ title, description, accent }: Props) {
   };
 
   const native = async () => {
+    track();
     setOpen(false);
     try {
       await navigator.share({ title, text: short || title, url: pageUrl() });

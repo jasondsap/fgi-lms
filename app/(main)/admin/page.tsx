@@ -79,6 +79,21 @@ export default async function AdminPage() {
         </Link>
 
         <Link
+          href="/admin/activity"
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-gold)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Activity</div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            What each person or organization viewed, shared, downloaded, and completed — and who accessed any resource. CSV export.
+          </p>
+        </Link>
+
+        <Link
           href="/admin/analytics"
           style={{
             display: 'block', textDecoration: 'none', color: 'inherit',

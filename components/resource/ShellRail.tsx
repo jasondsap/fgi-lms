@@ -23,6 +23,7 @@ export const RAIL_BUTTON = {
 
 interface Props {
   slug: string;
+  resourceId: string;
   /** For the Share pill's email note. */
   title: string;
   description?: string | null;
@@ -44,7 +45,7 @@ interface Props {
  * differing top section as a node.
  */
 export default function ShellRail(
-  { slug, title, description, surface, action, facts = [], presenters = [], related, extras }: Props,
+  { slug, resourceId, title, description, surface, action, facts = [], presenters = [], related, extras }: Props,
 ) {
   // One globe link per organisation — co-presenters from the same org (e.g.
   // the PPW webinar's two PEARL Program speakers) used to list it twice. A
@@ -126,7 +127,7 @@ export default function ShellRail(
 
       <FeedbackModal slug={slug} surface={surface.key} accent={surface.primary} button={surface.feedbackButton} />
 
-      <SharePill title={title} description={description} accent={surface.primary} />
+      <SharePill resourceId={resourceId} surfaceKey={surface.key} title={title} description={description} accent={surface.primary} />
 
       <Link href={surface.libraryHref} style={{
         display: 'block', textAlign: 'center', padding: '10px 0', borderRadius: '999px',

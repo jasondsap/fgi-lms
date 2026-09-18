@@ -107,6 +107,7 @@ export default async function VideoDetail(
             style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
           <ShellRail
+            resourceId={resource.id}
             slug={resource.slug}
             title={resource.title}
             description={resource.description}

@@ -6,6 +6,7 @@ import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import Clamp from '@/components/resource/Clamp';
 import CopyId from '@/components/resource/CopyId';
+import TrackedLink from '@/components/resource/TrackedLink';
 import { ceLabel } from '@/lib/ce';
 import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
@@ -128,6 +129,7 @@ export default async function WebinarDetail(
             style={{ width: '344px', maxWidth: '100%', height: 'auto', margin: '0 auto' }}
           />
           <ShellRail
+            resourceId={resource.id}
             slug={resource.slug}
             title={resource.title}
             description={resource.description}
@@ -143,12 +145,13 @@ export default async function WebinarDetail(
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={RAIL_LABEL}>Also included</div>
                   {materials.map((m) => (
-                    <a
-                      key={m.id} href={m.download_url} target="_blank" rel="noopener noreferrer"
+                    <TrackedLink
+                      key={m.id} resourceId={resource.id} event="download" surfaceKey={surface.key}
+                      href={m.download_url} target="_blank" rel="noopener noreferrer"
                       style={{ fontSize: '17px', color: surface.primary, fontWeight: 600 }}
                     >
                       {m.label}
-                    </a>
+                    </TrackedLink>
                   ))}
                 </div>
               ) : null

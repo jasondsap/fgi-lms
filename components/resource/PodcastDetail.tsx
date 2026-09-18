@@ -347,7 +347,7 @@ export default async function PodcastDetail(
                 button={surface.feedbackButton}
               />
               <div style={{ marginTop: '12px' }}>
-                <SharePill title={resource.title} description={resource.description} accent={surface.primary} />
+                <SharePill resourceId={resource.id} surfaceKey={surface.key} title={resource.title} description={resource.description} accent={surface.primary} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
                 <a

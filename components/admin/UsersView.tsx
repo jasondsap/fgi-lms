@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { AdminUserRow } from '@/lib/admin-users';
 import { deleteUserAction, updateUserAccessAction } from './admin-actions';
@@ -232,6 +233,12 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     <Pill bg="#eef1f3" fg="#5f6e7c">{surfaceLabel(u.registered_surface)}</Pill>
                     <Pill bg={rc.bg} fg={rc.fg}>{rc.label}</Pill>
+                    <Link
+                      href={`/admin/activity/user/${u.id}`}
+                      style={{ ...FIELD, textDecoration: 'none', fontWeight: 600, color: 'var(--fgi-blue)' }}
+                    >
+                      Activity
+                    </Link>
                     {self ? (
                       <span
                         title="You can’t change your own access — ask another admin."
