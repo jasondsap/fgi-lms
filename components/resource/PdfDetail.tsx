@@ -5,6 +5,7 @@ import ShellRail, { RAIL_BUTTON, RAIL_LABEL } from '@/components/resource/ShellR
 import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import Clamp from '@/components/resource/Clamp';
+import CopyId from '@/components/resource/CopyId';
 import { RESOURCE_TYPE_LABELS, type Resource, type ResourceType } from '@/types';
 
 /*
@@ -103,7 +104,7 @@ export default async function PdfDetail(
                 every shell — no "Course ID" prefix, no date. */}
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code
-                ? `ID: ${resource.course_code}`
+                ? <CopyId code={resource.course_code} title={resource.title} />
                 : typeLabel}
             </div>
 

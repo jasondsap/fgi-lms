@@ -4,6 +4,7 @@ import ShellRail, { RAIL_LABEL } from '@/components/resource/ShellRail';
 import { getRelatedResources, getVideoSeries } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import Clamp from '@/components/resource/Clamp';
+import CopyId from '@/components/resource/CopyId';
 import { ceLabel } from '@/lib/ce';
 import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
@@ -83,7 +84,7 @@ export default async function VideoDetail(
 
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
               {resource.course_code
-                ? `ID: ${resource.course_code}`
+                ? <CopyId code={resource.course_code} title={resource.title} />
                 : RESOURCE_TYPE_LABELS.video}
             </div>
 

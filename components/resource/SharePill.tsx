@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { copyText } from '@/lib/copy-text';
 
 interface Props {
   title: string;
@@ -53,16 +54,7 @@ export default function SharePill({ title, description, accent }: Props) {
 
   const copy = async () => {
     const url = pageUrl();
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Older/locked-down browsers: fall back to a hidden textarea.
-      const ta = document.createElement('textarea');
-      ta.value = url; ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
-    }
+    await copyText(url);
     setCopied(true);
     setOpen(false);
     window.setTimeout(() => setCopied(false), 2200);

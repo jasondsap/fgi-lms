@@ -6,6 +6,7 @@ import ShellRail, { RAIL_BUTTON } from '@/components/resource/ShellRail';
 import { getRelatedResources } from '@/lib/resources';
 import type { Surface } from '@/lib/surface';
 import Clamp from '@/components/resource/Clamp';
+import CopyId from '@/components/resource/CopyId';
 import { ceLabel } from '@/lib/ce';
 import { RESOURCE_TYPE_LABELS, type Resource } from '@/types';
 
@@ -88,7 +89,7 @@ export default async function CourseDetail(
             </h1>
 
             <div style={{ fontSize: '17px', color: 'var(--text-secondary)', marginTop: '10px' }}>
-              {resource.course_code ? `ID: ${resource.course_code}` : typeLabel}
+              {resource.course_code ? <CopyId code={resource.course_code} title={resource.title} /> : typeLabel}
             </div>
 
             {/* 2rem (Jennifer 8-31): clear air between the ID line and the

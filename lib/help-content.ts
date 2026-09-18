@@ -79,7 +79,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     ],
     tips: [
       'Describe the subject, not the exact title — "naloxone training" works even if the title says PAR.',
-      'Have a resource ID? Every resource page shows one (for example "ID: ka7386"). Type the ID into the search box and that resource comes back first.',
+      'Have a resource ID? Every resource page shows one (for example "ID: ka7386"). Type the ID into the search box and that resource comes back first. The copy icon next to the ID copies the title and ID together, ready to paste into an email or ticket.',
       'If a keyword search comes up short, try Ask Fletch and describe your situation in a full sentence instead.',
     ],
     faqs: [

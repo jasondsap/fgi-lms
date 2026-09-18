@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import CopyId from '@/components/resource/CopyId';
 import { AmazonIcon, AppleIcon, AudibleIcon, SpotifyIcon } from '@/components/BrandIcons';
 import AudioPlayer, { ListenNowButton, TrailerButton } from '@/components/resource/AudioPlayer';
 import SharePill from '@/components/resource/SharePill';
@@ -166,7 +167,7 @@ export default async function PodcastDetail(
                   course code today, so this renders only if one ever does. */}
               {resource.course_code && (
                 <div style={{ fontSize: '15px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                  ID: {resource.course_code}
+                  <CopyId code={resource.course_code} title={resource.title} />
                 </div>
               )}
 

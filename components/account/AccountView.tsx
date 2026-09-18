@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CopyId from '@/components/resource/CopyId';
 import { redirect } from 'next/navigation';
 import { authEnabled, getSession } from '@/auth';
 import { moodleEnabled } from '@/lib/moodle';
@@ -208,7 +209,7 @@ export default async function AccountView({ surface }: { surface: Surface }) {
                       <td style={TD}>
                         <Link href={courseHref(r)} style={{ color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{r.title}</Link>
                         <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          {typeLabel(r.type)}{r.course_code ? ` · ${r.course_code}` : ''}
+                          {typeLabel(r.type)}{r.course_code ? <> · <CopyId code={r.course_code} title={r.title} prefix="" /></> : null}
                         </div>
                       </td>
                       <td style={TD}>{fmtDate(r.completed_at!)}</td>
