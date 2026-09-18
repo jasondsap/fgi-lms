@@ -41,10 +41,17 @@ function Pill({ bg, fg, children }: { bg: string; fg: string; children: React.Re
 const surfaceLabel = (v: string | null) =>
   SURFACE_OPTIONS.find((s) => s.value === v)?.label ?? '—';
 
+// Home-portal quick-filter buttons, labelled the way Jennifer refers to them.
+const PORTAL_FILTERS = [
+  { value: 'scarr', label: 'SCARR' },
+  { value: 'colorado', label: 'ORH-CO' },
+] as const;
+
 export default function UsersView({ users, selfId }: { users: AdminUserRow[]; selfId: string }) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [surfaceFilter, setSurfaceFilter] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState('learner');
   const [editSurface, setEditSurface] = useState('fgi');
@@ -56,7 +63,15 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
   const q = search.trim().toLowerCase();
   const filtered = users.filter((u) => {
     const hay = `${u.given_name ?? ''} ${u.family_name ?? ''} ${u.email} ${u.organization ?? ''}`.toLowerCase();
-    return (!q || hay.includes(q)) && (!roleFilter || u.role === roleFilter);
+    return (!q || hay.includes(q))
+      && (!roleFilter || u.role === roleFilter)
+      && (!surfaceFilter || u.registered_surface === surfaceFilter);
+  });
+
+  const filterButton = (active: boolean): React.CSSProperties => ({
+    ...FIELD, cursor: 'pointer', borderRadius: '999px', fontWeight: 600,
+    background: active ? 'var(--fgi-navy)' : '#fff',
+    color: active ? '#fff' : 'var(--text-secondary)',
   });
 
   const startEdit = (u: AdminUserRow) => {
@@ -112,16 +127,12 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search name, email, organization…"
           aria-label="Search users"
-          style={{ ...FIELD, flex: '1 1 260px', padding: '9px 14px' }}
+          style={{ ...FIELD, flex: '1 1 180px', maxWidth: '230px', padding: '9px 14px' }}
         />
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
           <button
-            onClick={() => setRoleFilter('')}
-            style={{
-              ...FIELD, cursor: 'pointer', borderRadius: '999px', fontWeight: 600,
-              background: !roleFilter ? 'var(--fgi-navy)' : '#fff',
-              color: !roleFilter ? '#fff' : 'var(--text-secondary)',
-            }}
+            onClick={() => { setRoleFilter(''); setSurfaceFilter(''); }}
+            style={filterButton(!roleFilter && !surfaceFilter)}
           >
             All ({users.length})
           </button>
@@ -131,13 +142,23 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
               <button
                 key={r.value}
                 onClick={() => setRoleFilter(roleFilter === r.value ? '' : r.value)}
-                style={{
-                  ...FIELD, cursor: 'pointer', borderRadius: '999px', fontWeight: 600,
-                  background: roleFilter === r.value ? 'var(--fgi-navy)' : '#fff',
-                  color: roleFilter === r.value ? '#fff' : 'var(--text-secondary)',
-                }}
+                style={filterButton(roleFilter === r.value)}
               >
                 {r.label} ({n})
+              </button>
+            );
+          })}
+          {/* Portal quick-filters (Jennifer, 9-18-26) — combine with the role buttons */}
+          <span aria-hidden="true" style={{ width: '1px', height: '20px', background: 'var(--border-color)', margin: '0 2px' }} />
+          {PORTAL_FILTERS.map((p) => {
+            const n = users.filter((u) => u.registered_surface === p.value).length;
+            return (
+              <button
+                key={p.value}
+                onClick={() => setSurfaceFilter(surfaceFilter === p.value ? '' : p.value)}
+                style={filterButton(surfaceFilter === p.value)}
+              >
+                {p.label} ({n})
               </button>
             );
           })}
