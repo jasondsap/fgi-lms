@@ -58,7 +58,8 @@ export default async function PortalAdminUserPage({ params }: { params: { tenant
     ['I am a…', roleLabels(user.roles, user.role_other)],
     ['Account created', fmtDateTime(user.created_at)],
     ['Registration completed', fmtDateTime(user.registration_completed_at)],
-    ['Last active', fmtDateTime(user.last_active)],
+    ['Last sign-in', user.last_login_at ? fmtDateTime(user.last_login_at) : 'None since tracking began (Sep 19, 2026)'],
+    ['Last accessed', fmtDateTime(user.last_active)],
   ];
 
   return (

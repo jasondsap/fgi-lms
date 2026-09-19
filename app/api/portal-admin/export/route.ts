@@ -8,12 +8,9 @@
 // presigned.
 // =============================================================================
 import { NextRequest } from 'next/server';
-import {
-  listPortalEvaluations, listPortalProgress, listPortalUsers, parseFilters,
-} from '@/lib/portal-admin';
-import {
-  evaluationsTable, progressTable, tableToCsv, tableToXlsx, usersTable,
-} from '@/lib/portal-admin-export';
+import { parseFilters } from '@/lib/portal-admin';
+import { tableToCsv, tableToXlsx } from '@/lib/portal-admin-export';
+import { buildReportTable, isReportKind } from '@/lib/portal-reports';
 import { getTenantConfig } from '@/lib/tenants';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 
@@ -33,15 +30,11 @@ export async function GET(request: NextRequest) {
   const filters = parseFilters(params);
 
   const asked = p.get('report');
-  const report = asked === 'progress' || asked === 'evaluations' ? asked : 'users';
-  // &user=<id> narrows either report to one person (the user detail page).
+  const report = isReportKind(asked) ? asked : 'users';
+  // &user=<id> narrows any report to one person (the user detail page).
   // The queries still scope it to this portal, so a foreign id exports nothing.
   const onlyUser = UUID.test(p.get('user') ?? '') ? (p.get('user') as string) : undefined;
-  const table = report === 'evaluations'
-    ? evaluationsTable(await listPortalEvaluations(tenant.slug, filters, 20000, onlyUser), tenant.name)
-    : report === 'progress'
-    ? progressTable(await listPortalProgress(tenant.slug, filters, 20000, onlyUser), tenant.name)
-    : usersTable(await listPortalUsers(tenant.slug, filters, 5000, onlyUser));
+  const table = await buildReportTable(tenant.slug, tenant.name, report, filters, onlyUser);
   const base = `${tenant.slug}-${report}-${stamp()}`;
 
   if (p.get('format') === 'xlsx') {

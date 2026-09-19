@@ -24,6 +24,8 @@ export interface AppUser {
   role: string;
   /** Surface the account registered from: fgi | colorado | scarr. */
   registered_surface: string | null;
+  /** Last sign-in; null = not since 9-19-26, when stamping began. */
+  last_login_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -50,11 +52,15 @@ export async function upsertUser(input: {
 }): Promise<AppUser> {
   const allowRole = await getAllowlistedRole(input.email);
   // A learner on the allowlist is upgraded; staff/admin are never downgraded.
+  // Both sign-in paths (the on-site modal and the hosted UI) come through
+  // here and nothing else does, so this is also where last_login_at is
+  // stamped (9-19-26, Portal Admin "last date account accessed").
   const rows = await sql`
-    INSERT INTO users (cognito_sub, email, given_name, family_name, role)
+    INSERT INTO users (cognito_sub, email, given_name, family_name, role, last_login_at)
     VALUES (${input.cognitoSub}, ${input.email}, ${input.givenName}, ${input.familyName},
-            ${allowRole ?? 'learner'})
+            ${allowRole ?? 'learner'}, now())
     ON CONFLICT (cognito_sub) DO UPDATE SET
+      last_login_at = now(),
       email       = EXCLUDED.email,
       given_name  = COALESCE(EXCLUDED.given_name,  users.given_name),
       family_name = COALESCE(EXCLUDED.family_name, users.family_name),

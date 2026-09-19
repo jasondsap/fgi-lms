@@ -26,12 +26,12 @@ export function usersTable(users: PortalUserRow[]): ReportTable {
   return {
     sheet: 'Users',
     header: ['Name', 'Email', 'Organization', 'State', 'County', 'Zip', 'I am a…',
-      'Account created', 'Registration completed', 'Last active',
+      'Account created', 'Registration completed', 'Last sign-in', 'Last accessed',
       'Items accessed', 'In progress', 'Completed'],
     rows: users.map((u) => [
       name(u), u.email, u.organization ?? '', u.state ?? '', u.county ?? '', u.zip ?? '',
       roleLabels(u.roles, u.role_other),
-      date(u.created_at), date(u.registration_completed_at), date(u.last_active),
+      date(u.created_at), date(u.registration_completed_at), date(u.last_login_at), date(u.last_active),
       u.items, u.in_progress, u.completed,
     ]),
   };

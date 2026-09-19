@@ -89,7 +89,9 @@ export function filterQuery(f: PortalFilters, extra: Record<string, string> = {}
   f.roles.forEach((r) => qs.append('role', r));
   f.items.forEach((i) => qs.append('item', i));
   if (f.status) qs.set('status', f.status);
-  if (f.from || f.to) qs.set('datefield', f.dateField);
+  // Kept without dates too: a saved report scheduled "this period only" needs
+  // to know WHICH date the period applies to.
+  if (f.from || f.to || f.dateField !== 'accessed') qs.set('datefield', f.dateField);
   if (f.from) qs.set('from', f.from);
   if (f.to) qs.set('to', f.to);
   return qs.toString();
@@ -268,6 +270,9 @@ export interface PortalUserRow {
   roles: string[];
   created_at: string;
   registration_completed_at: string | null;
+  /** Last sign-in (stamped since 9-19-26). */
+  last_login_at: string | null;
+  /** Later of last sign-in and last recorded activity. */
   last_active: string | null;
   items: number;
   in_progress: number;
@@ -293,7 +298,11 @@ export async function listPortalUsers(
             u.role, u.role_other, u.created_at, u.registration_completed_at,
             COALESCE((SELECT array_agg(ur.role ORDER BY ur.role) FROM user_roles ur WHERE ur.user_id = u.id),
                      '{}') AS roles,
-            a.last_active,
+            u.last_login_at,
+            -- "Last accessed": the later of the last sign-in and the last
+            -- recorded activity. A session lasts weeks, so activity is usually
+            -- the fresher signal; sign-in catches visits that touched nothing.
+            GREATEST(a.last_active, u.last_login_at) AS last_active,
             COALESCE(a.items, 0)::int       AS items,
             COALESCE(a.in_progress, 0)::int AS in_progress,
             COALESCE(a.completed, 0)::int   AS completed

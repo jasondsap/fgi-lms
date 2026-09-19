@@ -108,6 +108,7 @@ When Moodle is deployed on AWS:
 | `S3_BUCKET_NAME` | `fgi-resources` |
 | `S3_PRESIGNED_URL_EXPIRY` | Seconds (default 3600) |
 | `JWT_SECRET` | Admin JWT signing secret |
+| `CRON_SECRET` | Shared secret Vercel Cron sends to `/api/cron/portal-reports` (scheduled Portal Admin report emails). Unset = the job refuses to run. Also needs `RESEND_API_KEY` + `RESEND_FROM_EMAIL`. |
 | `NEXT_PUBLIC_APP_URL` | Deployed app URL |
 | `AUTH_SECRET` | Auth.js session-cookie encryption secret |
 | `COGNITO_CLIENT_ID` | Cognito app client ID (site login) |

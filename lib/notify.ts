@@ -32,6 +32,8 @@ export async function sendEmail(input: {
   to: string[];
   subject: string;
   html: string;
+  /** Files to attach — `content` is base64 (scheduled Portal Admin reports, 9-19-26). */
+  attachments?: Array<{ filename: string; content: string }>;
 }): Promise<boolean> {
   if (!emailEnabled) return false;
   try {
@@ -46,6 +48,7 @@ export async function sendEmail(input: {
         to: input.to,
         subject: input.subject,
         html: input.html,
+        ...(input.attachments?.length ? { attachments: input.attachments } : {}),
       }),
     });
     if (!res.ok) {

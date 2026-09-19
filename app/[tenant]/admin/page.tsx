@@ -8,13 +8,16 @@ import { roleConfig, SURFACE_OPTIONS } from '@/components/admin/roles';
 import EvaluationsView from '@/components/portal-admin/EvaluationsView';
 import FilterBar from '@/components/portal-admin/FilterBar';
 import PrintButton from '@/components/portal-admin/PrintButton';
+import SavedReports, { SaveBar } from '@/components/portal-admin/SavedReports';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { requireSignIn } from '@/lib/lockdown';
 import {
   filterQuery, getPortalStats, hasFilters, listItemOptions, listPortalEvaluations,
   listPortalProgress, listPortalUsers, listZipOptions, parseFilters, roleLabels, statusLabel,
 } from '@/lib/portal-admin';
+import { listSavedReports } from '@/lib/portal-reports';
 import { TENANT_SLUGS, getTenantConfig } from '@/lib/tenants';
+import { getUserById } from '@/lib/users';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 import { RESOURCE_TYPE_LABELS, type ResourceType } from '@/types';
 
@@ -25,6 +28,7 @@ const TABS = [
   { value: 'users', label: 'Users' },
   { value: 'progress', label: 'Progress' },
   { value: 'evaluations', label: 'Evaluations' },
+  { value: 'saved', label: 'Saved reports' },
 ] as const;
 type Tab = (typeof TABS)[number]['value'];
 
@@ -40,7 +44,8 @@ const dash = <span style={{ color: 'var(--text-muted)' }}>—</span>;
  * Portal Admin (Jennifer, 9-19-26) — read-only reporting on ONE portal's
  * people, in that portal's chrome: everything registration captured, progress
  * through items, evaluation answers by item, the filter set from her doc, CSV / Excel / print exports.
- * Nothing on this page writes. Portal Admins (users.role 'tenant_admin') see
+ * Nothing on this page writes portal data — the only writes are the viewer's
+ * own saved reports and their email schedules (phase 3). Portal Admins (users.role 'tenant_admin') see
  * only the portal they are bound to; FGI admins get a portal switcher.
  * Every query is scoped inside lib/portal-admin.ts by the route's slug, and
  * only after canAdminPortal() passes.
@@ -62,14 +67,16 @@ export default async function PortalAdminPage({
   const filters = parseFilters(searchParams);
   const accent = tenant.primary;
 
-  const [stats, items, zips, users, progress, evaluations] = await Promise.all([
+  const [stats, items, zips, users, progress, evaluations, saved] = await Promise.all([
     getPortalStats(tenant.slug),
     listItemOptions(tenant.slug),
     listZipOptions(tenant.slug),
     tab === 'users' ? listPortalUsers(tenant.slug, filters) : Promise.resolve([]),
     tab === 'progress' ? listPortalProgress(tenant.slug, filters) : Promise.resolve([]),
     tab === 'evaluations' ? listPortalEvaluations(tenant.slug, filters) : Promise.resolve([]),
+    listSavedReports(tenant.slug, viewer.userId as string),
   ]);
+  const note = typeof searchParams.note === 'string' ? searchParams.note.slice(0, 200) : '';
 
   const count = tab === 'users' ? users.length : tab === 'progress' ? progress.length : evaluations.length;
   const exportHref = (format: 'csv' | 'xlsx') =>
@@ -138,22 +145,43 @@ export default async function PortalAdminPage({
             return (
               <Link
                 key={t.value}
-                href={`${base}?${filterQuery(filters, { tab: t.value })}`}
+                href={t.value === 'saved' ? `${base}?tab=saved` : `${base}?${filterQuery(filters, { tab: t.value })}`}
                 style={{
                   padding: '9px 18px', fontSize: '14.5px', fontWeight: 700, textDecoration: 'none',
                   color: active ? accent : 'var(--text-secondary)',
                   borderBottom: `3px solid ${active ? accent : 'transparent'}`, marginBottom: '-1px',
                 }}
               >
-                {t.label}
+                {t.label}{t.value === 'saved' && saved.length ? ` (${saved.length})` : ''}
               </Link>
             );
           })}
         </div>
 
+        {tab === 'saved' ? (
+          <>
+            {note && (
+              <div role="status" style={{
+                fontSize: '13.5px', background: '#eef6ee', border: '1px solid #cfe6cf', color: '#1e5a2a',
+                borderRadius: 'var(--radius-md)', padding: '9px 12px', marginBottom: '12px',
+              }}>
+                {note}
+              </div>
+            )}
+            <SavedReports
+              portal={tenant.slug} base={base} saved={saved} accent={accent}
+              ownerEmail={(await getUserById(viewer.userId as string))?.email ?? 'your account email'}
+            />
+          </>
+        ) : (
+        <>
         <FilterBar
           action={base} tab={tab} filters={filters} items={items} zips={zips}
           accent={accent} portalName={tenant.name}
+        />
+        <SaveBar
+          portal={tenant.slug} base={base} report={tab} query={filterQuery(filters)}
+          saved={saved} accent={accent}
         />
 
         <SectionTitle
@@ -191,7 +219,7 @@ export default async function PortalAdminPage({
                   <th style={TH}>County · Zip</th>
                   <th style={TH}>I am a…</th>
                   <th style={TH}>Created</th>
-                  <th style={TH}>Last active</th>
+                  <th style={TH}>Last accessed</th>
                   <th style={{ ...TH, textAlign: 'right' }}>In progress</th>
                   <th style={{ ...TH, textAlign: 'right' }}>Completed</th>
                 </tr>
@@ -270,6 +298,8 @@ export default async function PortalAdminPage({
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '10px' }}>
             Showing the first {PAGE_ROWS} of {count}. Narrow the filters, or export for the full list.
           </p>
+        )}
+        </>
         )}
       </div>
       <div className="no-print"><TenantShellFooter tenant={tenant} /></div>
