@@ -1,5 +1,5 @@
 // =============================================================================
-// GET /api/portal-admin/export?portal=<slug>&report=users|progress&format=csv|xlsx
+// GET /api/portal-admin/export?portal=<slug>&report=users|progress|evaluations&format=csv|xlsx
 //     …plus the same filter params the /<portal>/admin page uses, or &user=<id>.
 // Portal Admin exports (Jennifer, 9-19-26). Same gate as the page
 // (canAdminPortal): an FGI admin for any portal, a Portal Admin only for the
@@ -8,8 +8,12 @@
 // presigned.
 // =============================================================================
 import { NextRequest } from 'next/server';
-import { listPortalProgress, listPortalUsers, parseFilters } from '@/lib/portal-admin';
-import { progressTable, tableToCsv, tableToXlsx, usersTable } from '@/lib/portal-admin-export';
+import {
+  listPortalEvaluations, listPortalProgress, listPortalUsers, parseFilters,
+} from '@/lib/portal-admin';
+import {
+  evaluationsTable, progressTable, tableToCsv, tableToXlsx, usersTable,
+} from '@/lib/portal-admin-export';
 import { getTenantConfig } from '@/lib/tenants';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 
@@ -28,11 +32,14 @@ export async function GET(request: NextRequest) {
   p.forEach((v, k) => { (params[k] ??= []).push(v); });
   const filters = parseFilters(params);
 
-  const report = p.get('report') === 'progress' ? 'progress' : 'users';
+  const asked = p.get('report');
+  const report = asked === 'progress' || asked === 'evaluations' ? asked : 'users';
   // &user=<id> narrows either report to one person (the user detail page).
   // The queries still scope it to this portal, so a foreign id exports nothing.
   const onlyUser = UUID.test(p.get('user') ?? '') ? (p.get('user') as string) : undefined;
-  const table = report === 'progress'
+  const table = report === 'evaluations'
+    ? evaluationsTable(await listPortalEvaluations(tenant.slug, filters, 20000, onlyUser), tenant.name)
+    : report === 'progress'
     ? progressTable(await listPortalProgress(tenant.slug, filters, 20000, onlyUser), tenant.name)
     : usersTable(await listPortalUsers(tenant.slug, filters, 5000, onlyUser));
   const base = `${tenant.slug}-${report}-${stamp()}`;

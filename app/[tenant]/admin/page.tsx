@@ -5,13 +5,14 @@ import {
   BTN, CARD, Empty, NUM, SectionTitle, Stat, TD, TH, fmtDate,
 } from '@/components/admin/activity-ui';
 import { roleConfig, SURFACE_OPTIONS } from '@/components/admin/roles';
+import EvaluationsView from '@/components/portal-admin/EvaluationsView';
 import FilterBar from '@/components/portal-admin/FilterBar';
 import PrintButton from '@/components/portal-admin/PrintButton';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { requireSignIn } from '@/lib/lockdown';
 import {
-  filterQuery, getPortalStats, hasFilters, listItemOptions, listPortalProgress,
-  listPortalUsers, listZipOptions, parseFilters, roleLabels, statusLabel,
+  filterQuery, getPortalStats, hasFilters, listItemOptions, listPortalEvaluations,
+  listPortalProgress, listPortalUsers, listZipOptions, parseFilters, roleLabels, statusLabel,
 } from '@/lib/portal-admin';
 import { TENANT_SLUGS, getTenantConfig } from '@/lib/tenants';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic';
 const TABS = [
   { value: 'users', label: 'Users' },
   { value: 'progress', label: 'Progress' },
+  { value: 'evaluations', label: 'Evaluations' },
 ] as const;
 type Tab = (typeof TABS)[number]['value'];
 
@@ -37,7 +39,7 @@ const dash = <span style={{ color: 'var(--text-muted)' }}>—</span>;
 /**
  * Portal Admin (Jennifer, 9-19-26) — read-only reporting on ONE portal's
  * people, in that portal's chrome: everything registration captured, progress
- * through items, the filter set from her doc, CSV / Excel / print exports.
+ * through items, evaluation answers by item, the filter set from her doc, CSV / Excel / print exports.
  * Nothing on this page writes. Portal Admins (users.role 'tenant_admin') see
  * only the portal they are bound to; FGI admins get a portal switcher.
  * Every query is scoped inside lib/portal-admin.ts by the route's slug, and
@@ -56,19 +58,20 @@ export default async function PortalAdminPage({
   const viewer = await getViewer();
   if (!canAdminPortal(viewer, tenant.slug)) notFound();
 
-  const tab: Tab = searchParams.tab === 'progress' ? 'progress' : 'users';
+  const tab: Tab = TABS.find((t) => t.value === searchParams.tab)?.value ?? 'users';
   const filters = parseFilters(searchParams);
   const accent = tenant.primary;
 
-  const [stats, items, zips, users, progress] = await Promise.all([
+  const [stats, items, zips, users, progress, evaluations] = await Promise.all([
     getPortalStats(tenant.slug),
     listItemOptions(tenant.slug),
     listZipOptions(tenant.slug),
     tab === 'users' ? listPortalUsers(tenant.slug, filters) : Promise.resolve([]),
     tab === 'progress' ? listPortalProgress(tenant.slug, filters) : Promise.resolve([]),
+    tab === 'evaluations' ? listPortalEvaluations(tenant.slug, filters) : Promise.resolve([]),
   ]);
 
-  const count = tab === 'users' ? users.length : progress.length;
+  const count = tab === 'users' ? users.length : tab === 'progress' ? progress.length : evaluations.length;
   const exportHref = (format: 'csv' | 'xlsx') =>
     `/api/portal-admin/export?${filterQuery(filters, { portal: tenant.slug, report: tab, format })}`;
 
@@ -125,6 +128,7 @@ export default async function PortalAdminPage({
           <Stat label="In progress" value={stats.in_progress} />
           <Stat label="Completions" value={stats.completions} />
           <Stat label="Certificates" value={stats.certificates} />
+          <Stat label="Evaluations" value={stats.evaluations} />
         </div>
 
         {/* Tabs keep the filters, so the same selection reads as people or as items. */}
@@ -163,12 +167,20 @@ export default async function PortalAdminPage({
         >
           {tab === 'users'
             ? `${count} user${count === 1 ? '' : 's'}`
-            : `${count} item record${count === 1 ? '' : 's'}`}
+            : tab === 'progress'
+              ? `${count} item record${count === 1 ? '' : 's'}`
+              : `${count} evaluation${count === 1 ? '' : 's'}`}
           {hasFilters(filters) ? ' matching the filters' : ''}
         </SectionTitle>
 
         {count === 0 ? (
-          <Empty>{hasFilters(filters) ? 'Nothing matches these filters.' : 'No one has registered on this portal yet.'}</Empty>
+          <Empty>
+            {hasFilters(filters) ? 'Nothing matches these filters.'
+              : tab === 'evaluations' ? 'No one on this portal has submitted an evaluation yet.'
+              : 'No one has registered on this portal yet.'}
+          </Empty>
+        ) : tab === 'evaluations' ? (
+          <EvaluationsView rows={evaluations} base={base} accent={accent} pageRows={PAGE_ROWS} />
         ) : tab === 'users' ? (
           <div style={{ ...CARD, overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>

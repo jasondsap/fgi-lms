@@ -5,8 +5,10 @@
 // =============================================================================
 import ExcelJS from 'exceljs';
 import { toCsv } from '@/lib/csv';
+import { RATING_ITEMS, TEXT_ITEMS, CONTACT_ITEM } from '@/lib/evaluation-items';
 import {
-  roleLabels, statusLabel, type PortalProgressRow, type PortalUserRow,
+  roleLabels, statusLabel,
+  type PortalEvaluationRow, type PortalProgressRow, type PortalUserRow,
 } from '@/lib/portal-admin';
 import { RESOURCE_TYPE_LABELS, type ResourceType } from '@/types';
 
@@ -54,6 +56,26 @@ export function progressTable(rows: PortalProgressRow[], portalName: string): Re
       yesNo(r.quiz_passed), r.is_course ? yesNo(r.eval_submitted) : '',
       r.is_course ? yesNo(r.cert_earned) : '',
       r.completed_at && r.ce_hours ? r.ce_hours : null,
+    ]),
+  };
+}
+
+/** Column headers are the questions as the learner saw them, so the file explains itself. */
+export function evaluationsTable(rows: PortalEvaluationRow[], portalName: string): ReportTable {
+  return {
+    sheet: 'Evaluations',
+    header: ['Submitted', 'Name', 'Email', 'Organization', 'County', 'Zip',
+      'Item', 'ID', 'Type', 'Library',
+      ...RATING_ITEMS.map((i) => `${i.prompt} (0-10)`),
+      ...TEXT_ITEMS.map((i) => i.prompt),
+      CONTACT_ITEM.prompt, 'Contact email'],
+    rows: rows.map((r) => [
+      date(r.created_at), name(r), r.email, r.organization ?? '', r.county ?? '', r.zip ?? '',
+      r.title ?? '(item removed)', r.course_code ?? '', typeLabel(r.type),
+      r.on_portal ? portalName : 'Fletcher Group Library',
+      ...RATING_ITEMS.map((i) => r[i.key]),
+      ...TEXT_ITEMS.map((i) => r[i.key] ?? ''),
+      yesNo(r.may_contact), r.contact_email ?? '',
     ]),
   };
 }

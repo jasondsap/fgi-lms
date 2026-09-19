@@ -4,10 +4,13 @@ import { notFound } from 'next/navigation';
 import {
   BTN, CARD, Empty, NUM, SectionTitle, Stat, TD, TH, fmtDate, fmtDateTime,
 } from '@/components/admin/activity-ui';
+import EvaluationsView from '@/components/portal-admin/EvaluationsView';
 import PrintButton from '@/components/portal-admin/PrintButton';
 import { TenantShellFooter } from '@/components/layout/ShellFooter';
 import { requireSignIn } from '@/lib/lockdown';
-import { getPortalUser, getPortalUserProgress, roleLabels, statusLabel } from '@/lib/portal-admin';
+import {
+  EMPTY_FILTERS, getPortalUser, getPortalUserProgress, listPortalEvaluations, roleLabels, statusLabel,
+} from '@/lib/portal-admin';
 import { getTenantConfig } from '@/lib/tenants';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 import { RESOURCE_TYPE_LABELS, US_STATES, type ResourceType } from '@/types';
@@ -32,15 +35,18 @@ export default async function PortalAdminUserPage({ params }: { params: { tenant
 
   const user = await getPortalUser(tenant.slug, params.id);
   if (!user) notFound();
-  const items = await getPortalUserProgress(tenant.slug, user.id);
+  const [items, evaluations] = await Promise.all([
+    getPortalUserProgress(tenant.slug, user.id),
+    listPortalEvaluations(tenant.slug, EMPTY_FILTERS, 500, user.id),
+  ]);
 
   const accent = tenant.primary;
   const name = [user.given_name, user.family_name].filter(Boolean).join(' ') || user.email;
   const state = US_STATES.find((s) => s.code === user.state)?.name ?? user.state;
   const ceHours = items.reduce((t, r) => t + (r.completed_at && r.ce_hours ? r.ce_hours : 0), 0);
-  const exportHref = (format: 'csv' | 'xlsx') =>
+  const exportHref = (format: 'csv' | 'xlsx', report: 'progress' | 'evaluations' = 'progress') =>
     `/api/portal-admin/export?${new URLSearchParams({
-      portal: tenant.slug, report: 'progress', format, user: user.id,
+      portal: tenant.slug, report, format, user: user.id,
     }).toString()}`;
 
   const facts: Array<[string, React.ReactNode]> = [
@@ -83,6 +89,7 @@ export default async function PortalAdminUserPage({ params }: { params: { tenant
           <Stat label="In progress" value={user.in_progress} />
           <Stat label="Completed" value={user.completed} />
           <Stat label="CE hours" value={ceHours} />
+          <Stat label="Evaluations" value={evaluations.length} />
         </div>
 
         <SectionTitle
@@ -148,6 +155,22 @@ export default async function PortalAdminUserPage({ params }: { params: { tenant
               </tbody>
             </table>
           </div>
+        )}
+
+        {evaluations.length > 0 && (
+          <>
+            <SectionTitle
+              aside={(
+                <div className="no-print" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <a href={exportHref('csv', 'evaluations')} style={{ ...BTN, borderColor: accent, color: accent }}>Export CSV</a>
+                  <a href={exportHref('xlsx', 'evaluations')} style={{ ...BTN, borderColor: accent, color: accent }}>Export Excel</a>
+                </div>
+              )}
+            >
+              Evaluations submitted
+            </SectionTitle>
+            <EvaluationsView rows={evaluations} base={base} accent={accent} showPerson={false} />
+          </>
         )}
       </div>
       <div className="no-print"><TenantShellFooter tenant={tenant} /></div>

@@ -35,6 +35,7 @@ export default function FilterBar({
   accent: string;
   portalName: string;
 }) {
+  const evals = tab === 'evaluations';
   return (
     <form
       // Uncontrolled inputs keep their DOM value across a same-route
@@ -101,19 +102,30 @@ export default function FilterBar({
         />
       </div>
 
-      <label style={LABEL}>
-        Completion
-        <select name="status" defaultValue={filters.status} style={FIELD}>
-          <option value="">Any</option>
-          <option value="completed">Completed</option>
-          <option value="in_progress">In progress</option>
-        </select>
-      </label>
+      {evals ? (
+        // An evaluation has no completion status; carry the value so it is
+        // still there when the person switches back to Users / Progress.
+        <input type="hidden" name="status" value={filters.status} />
+      ) : (
+        <label style={LABEL}>
+          Completion
+          <select name="status" defaultValue={filters.status} style={FIELD}>
+            <option value="">Any</option>
+            <option value="completed">Completed</option>
+            <option value="in_progress">In progress</option>
+          </select>
+        </label>
+      )}
 
       <label style={LABEL}>
         Date range applies to
-        <select name="datefield" defaultValue={filters.dateField} style={FIELD}>
-          {DATE_FIELDS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+        <select name="datefield" defaultValue={evals && filters.dateField !== 'created' ? 'accessed' : filters.dateField} style={FIELD}>
+          {evals ? (
+            <>
+              <option value="accessed">Evaluation submitted</option>
+              <option value="created">Account created</option>
+            </>
+          ) : DATE_FIELDS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
         </select>
       </label>
       <label style={LABEL}>
@@ -142,7 +154,8 @@ export default function FilterBar({
         )}
       </div>
       <p style={{ flexBasis: '100%', margin: 0, fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.45 }}>
-        Filters combine. Item, completion and date filters keep a person who has at least one matching item.
+        Filters combine.{' '}
+        {evals ? '' : 'Item, completion and date filters keep a person who has at least one matching item. '}
         Organization and county are typed in by each person at registration, so they match on part of the text.
         Items marked Fletcher Group Library were reached from {portalName} but are not in its own library.
       </p>

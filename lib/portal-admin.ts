@@ -6,6 +6,7 @@
 // admin Activity report (lib/admin-activity.ts):
 //   user_resource_events   view / course_open / complete / share / download
 //   user_course_progress   Moodle course mirror — started, pct, completed_at
+// plus evaluation_responses for the Evaluations tab (phase 2).
 //
 // THE BOUNDARY: every query here is scoped to users.registered_surface =
 // <portal>. The portal slug is always this module's first bound parameter
@@ -152,7 +153,9 @@ interface Built { userConds: string[]; itemConds: string[]; values: unknown[] }
  * Conditions + values in lockstep. `u` = users row, `ui` = the user-item row.
  * values[0] is ALWAYS the portal slug ($1, which UI_CTE reads).
  */
-function build(portal: string, f: PortalFilters, onlyUserId?: string): Built {
+function build(
+  portal: string, f: PortalFilters, onlyUserId?: string, mode: 'items' | 'evals' = 'items',
+): Built {
   const values: unknown[] = [portal];
   const bind = (v: unknown): string => {
     values.push(v);
@@ -173,6 +176,18 @@ function build(portal: string, f: PortalFilters, onlyUserId?: string): Built {
     userConds.push(
       `EXISTS (SELECT 1 FROM user_roles ur WHERE ur.user_id = u.id AND ur.role = ANY(${bind(f.roles)}::text[]))`,
     );
+  }
+
+  // Evaluations (alias `e`) take the item filter and the date range — as the
+  // date the evaluation was submitted — and have no completion status.
+  if (mode === 'evals') {
+    if (f.items.length) itemConds.push(`e.resource_id = ANY(${bind(f.items)}::uuid[])`);
+    if (f.from || f.to) {
+      const col = f.dateField === 'created' ? 'u.created_at' : 'e.created_at';
+      if (f.from) itemConds.push(`${col} >= ${bind(f.from)}::date`);
+      if (f.to) itemConds.push(`${col} < (${bind(f.to)}::date + 1)`);
+    }
+    return { userConds, itemConds, values };
   }
 
   if (f.items.length) itemConds.push(`ui.resource_id = ANY(${bind(f.items)}::uuid[])`);
@@ -214,6 +229,7 @@ export interface PortalStats {
   in_progress: number;
   completions: number;
   certificates: number;
+  evaluations: number;
 }
 
 export async function getPortalStats(portal: string): Promise<PortalStats> {
@@ -226,7 +242,8 @@ export async function getPortalStats(portal: string): Promise<PortalStats> {
        (SELECT COUNT(DISTINCT user_id) FROM ui WHERE last_at >= now() - interval '30 days')::int AS active_30,
        (SELECT COUNT(*) FROM ui WHERE is_course AND completed_at IS NULL)::int AS in_progress,
        (SELECT COUNT(*) FROM ui WHERE completed_at IS NOT NULL)::int AS completions,
-       (SELECT COUNT(*) FROM ui WHERE cert_earned)::int AS certificates`,
+       (SELECT COUNT(*) FROM ui WHERE cert_earned)::int AS certificates,
+       (SELECT COUNT(*) FROM evaluation_responses e JOIN pu ON pu.id = e.user_id)::int AS evaluations`,
     [portal],
   );
   return rows[0] as PortalStats;
@@ -384,6 +401,101 @@ export function statusLabel(row: Pick<PortalProgressRow, 'completed_at' | 'is_co
 }
 
 // -----------------------------------------------------------------------------
+// Evaluations (phase 2, 9-19-26) — Learning Center evaluation answers, by item
+// -----------------------------------------------------------------------------
+//
+// Source is Neon's evaluation_responses alone. Since 8-30-26 every course runs
+// the site's evaluation form inside the player, so every answer from a real
+// learner is already there with a user_id. Moodle's own mod_feedback tables
+// hold five responses, all pre-launch staff tests (checked 9-19-26 with
+// scripts/moodle/evalcount.php) — nothing to import for portal reporting.
+//
+// Scoped like everything else here: answers given BY this portal's users.
+// An anonymous answer has no user and so belongs to no portal's report.
+
+export const EVAL_RATING_KEYS = [
+  'made_sense', 'can_apply', 'presented_well', 'overall_impression', 'would_recommend',
+] as const;
+export type EvalRatingKey = (typeof EVAL_RATING_KEYS)[number];
+
+export interface PortalEvaluationRow extends Record<EvalRatingKey, number> {
+  id: string;
+  created_at: string;
+  user_id: string;
+  email: string;
+  given_name: string | null;
+  family_name: string | null;
+  organization: string | null;
+  county: string | null;
+  zip: string | null;
+  resource_id: string | null;
+  title: string | null;
+  type: string | null;
+  course_code: string | null;
+  on_portal: boolean;
+  liked: string | null;
+  disliked: string | null;
+  future_topics: string | null;
+  may_contact: boolean;
+  contact_email: string | null;
+}
+
+export async function listPortalEvaluations(
+  portal: string, f: PortalFilters, limit = 20000, onlyUserId?: string,
+): Promise<PortalEvaluationRow[]> {
+  const { userConds, itemConds, values } = build(portal, f, onlyUserId, 'evals');
+  values.push(limit);
+  const rows = await sql(
+    `SELECT e.id, e.created_at, e.user_id,
+            u.email, u.given_name, u.family_name, u.organization, u.county, u.zip,
+            e.resource_id, COALESCE(r.title, e.resource_slug) AS title, r.type::text AS type, r.course_code,
+            EXISTS (SELECT 1 FROM resource_visibility rv JOIN tenants t ON t.id = rv.tenant_id
+                    WHERE rv.resource_id = e.resource_id AND t.slug = $1) AS on_portal,
+            e.made_sense, e.can_apply, e.presented_well, e.overall_impression, e.would_recommend,
+            e.liked, e.disliked, e.future_topics, e.may_contact, e.contact_email
+     FROM evaluation_responses e
+     JOIN users u ON u.id = e.user_id
+     LEFT JOIN resources r ON r.id = e.resource_id
+     WHERE ${[...userConds, ...itemConds].join(' AND ')}
+     ORDER BY e.created_at DESC
+     LIMIT $${values.length}`,
+    values,
+  );
+  return rows as PortalEvaluationRow[];
+}
+
+export interface EvaluationItemSummary extends Record<EvalRatingKey, number> {
+  resource_id: string | null;
+  title: string;
+  course_code: string | null;
+  responses: number;
+}
+
+/** Per-item response count and average of each 0-10 rating — "by item", from the rows already fetched. */
+export function summarizeEvaluations(rows: PortalEvaluationRow[]): EvaluationItemSummary[] {
+  const byItem = new Map<string, PortalEvaluationRow[]>();
+  for (const r of rows) {
+    const key = r.resource_id ?? `slug:${r.title}`;
+    byItem.set(key, [...(byItem.get(key) ?? []), r]);
+  }
+  return [...byItem.values()]
+    .map((group) => {
+      const avg = (k: EvalRatingKey) =>
+        Math.round((group.reduce((t, r) => t + r[k], 0) / group.length) * 10) / 10;
+      return {
+        resource_id: group[0].resource_id,
+        title: group[0].title ?? '(item removed)',
+        course_code: group[0].course_code,
+        responses: group.length,
+        made_sense: avg('made_sense'), can_apply: avg('can_apply'),
+        presented_well: avg('presented_well'), overall_impression: avg('overall_impression'),
+        would_recommend: avg('would_recommend'),
+      };
+    })
+    .sort((a, b) => b.responses - a.responses || a.title.localeCompare(b.title));
+}
+
+// -----------------------------------------------------------------------------
 // Filter option lists
 // -----------------------------------------------------------------------------
 
@@ -402,6 +514,7 @@ export async function listItemOptions(portal: string): Promise<ItemOption[]> {
      FROM resources r
      WHERE (r.published = TRUE AND r.id IN (SELECT resource_id FROM lib))
         OR r.id IN (SELECT resource_id FROM ui)
+        OR r.id IN (SELECT e.resource_id FROM evaluation_responses e JOIN pu ON pu.id = e.user_id)
      ORDER BY on_portal DESC, r.title`,
     [portal],
   );
