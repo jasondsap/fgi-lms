@@ -2,6 +2,7 @@ import { authEnabled, getSession } from '@/auth';
 import LoginModal from '@/components/auth/LoginModal';
 import SignedOutGate from '@/components/auth/SignedOutGate';
 import { getUserById } from '@/lib/users';
+import { getViewer } from '@/lib/viewer';
 import { signOutAction } from './auth-actions';
 import UserMenu from './UserMenu';
 
@@ -50,6 +51,17 @@ export default async function AuthNav({
   const initials = ((given[0] ?? '') + (family[0] ?? '')).toUpperCase() || name.slice(0, 2).toUpperCase();
   const accountHref = surface === 'fgi' ? '/account' : `/${surface}/account`;
 
+  // Portal Admin reports (9-19-26): a Portal Admin gets the link to the one
+  // portal they administer (the extra lookup runs for that role only); an FGI
+  // admin gets it for whichever portal they are standing in.
+  let portalAdminHref: string | undefined;
+  if (user?.role === 'tenant_admin') {
+    const { tenantSlug } = await getViewer();
+    if (tenantSlug) portalAdminHref = `/${tenantSlug}/admin`;
+  } else if (user?.role === 'admin' && surface !== 'fgi') {
+    portalAdminHref = `/${surface}/admin`;
+  }
+
   return (
     <UserMenu
       initials={initials}
@@ -58,6 +70,7 @@ export default async function AuthNav({
       accountHref={accountHref}
       // Admins get the Admin entry (8-31-26) — always FGI-chromed /admin.
       adminHref={user?.role === 'admin' ? '/admin' : undefined}
+      portalAdminHref={portalAdminHref}
       // Bound arg, not a closure — see auth-actions.ts for why.
       signOut={signOutAction.bind(null, signOutRedirect)}
       chevronColor={color}

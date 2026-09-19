@@ -379,3 +379,15 @@ html, body { overflow-x: clip; }
   .tenant-lobe-logo img { height: 44px; }
   .tenant-lobe-bar { padding-left: 1rem; }
 }
+
+/* ---- Portal Admin reports: print = the PDF export (9-19-26) ---------------
+   Only the report prints — portal chrome, filters, export buttons and the
+   floating launchers drop out. Scoped with :has() so no other page changes. */
+@media print {
+  body:has(.portal-admin-page) .site-header,
+  body:has(.portal-admin-page) .no-print,
+  body:has(.portal-admin-page) button { display: none !important; }
+  .portal-admin-page { max-width: none !important; padding: 0 !important; }
+  .portal-admin-page table { font-size: 11px; }
+  .portal-admin-page tr { break-inside: avoid; }
+}

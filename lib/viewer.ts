@@ -59,6 +59,16 @@ export function viewerHome(viewer: Viewer): string {
 }
 
 /**
+ * Portal Admin reporting (Jennifer, 9-19-26) — /<portal>/admin. FGI admins
+ * may open any portal's reports; a Portal Admin (users.role 'tenant_admin')
+ * only the portal they are bound to through users.tenant_id.
+ */
+export function canAdminPortal(viewer: Viewer, portalSlug: string): boolean {
+  if (viewer.role === 'admin') return true;
+  return viewer.role === 'tenant_admin' && viewer.tenantSlug === portalSlug;
+}
+
+/**
  * May this viewer see `internal` resources on the given surface?
  * Admins everywhere; FGI staff on the FGI library (Jason's 8-31-26 role
  * model: "FGI Staff can see all items in the FGI portal, including internal

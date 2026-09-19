@@ -8,10 +8,14 @@
 //            internal/private items (lib/viewer.ts canSeeInternal).
 // - learner: their own portal plus what's public in the FGI library.
 //
-// `tenant_admin` (a tenant's own administrator, e.g. ORH-CO for the Colorado
-// Code of Ethics) still exists in lib/viewer.ts and via
-// scripts/set-tenant-admin.js; it's deliberately not offered by the users
-// page until a tenant actually staffs one.
+// Plus Portal Admin (Jennifer, 9-19-26): stored as `tenant_admin` — the value
+// lib/viewer.ts has honoured since 8-29-26 — and bound to ONE portal through
+// users.tenant_id, which the users page sets from the Home portal picker.
+// Read-only reporting on that portal's users at /<portal>/admin, plus the
+// portal's internal items; no FGI admin tools.
+
+/** Stored value of the Portal Admin role. */
+export const PORTAL_ADMIN_ROLE = 'tenant_admin';
 
 export const USER_ROLES = [
   {
@@ -25,6 +29,12 @@ export const USER_ROLES = [
     label: 'FGI Staff',
     desc: 'Everything in the FGI library, including internal items',
     bg: '#efe8f8', fg: '#6a3fa0',
+  },
+  {
+    value: PORTAL_ADMIN_ROLE,
+    label: 'Portal Admin',
+    desc: 'Read-only reports on their own portal’s users — set the Home portal to the portal they administer',
+    bg: '#fdf3dd', fg: '#8a6410',
   },
   {
     value: 'learner',

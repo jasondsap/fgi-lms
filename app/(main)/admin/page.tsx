@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { countUsers } from '@/lib/admin-users';
 import { countOpenTickets } from '@/lib/support-db';
+import { TENANT_SLUGS } from '@/lib/tenants';
 import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = { title: 'Admin — FGI Learning Resource Center' };
@@ -74,7 +75,7 @@ export default async function AdminPage() {
             </span>
           </div>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-            Every account — set each person&#39;s role (Admin, FGI Staff, Learner) and home portal.
+            Every account — set each person&#39;s role (Admin, FGI Staff, Portal Admin, Learner) and home portal.
           </p>
         </Link>
 
@@ -90,6 +91,23 @@ export default async function AdminPage() {
           <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Activity</div>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
             What each person or organization viewed, shared, downloaded, and completed — and who accessed any resource. CSV export.
+          </p>
+        </Link>
+
+        {/* Portal Admin reports (9-19-26) live in each portal's chrome; the page
+            carries a portal switcher for FGI admins. */}
+        <Link
+          href={`/${TENANT_SLUGS[0]}/admin`}
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-amber)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Portal Reports</div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            What each portal&#39;s Portal Admin sees — that portal&#39;s users, registration data, and progress, with filters and CSV / Excel export.
           </p>
         </Link>
 

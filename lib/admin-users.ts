@@ -60,16 +60,22 @@ export async function getUserEmailAndRole(
   return (rows[0] as { email: string; role: string }) ?? null;
 }
 
-/** Values validated by the caller (admin-actions.ts). */
+/**
+ * Values validated by the caller (admin-actions.ts). `adminPortal` is the
+ * portal slug a Portal Admin is bound to (users.tenant_id — read by
+ * lib/viewer.ts); null clears the binding for every other role.
+ */
 export async function updateUserAccess(input: {
   userId: string;
   role: string;
   registeredSurface: string | null;
+  adminPortal: string | null;
 }): Promise<void> {
   await sql`
     UPDATE users SET
       role = ${input.role},
       registered_surface = ${input.registeredSurface},
+      tenant_id = (SELECT id FROM tenants WHERE slug = ${input.adminPortal}),
       updated_at = now()
     WHERE id = ${input.userId}
   `;

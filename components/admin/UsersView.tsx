@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { AdminUserRow } from '@/lib/admin-users';
 import { deleteUserAction, updateUserAccessAction } from './admin-actions';
-import { roleConfig, SURFACE_OPTIONS, USER_ROLES } from './roles';
+import { PORTAL_ADMIN_ROLE, roleConfig, SURFACE_OPTIONS, USER_ROLES } from './roles';
 
 const joined = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -37,6 +37,9 @@ function Pill({ bg, fg, children }: { bg: string; fg: string; children: React.Re
     </span>
   );
 }
+
+/** Portals a Portal Admin can be bound to — every surface except the FGI library. */
+const portalSurfaces = SURFACE_OPTIONS.filter((s) => s.value !== 'fgi');
 
 const surfaceLabel = (v: string | null) =>
   SURFACE_OPTIONS.find((s) => s.value === v)?.label ?? '—';
@@ -203,11 +206,29 @@ export default function UsersView({ users, selfId }: { users: AdminUserRow[]; se
 
                 {editing ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <select value={editRole} onChange={(e) => setEditRole(e.target.value)} style={FIELD} aria-label="Role">
+                    <select
+                      value={editRole}
+                      onChange={(e) => {
+                        setEditRole(e.target.value);
+                        // A Portal Admin administers their home portal, and FGI has none.
+                        if (e.target.value === PORTAL_ADMIN_ROLE && editSurface === 'fgi') {
+                          setEditSurface(portalSurfaces[0].value);
+                        }
+                      }}
+                      style={FIELD}
+                      aria-label="Role"
+                    >
                       {USER_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                     </select>
-                    <select value={editSurface} onChange={(e) => setEditSurface(e.target.value)} style={FIELD} aria-label="Home portal">
-                      {SURFACE_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    <select
+                      value={editSurface}
+                      onChange={(e) => setEditSurface(e.target.value)}
+                      style={FIELD}
+                      aria-label={editRole === PORTAL_ADMIN_ROLE ? 'Portal they administer' : 'Home portal'}
+                      title={editRole === PORTAL_ADMIN_ROLE ? 'The portal this person administers' : 'Home portal'}
+                    >
+                      {(editRole === PORTAL_ADMIN_ROLE ? portalSurfaces : SURFACE_OPTIONS)
+                        .map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
                     <button
                       onClick={save}

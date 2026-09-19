@@ -8,7 +8,7 @@ import { revalidatePath } from 'next/cache';
 import { deleteUser, getUserEmailAndRole, updateUserAccess } from '@/lib/admin-users';
 import { deleteCognitoUser } from '@/lib/cognito';
 import { getViewer } from '@/lib/viewer';
-import { ROLE_VALUES, SURFACE_VALUES } from './roles';
+import { PORTAL_ADMIN_ROLE, ROLE_VALUES, SURFACE_VALUES } from './roles';
 
 const UUID = /^[0-9a-f-]{36}$/i;
 
@@ -22,8 +22,17 @@ export async function updateUserAccessAction(
   if (userId === viewer.userId) return { error: 'You can’t change your own access — ask another admin.' };
   if (!ROLE_VALUES.has(input.role)) return { error: 'Unknown role.' };
   const surface = SURFACE_VALUES.has(input.registeredSurface) ? input.registeredSurface : null;
+  // A Portal Admin administers their home portal; the FGI library has no
+  // portal admin (FGI Staff / Admin cover it).
+  const isPortalAdmin = input.role === PORTAL_ADMIN_ROLE;
+  if (isPortalAdmin && (!surface || surface === 'fgi')) {
+    return { error: 'Pick the portal this person administers as their Home portal (not FGI).' };
+  }
 
-  await updateUserAccess({ userId, role: input.role, registeredSurface: surface });
+  await updateUserAccess({
+    userId, role: input.role, registeredSurface: surface,
+    adminPortal: isPortalAdmin ? surface : null,
+  });
   revalidatePath('/admin/users');
   return { ok: true };
 }

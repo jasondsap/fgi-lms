@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/api/', '/account', '/support', '/course/'],
+      disallow: ['/admin', '/*/admin', '/api/', '/account', '/support', '/course/'],
     },
     sitemap: 'https://fgilearn.org/sitemap.xml',
   };
