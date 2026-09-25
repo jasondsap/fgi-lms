@@ -196,7 +196,7 @@ export default async function PodcastDetail(
             ))}
 
             {/* Your Host — identical on every episode, from lib/podcast.ts.
-                The 8-18 mockup hides the bio behind "Read Bio". */}
+                Clamped like the guest cards (Jason, 9-25). */}
             <div style={{
               background: 'var(--body-bg)', borderRadius: 'var(--radius-lg)',
               padding: '1.5rem 1.75rem',

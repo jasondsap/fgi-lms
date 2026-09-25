@@ -45,34 +45,44 @@ export default function PresenterBio({ bio, accent }: { bio: string; accent: str
 }
 
 /**
- * The podcast shell's "Your Host" treatment (8-18-26 mockup): the bio is not
- * shown at all until "Read Bio" is clicked — unlike the clamp above, which
- * always shows the first lines. Multi-paragraph, since Tony's bio is two.
+ * The podcast shell's "Your Host" bio. Same treatment as the guest clamp
+ * above — the first lines show, Read More expands — but multi-paragraph,
+ * since Tony's bio is two. (Was fully hidden behind "Read Bio" per the 8-18
+ * mockup; Jason, 9-25: should clamp half way like the guest cards.)
  */
 export function CollapsedBio({ paragraphs, accent }: { paragraphs: string[]; accent: string }) {
-  const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div>
+      <div
+        style={expanded ? {} : {
+          display: '-webkit-box',
+          WebkitLineClamp: 6,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: 'hidden',
+        }}
+      >
+        {paragraphs.map((para, i) => (
+          <p key={i} style={{
+            fontSize: '14px', lineHeight: 1.65, color: 'var(--text-secondary)',
+            margin: i === 0 ? 0 : '10px 0 0',
+          }}>
+            {para}
+          </p>
+        ))}
+      </div>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setExpanded((v) => !v)}
         style={{
-          padding: 0, border: 'none', background: 'none',
-          color: accent, fontWeight: 700, fontSize: '15px',
+          marginTop: '8px', padding: 0, border: 'none', background: 'none',
+          color: accent, fontWeight: 700, fontSize: '14px',
           fontFamily: 'inherit', cursor: 'pointer',
         }}
       >
-        {open ? 'Close Bio' : 'Read Bio'}
+        {expanded ? 'Read Less' : 'Read More'}
       </button>
-      {open && paragraphs.map((para, i) => (
-        <p key={i} style={{
-          fontSize: '14px', lineHeight: 1.65, color: 'var(--text-secondary)',
-          margin: '10px 0 0',
-        }}>
-          {para}
-        </p>
-      ))}
     </div>
   );
 }
