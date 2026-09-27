@@ -250,7 +250,7 @@ export async function getPublicResources(
   const where = conditions.join(' AND ');
   const COLUMNS = `
       id, title, slug, type, description, duration_minutes,
-      thumbnail_url, vimeo_id, external_url,
+      thumbnail_url, vimeo_id, vimeo_hash, external_url,
       is_naadac_ce, internal, audience_tags, topic_tags, published_at`;
   // What the card's INTERNAL pill reflects: internal everywhere, or internal
   // on this surface. Only for the SELECT against `resources` itself — the
@@ -327,7 +327,7 @@ export async function getRelatedWebinars(
 ): Promise<Resource[]> {
   const rows = await sql`
     SELECT r.id, r.title, r.slug, r.type, r.description, r.duration_minutes,
-           r.thumbnail_url, r.vimeo_id, r.external_url,
+           r.thumbnail_url, r.vimeo_id, r.vimeo_hash, r.external_url,
            r.is_naadac_ce, r.audience_tags, r.topic_tags, r.published_at
     FROM resources r
     WHERE r.type = 'webinar'
@@ -694,7 +694,7 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
   // Tagged-template form — slug is bound as a parameter, not interpolated.
   const rows = await sql`
     SELECT id, title, slug, type, description, duration_minutes,
-           thumbnail_url, vimeo_id, external_url,
+           thumbnail_url, vimeo_id, vimeo_hash, external_url,
            is_naadac_ce, internal, audience_tags, topic_tags, published_at, s3_key,
            event_date, ceu_credits, course_code, naadac_skill_groups,
            citation, abstract, sponsor_text, sponsor_logo_url, sponsor_url,

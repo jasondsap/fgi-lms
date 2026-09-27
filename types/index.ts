@@ -95,6 +95,9 @@ export interface Resource {
   duration_minutes: number | null;
   thumbnail_url: string | null;
   vimeo_id: string | null;
+  // Vimeo privacy hash (the `h=` in an unlisted video's embed). Unlisted videos
+  // 403 without it; null for public ones (9-27-26).
+  vimeo_hash?: string | null;
   external_url: string | null;
   is_naadac_ce: boolean;
   /** Hidden from ordinary learners; cards show an Internal pill (8-29-26).

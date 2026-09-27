@@ -156,7 +156,7 @@ export default async function VideoDetail(
                 borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#111',
               }}>
                 <iframe
-                  src={`https://player.vimeo.com/video/${resource.vimeo_id}?badge=0&autopause=0`}
+                  src={`https://player.vimeo.com/video/${resource.vimeo_id}?${resource.vimeo_hash ? `h=${resource.vimeo_hash}&` : ''}badge=0&autopause=0`}
                   frameBorder="0" allow="autoplay; fullscreen; picture-in-picture"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                   title={resource.title}
