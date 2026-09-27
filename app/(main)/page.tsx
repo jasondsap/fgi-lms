@@ -9,7 +9,7 @@ import ContactButton from '@/components/layout/ContactButton';
 import { getSession } from '@/auth';
 import { getCompletedResourceIds } from '@/lib/progress';
 import { canSeeInternal, getViewer } from '@/lib/viewer';
-import { getLatestByType, getPublicResources } from '@/lib/resources';
+import { getFeaturedHighlight, getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery, loadedPages } from '@/lib/query';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
 
@@ -67,13 +67,14 @@ export default async function HomePage({ searchParams }: PageProps) {
   const session = await getSession();
   const completedIds = session?.user?.id ? await getCompletedResourceIds(session.user.id) : [];
 
-  // "Latest Highlights" is live data for every type the catalog actually
-  // holds. Podcasts have no rows yet, so that tile simply drops out until
-  // they are loaded rather than showing a hardcoded title.
-  const [latestPodcast, latestWebinar, latestBrief] = await Promise.all([
+  // "Latest Highlights": newest podcast, newest webinar, and a pinned third
+  // tile (getFeaturedHighlight — the Social Model of Recovery video since
+  // 9-27-26, falling back to the newest Learning Brief). A type with no
+  // visible rows simply drops its tile.
+  const [latestPodcast, latestWebinar, featured] = await Promise.all([
     getLatestByType('podcast'),
     getLatestByType('webinar'),
-    getLatestByType('toolkit'),
+    getFeaturedHighlight(),
   ]);
 
   const highlights: HighlightTile[] = [
@@ -89,11 +90,11 @@ export default async function HomePage({ searchParams }: PageProps) {
       naadac: Boolean(latestWebinar.is_naadac_ce),
       icon: '/images/category-cards/webinar.webp',
     },
-    latestBrief && {
-      label: 'Learning Brief', title: latestBrief.title,
-      href: `/resource/${latestBrief.slug}`,
-      naadac: Boolean(latestBrief.is_naadac_ce),
-      icon: '/images/category-cards/learning.webp',
+    featured && {
+      label: featured.label, title: featured.title,
+      href: `/resource/${featured.slug}`,
+      naadac: Boolean(featured.is_naadac_ce),
+      icon: featured.icon,
     },
   ].filter(Boolean) as HighlightTile[];
 

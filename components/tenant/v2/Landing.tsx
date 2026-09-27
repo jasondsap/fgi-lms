@@ -6,7 +6,7 @@ import ResourceGrid from '@/components/library/ResourceGrid';
 import SearchBar from '@/components/library/SearchBar';
 import LatestHighlights, { type HighlightTile } from '@/components/home/LatestHighlights';
 import TenantHeroVisual from './HeroVisual';
-import { getLatestByType, getPublicResources } from '@/lib/resources';
+import { getFeaturedHighlight, getLatestByType, getPublicResources } from '@/lib/resources';
 import { filterQuery } from '@/lib/query';
 import { TENANT_HOSTED_TEXT, type TenantConfig } from '@/lib/tenants';
 import type { ResourceListParams, ResourceType, AudienceTag, TopicTag } from '@/types';
@@ -55,10 +55,10 @@ export default async function TenantLandingV2({ tenant, searchParams }: Props) {
 
   // Highlights are FGI's newest items, and they point at the FGI site: these
   // resources are FGI-only, so they are not in the tenant's own library.
-  const [latestPodcast, latestWebinar, latestBrief] = await Promise.all([
+  const [latestPodcast, latestWebinar, featured] = await Promise.all([
     getLatestByType('podcast'),
     getLatestByType('webinar'),
-    getLatestByType('toolkit'),
+    getFeaturedHighlight(),
   ]);
   const highlights: HighlightTile[] = [
     latestPodcast && {
@@ -73,11 +73,11 @@ export default async function TenantLandingV2({ tenant, searchParams }: Props) {
       naadac: Boolean(latestWebinar.is_naadac_ce),
       icon: '/images/category-cards/webinar.webp',
     },
-    latestBrief && {
-      label: 'Learning Brief', title: latestBrief.title,
-      href: `${tenant.fgiSiteUrl}/resource/${latestBrief.slug}`,
-      naadac: Boolean(latestBrief.is_naadac_ce),
-      icon: '/images/category-cards/learning.webp',
+    featured && {
+      label: featured.label, title: featured.title,
+      href: `${tenant.fgiSiteUrl}/resource/${featured.slug}`,
+      naadac: Boolean(featured.is_naadac_ce),
+      icon: featured.icon,
     },
   ].filter(Boolean) as HighlightTile[];
 

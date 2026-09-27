@@ -13,7 +13,7 @@ import { getPresignedUrl, getPresignedDownloadUrl } from './s3';
 import type {
   Presenter, Resource, ResourceListParams, ResourceListResponse, ResourceMaterial, ResourceType,
 } from '@/types';
-import { DOCUMENT_TYPES, RESOURCE_TYPE_TIERS } from '@/types';
+import { RESOURCE_TYPE_LABELS, DOCUMENT_TYPES, RESOURCE_TYPE_TIERS } from '@/types';
 
 // Jennifer's four-level content hierarchy (8-31-26) as a SQL CASE. Built from
 // the hardcoded RESOURCE_TYPE_TIERS map in types/index.ts — type names and
@@ -631,6 +631,47 @@ export async function getLatestByType(type: ResourceType): Promise<LatestItem | 
 
 export async function getLatestWebinar(): Promise<LatestItem | null> {
   return getLatestByType('webinar');
+}
+
+/**
+ * The third "Latest Highlights" tile. Jason (9-27-26): the Social Model of
+ * Recovery video replaces the newest Learning Brief there. Pinned by slug and
+ * checked against the same FGI visibility rules as getLatestByType; if the
+ * pinned resource is ever unpublished or hidden, the tile falls back to the
+ * newest Learning Brief rather than disappearing. Shared by the FGI home and
+ * both tenant landings, which only differ in the href they build.
+ */
+export const FEATURED_HIGHLIGHT_SLUG = 'social-model-of-recovery';
+
+export interface FeaturedHighlight extends LatestItem {
+  label: string;
+  icon: string;
+}
+
+export async function getFeaturedHighlight(): Promise<FeaturedHighlight | null> {
+  const rows = await sql(
+    `SELECT r.slug, r.title, r.is_naadac_ce, r.type
+       FROM resources r
+      WHERE r.slug = $1
+        AND r.published = TRUE AND r.internal = FALSE
+        AND EXISTS (
+          SELECT 1 FROM resource_visibility rv
+          JOIN tenants t ON t.id = rv.tenant_id
+          WHERE rv.resource_id = r.id AND t.slug = 'fgi' AND rv.internal = FALSE
+        )
+      LIMIT 1`,
+    [FEATURED_HIGHLIGHT_SLUG],
+  );
+  const pinned = rows[0] as (LatestItem & { type: ResourceType }) | undefined;
+  if (pinned) {
+    return {
+      slug: pinned.slug, title: pinned.title, is_naadac_ce: pinned.is_naadac_ce,
+      label: RESOURCE_TYPE_LABELS[pinned.type] ?? pinned.type,
+      icon: `/images/category-cards/${pinned.type === 'toolkit' ? 'learning' : pinned.type}.webp`,
+    };
+  }
+  const brief = await getLatestByType('toolkit');
+  return brief && { ...brief, label: 'Learning Brief', icon: '/images/category-cards/learning.webp' };
 }
 
 // Course-player lookup — includes moodle_course_id, which the public
