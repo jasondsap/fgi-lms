@@ -367,7 +367,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     description:
       'The pre-certification course is a seven-part video series taken in order: each video unlocks after you’ve watched the one before it (about 90% counts as watched). The certificate unlocks after all seven plus the evaluation.',
     quickStart: [
-      'Click the Pre-Certification button in the portal header.',
+      'Click the Pre-Certification button in the portal header, or the Pre-cert Requirements link under Certification Info in the library filter bar.',
       'Start with Part 1 and let each video play through.',
       'Each next part unlocks as the previous one completes.',
       'Submit the evaluation, then download your certificate.',

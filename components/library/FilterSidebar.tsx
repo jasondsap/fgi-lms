@@ -26,6 +26,12 @@ interface Props {
    * `TenantV3.filterBarStatic`.
    */
   alwaysOpen?: boolean;
+  /**
+   * Tenant portals (Jason, 9-27-26): the pre-certification course landing
+   * page, linked as "Pre-cert Requirements" at the top of the Certification
+   * Info group — the same destination as the header's gold button.
+   */
+  preCertHref?: string;
 }
 
 /**
@@ -113,7 +119,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
 
 export default function FilterSidebar({
   total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel, fgiLibraryNewTab = false,
-  alwaysOpen = false,
+  alwaysOpen = false, preCertHref,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -259,6 +265,17 @@ export default function FilterSidebar({
           defaultOpen={group.items.some(i => active[i.param].includes(i.value))}
           alwaysOpen={alwaysOpen}
         >
+          {group.title === 'Certification Info' && preCertHref && (
+            <a
+              href={preCertHref}
+              style={{
+                display: 'block', marginBottom: '7px', fontSize: '13px',
+                color: 'var(--fgi-blue)', textDecoration: 'underline', lineHeight: 1.35,
+              }}
+            >
+              Pre-cert Requirements
+            </a>
+          )}
           {group.items.map(item => (
             <CheckItem
               key={`${item.param}:${item.value}`}
