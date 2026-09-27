@@ -125,6 +125,9 @@ export interface Resource {
   // s3_key is never exposed to the client — middleware issues a presigned URL
   download_url?: string;   // presigned URL, populated per-request for PDF resources
   attachment_url?: string; // same object, signed to force a save rather than render
+  // Set when attachment_url is an editable original (docx/xlsx/pptx) promoted
+  // from the materials, rather than the viewer's PDF — drives the button label.
+  attachment_ext?: string;
   presenters?: Presenter[];
   materials?: ResourceMaterial[];
 }

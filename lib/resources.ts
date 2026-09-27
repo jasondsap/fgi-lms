@@ -733,13 +733,40 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
     delete resource.s3_key;
   }
 
-  const [presenters, materials] = await Promise.all([
+  const [presenters, allMaterials] = await Promise.all([
     getResourcePresenters(resource.id),
     getResourceMaterials(resource.id),
   ]);
 
-  return { ...resource, download_url, attachment_url, presenters, materials } as Resource;
+  // Editable-source promotion (Jason, 9-27-26): when a document is really a
+  // template — the s3_key is a PDF render for the inline viewer and the
+  // Office original rides along as a `kind = 'other'` material — the big
+  // Download button must hand out the editable file, not the render. The
+  // promoted material leaves the "Also included" list so it isn't offered
+  // twice. First case: the Level 3 Recovery House Handbook Template (.docx).
+  let attachment_ext: string | undefined;
+  let materials = allMaterials;
+  const source = allMaterials.find(m => m.kind === 'other' && EDITABLE_EXT.test(m.s3_key));
+  if (source) {
+    try {
+      const ext = source.s3_key.split('.').pop()!.toLowerCase();
+      attachment_url = await getPresignedDownloadUrl(source.s3_key, `${resource.slug}.${ext}`);
+      attachment_ext = ext;
+      materials = allMaterials.filter(m => m !== source);
+    } catch (e) {
+      console.error('Presigned URL error:', e);
+    }
+  }
+  // The key never reaches the client (same invariant as the resource itself).
+  const publicMaterials: ResourceMaterial[] = materials.map(({ s3_key: _k, ...rest }) => rest);
+
+  return {
+    ...resource, download_url, attachment_url, attachment_ext, presenters, materials: publicMaterials,
+  } as Resource;
 }
+
+/** Office originals that a browser can't render inline but a visitor can edit. */
+const EDITABLE_EXT = /\.(docx|xlsx|pptx)$/i;
 
 /** Presenters attached to a resource, in the order Jennifer listed them. */
 async function getResourcePresenters(resourceId: string): Promise<Presenter[]> {
@@ -758,8 +785,12 @@ async function getResourcePresenters(resourceId: string): Promise<Presenter[]> {
 /**
  * Transcripts, slide decks and handouts. Same S3 invariant as the resource
  * itself: the key is swapped for a presigned URL and never reaches the client.
+ * The key is kept on the returned row only so getResourceBySlug can spot an
+ * editable original to promote — callers strip it before responding.
  */
-async function getResourceMaterials(resourceId: string): Promise<ResourceMaterial[]> {
+async function getResourceMaterials(
+  resourceId: string,
+): Promise<(ResourceMaterial & { s3_key: string })[]> {
   const rows = await sql`
     SELECT id, kind, label, s3_key
     FROM resource_materials
@@ -769,9 +800,8 @@ async function getResourceMaterials(resourceId: string): Promise<ResourceMateria
 
   const materials = await Promise.all(
     rows.map(async (row: any) => {
-      const { s3_key, ...rest } = row;
       try {
-        return { ...rest, download_url: await getPresignedUrl(s3_key) };
+        return { ...row, download_url: await getPresignedUrl(row.s3_key) };
       } catch (e) {
         console.error('Presigned URL error:', e);
         return null;
@@ -779,5 +809,5 @@ async function getResourceMaterials(resourceId: string): Promise<ResourceMateria
     }),
   );
 
-  return materials.filter(Boolean) as ResourceMaterial[];
+  return materials.filter(Boolean) as (ResourceMaterial & { s3_key: string })[];
 }

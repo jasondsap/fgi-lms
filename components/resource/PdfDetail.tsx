@@ -28,6 +28,16 @@ const TYPE_ILLUSTRATION: Record<string, string> = {
 };
 
 /*
+ * Download-button label when the attachment is an editable original rather
+ * than the PDF in the viewer (templates, 9-27-26).
+ */
+const DOWNLOAD_LABEL: Record<string, string> = {
+  docx: 'Download Word Template',
+  xlsx: 'Download Excel Template',
+  pptx: 'Download PowerPoint',
+};
+
+/*
  * Column geometry from the mockup, at the x1.4 artboard-to-site scale: 627pt of
  * document column, a 46.5pt gutter and a 269pt rail = 1320px total. It lives in
  * `.shell-grid` in globals.css, where it can also carry a breakpoint.
@@ -168,7 +178,7 @@ export default async function PdfDetail(
                     href={resource.attachment_url ?? resource.download_url}
                     style={{ ...RAIL_BUTTON, background: surface.primary }}
                   >
-                    {isPublication ? 'Download PDF' : 'Download'}
+                    {isPublication ? 'Download PDF' : DOWNLOAD_LABEL[resource.attachment_ext ?? ''] ?? 'Download'}
                   </TrackedLink>
                 )}
                 {resource.external_url && (
