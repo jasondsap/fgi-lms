@@ -56,7 +56,7 @@ function DimTable({ title, rows, keyLabel }: { title: string; rows: DimRow[]; ke
     <div style={{ flex: '1 1 300px', minWidth: 0 }}>
       <h3 style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 6px' }}>{title}</h3>
       {rows.length === 0 ? <Empty>Nothing recorded.</Empty> : (
-        <Table head={<><th style={TH}>{keyLabel}</th><th style={{ ...TH, textAlign: 'right' }}>Views</th><th style={{ ...TH, textAlign: 'right' }}>Visitors</th></>}>
+        <Table head={<><th style={TH}>{keyLabel}</th><th style={{ ...TH, textAlign: 'right' }}>Page views</th><th style={{ ...TH, textAlign: 'right' }}>Visitors</th></>}>
           {rows.map((r) => (
             <tr key={r.key}>
               <td style={{ ...TD, maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.key || '(none)'}</td>
@@ -143,16 +143,17 @@ export default async function MonthlyReportPage({
 
       {/* ── Headline numbers ── */}
       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', margin: '18px 0 6px' }}>
-        <Stat label="Visitors" value={t ? nf.format(t.visitors) : '—'} />
+        <Stat label="Site visitors" value={t ? nf.format(t.visitors) : '—'} />
         <Stat label="Page views" value={t ? nf.format(t.pageviews) : '—'} />
         <Stat label="New registrations" value={nf.format(r.registrations.total)} />
-        <Stat label="Active users" value={nf.format(r.activity.activeUsers)} />
+        <Stat label="Active accounts" value={nf.format(r.activity.activeUsers)} />
         <Stat label="Resource views" value={nf.format(r.activity.views)} />
-        <Stat label="Evaluations" value={nf.format(s.responses)} />
+        <Stat label="Evaluation responses" value={nf.format(s.responses)} />
       </div>
       <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '0 0 4px', lineHeight: 1.5 }}>
-        Visitors and page views come from Vercel and count browsers, including signed-out visits to the landing pages.
-        Everything else counts signed-in accounts.
+        Site visitors and page views come from Vercel and count browsers, including signed-out visits to the landing pages.
+        Active accounts are signed-in people with any logged activity; the remaining figures count signed-in activity.
+        Wherever a column says &#34;unique&#34; it counts people once; the column beside it counts every occurrence.
       </p>
 
       {/* ── Registrations ── */}
@@ -306,7 +307,7 @@ export default async function MonthlyReportPage({
         <Table minWidth="680px" head={<>
           <th style={TH}>Resource</th>
           <th style={TH}>Type</th>
-          <th style={{ ...TH, textAlign: 'right' }}>People</th>
+          <th style={{ ...TH, textAlign: 'right' }}>Unique viewers</th>
           <th style={{ ...TH, textAlign: 'right' }}>Views</th>
           <th style={{ ...TH, textAlign: 'right' }}>Downloads</th>
           <th style={{ ...TH, textAlign: 'right' }}>Shares</th>
