@@ -85,22 +85,31 @@ export function tableToCsv(t: ReportTable): string {
 }
 
 export async function tableToXlsx(t: ReportTable, title: string): Promise<Buffer> {
+  return tablesToXlsx([t], title);
+}
+
+/** One workbook, one sheet per table (10-1-26, monthly report). Bold frozen header, auto-filter, fitted widths. */
+export async function tablesToXlsx(tables: ReportTable[], title: string): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.created = new Date();
-  const ws = wb.addWorksheet(t.sheet, { views: [{ state: 'frozen', ySplit: 1 }] });
-  ws.addRow(t.header);
-  ws.getRow(1).font = { bold: true };
-  t.rows.forEach((row) => ws.addRow(row));
-  ws.columns.forEach((col, i) => {
-    const isDate = t.rows.some((row) => row[i] instanceof Date);
-    if (isDate) col.numFmt = 'mmm d, yyyy h:mm AM/PM';
-    const longest = Math.max(
-      t.header[i].length,
-      ...t.rows.slice(0, 500).map((row) => (row[i] instanceof Date ? 20 : String(row[i] ?? '').length)),
-    );
-    col.width = Math.min(60, Math.max(10, longest + 2));
-  });
-  ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: t.header.length } };
+  for (const t of tables) {
+    // Excel caps sheet names at 31 characters and bans a few punctuation marks.
+    const sheetName = t.sheet.replace(/[\\/?*[\]:]/g, ' ').slice(0, 31);
+    const ws = wb.addWorksheet(sheetName, { views: [{ state: 'frozen', ySplit: 1 }] });
+    ws.addRow(t.header);
+    ws.getRow(1).font = { bold: true };
+    t.rows.forEach((row) => ws.addRow(row));
+    ws.columns.forEach((col, i) => {
+      const isDate = t.rows.some((row) => row[i] instanceof Date);
+      if (isDate) col.numFmt = 'mmm d, yyyy h:mm AM/PM';
+      const longest = Math.max(
+        t.header[i].length,
+        ...t.rows.slice(0, 500).map((row) => (row[i] instanceof Date ? 20 : String(row[i] ?? '').length)),
+      );
+      col.width = Math.min(60, Math.max(10, longest + 2));
+    });
+    ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: t.header.length } };
+  }
   wb.title = title;
   return Buffer.from(await wb.xlsx.writeBuffer());
 }

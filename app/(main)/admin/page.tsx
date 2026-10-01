@@ -125,6 +125,23 @@ export default async function AdminPage() {
             Traffic across every page — views, visitors, top pages, referrers, countries.
           </p>
         </Link>
+
+        {/* Monthly report (Jennifer, 10-1-26) — one calendar month of
+            everything her report needs, with Excel / CSV. */}
+        <Link
+          href="/admin/reports/monthly"
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-green, #4f9d69)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Monthly Report</div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            One month at a glance — traffic, new registrations and &#34;I am a…&#34;, podcast plays, evaluations, top resources. Excel / CSV export.
+          </p>
+        </Link>
       </div>
     </div>
   );
