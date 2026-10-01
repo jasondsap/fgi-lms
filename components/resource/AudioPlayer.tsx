@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { logResourceEventAction } from './activity-actions';
 
 /**
  * The episode player on the podcast shell. The MP3s live in the private S3
@@ -11,6 +12,11 @@ import { useEffect, useRef, useState } from 'react';
  * button plays the trailer audio right here (it used to navigate to the
  * trailer's own page). The buttons live in different grid cells from the
  * player, so they talk over window events rather than through React state.
+ *
+ * Play logging (10-1-26, Jennifer's monthly report wants "unique users who
+ * actually pressed play"): the first time each track starts on a page visit,
+ * one 'play' event is logged against that track's resource — the episode's
+ * own row, or the trailer's row when the Trailer button plays it here.
  */
 
 /** Fired by ListenNowButton; the player reveals itself and plays the episode. */
@@ -23,6 +29,8 @@ const RATES = [1, 1.25, 1.5, 2];
 interface Track {
   src: string;
   title: string;
+  /** resources.id the play event is logged against; absent = don't log. */
+  resourceId?: string | null;
 }
 
 function fmt(seconds: number): string {
@@ -42,10 +50,13 @@ const ROUND = {
 };
 
 export default function AudioPlayer(
-  { episode, trailer }: { episode: Track | null; trailer: Track | null },
+  { episode, trailer, surfaceKey }:
+  { episode: Track | null; trailer: Track | null; surfaceKey: string },
 ) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wrapRef  = useRef<HTMLDivElement>(null);
+  // Tracks already logged as played on this page visit (by resource id).
+  const loggedRef = useRef<Set<string>>(new Set());
   // null = the player has not been asked for anything yet and stays hidden.
   const [active,   setActive]   = useState<'episode' | 'trailer' | null>(null);
   const [playing,  setPlaying]  = useState(false);
@@ -97,6 +108,14 @@ export default function AudioPlayer(
     audio.currentTime = Math.min(Math.max(audio.currentTime + delta, 0), duration || Infinity);
   };
 
+  /** First play of this track on this visit → one 'play' row. Pause/resume don't repeat it. */
+  const logPlay = () => {
+    const id = track.resourceId;
+    if (!id || loggedRef.current.has(id)) return;
+    loggedRef.current.add(id);
+    void logResourceEventAction(id, 'play', surfaceKey);
+  };
+
   const cycleRate = () => {
     const next = RATES[(RATES.indexOf(rate) + 1) % RATES.length];
     setRate(next);
@@ -116,7 +135,7 @@ export default function AudioPlayer(
         ref={audioRef}
         src={track.src}
         preload="metadata"
-        onPlay={() => setPlaying(true)}
+        onPlay={() => { setPlaying(true); logPlay(); }}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
         onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}

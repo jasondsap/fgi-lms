@@ -466,8 +466,10 @@ export async function toggleBookmark(userId: string, resourceId: string): Promis
 /**
  * view / course_open / complete are written server-side; share and download
  * arrive from the client through logResourceEventAction (9-17-26).
+ * 'play' (10-1-26, Jennifer's monthly report) is the podcast player's first
+ * press of play on a track — one row per track per page visit.
  */
-export type ResourceEvent = 'view' | 'course_open' | 'complete' | 'share' | 'download';
+export type ResourceEvent = 'view' | 'course_open' | 'complete' | 'share' | 'download' | 'play';
 
 /** Never throws — a logging failure must not 500 a page. */
 export async function logResourceEvent(

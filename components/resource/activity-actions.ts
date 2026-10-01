@@ -10,7 +10,7 @@ import { getSession } from '@/auth';
 import { logResourceEvent, type ResourceEvent } from '@/lib/progress';
 
 const UUID = /^[0-9a-f-]{36}$/i;
-const CLIENT_EVENTS = new Set<ResourceEvent>(['share', 'download']);
+const CLIENT_EVENTS = new Set<ResourceEvent>(['share', 'download', 'play']);
 const SURFACE = /^[a-z0-9-]{1,40}$/;
 
 export async function logResourceEventAction(

@@ -10,7 +10,7 @@ import { getRelatedResources } from '@/lib/resources';
 import PodcastInfoModal from '@/components/resource/PodcastInfoModal';
 import { CollapsedBio } from '@/components/resource/PresenterBio';
 import PresenterCard from '@/components/resource/PresenterCard';
-import { getOtherEpisodes, getPodcastAudioUrl } from '@/lib/resources';
+import { getOtherEpisodes, getPodcastTrack } from '@/lib/resources';
 import {
   ABOUT_THE_PODCAST, PODCAST_EMAIL, PODCAST_FEEDBACK_EMBED_URL, PODCAST_FEEDBACK_FORM_URL, PODCAST_HOST,
   PODCAST_PLATFORMS, SHOW_LOGO, SHOW_TAGLINE, SHOW_TITLE, TRAILER_SLUG, WEBBERIZED,
@@ -68,11 +68,11 @@ export default async function PodcastDetail(
   const guests    = resource.presenters ?? [];
   const released  = formatReleaseDate(resource.event_date ?? resource.published_at);
   const isTrailer = resource.slug === TRAILER_SLUG;
-  const [episodes, trailerSrc] = await Promise.all([
+  const [episodes, trailerTrack] = await Promise.all([
     getOtherEpisodes(resource.id, surface.key, 6),
     // On the trailer's own page the episode audio IS the trailer, so there is
     // no second track to fetch (and no Trailer button either).
-    isTrailer ? Promise.resolve(null) : getPodcastAudioUrl(TRAILER_SLUG),
+    isTrailer ? Promise.resolve(null) : getPodcastTrack(TRAILER_SLUG),
   ]);
   const platforms = PODCAST_PLATFORMS.filter((p) => p.url);
   // "You Might Also Be Interested In" (Jason, 8-30) — same engine as the
@@ -135,7 +135,7 @@ export default async function PodcastDetail(
               />
               {/* Plays the trailer audio in place — hidden on the trailer's
                   own page, where Listen Now already plays it. */}
-              {!isTrailer && trailerSrc && <TrailerButton />}
+              {!isTrailer && trailerTrack && <TrailerButton />}
             </div>
 
             {/* The player — invisible until Listen Now or Trailer is clicked
@@ -145,9 +145,10 @@ export default async function PodcastDetail(
             <div style={{ maxWidth: '543px', marginTop: '1.25rem' }}>
               <AudioPlayer
                 episode={resource.download_url
-                  ? { src: resource.download_url, title: resource.title }
+                  ? { src: resource.download_url, title: resource.title, resourceId: resource.id }
                   : null}
-                trailer={trailerSrc ? { src: trailerSrc, title: 'Trailer' } : null}
+                trailer={trailerTrack ? { src: trailerTrack.src, title: 'Trailer', resourceId: trailerTrack.id } : null}
+                surfaceKey={surface.key}
               />
             </div>
             {/* ── The episode — continues the left column ── */}

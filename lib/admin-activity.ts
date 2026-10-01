@@ -215,4 +215,5 @@ export const EVENT_LABEL: Record<string, string> = {
   complete: 'Completed',
   share: 'Shared',
   download: 'Downloaded',
+  play: 'Played',
 };

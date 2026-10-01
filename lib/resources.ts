@@ -571,23 +571,26 @@ export async function getResourceTeaser(slug: string): Promise<ResourceTeaser | 
   return (rows[0] as ResourceTeaser) ?? null;
 }
 
+export interface PodcastTrack { id: string; src: string }
+
 /**
- * Presigned audio for one podcast row by slug — how an episode page gets the
- * Trailer's MP3 so the Trailer button can play it in place (8-18-26 shell)
- * instead of navigating. Same 6-hour signing rule as the episode's own audio,
- * same invariant: the s3_key never leaves the server.
+ * Presigned audio for one podcast row by slug, plus its id — how an episode
+ * page gets the Trailer's MP3 so the Trailer button can play it in place
+ * (8-18-26 shell) instead of navigating. The id lets the player log a 'play'
+ * event against the trailer's own row (10-1-26). Same 6-hour signing rule as
+ * the episode's audio, same invariant: the s3_key never leaves the server.
  */
-export async function getPodcastAudioUrl(slug: string): Promise<string | null> {
+export async function getPodcastTrack(slug: string): Promise<PodcastTrack | null> {
   const rows = await sql`
-    SELECT s3_key FROM resources
+    SELECT id, s3_key FROM resources
     WHERE slug = ${slug} AND type = 'podcast'
       AND published = TRUE AND s3_key IS NOT NULL
     LIMIT 1
   `;
-  const key = (rows[0] as { s3_key?: string } | undefined)?.s3_key;
-  if (!key) return null;
+  const row = rows[0] as { id: string; s3_key: string } | undefined;
+  if (!row) return null;
   try {
-    return await getPresignedUrl(key, 6 * 3600);
+    return { id: row.id, src: await getPresignedUrl(row.s3_key, 6 * 3600) };
   } catch (e) {
     console.error('Presigned URL error:', e);
     return null;
