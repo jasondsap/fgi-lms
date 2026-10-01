@@ -60,7 +60,7 @@ export function monthlyReportTables(r: MonthlyReport): ReportTable[] {
 
   const podcast: ReportTable = {
     sheet: 'Podcast',
-    header: ['Item', 'Unique users who pressed play', 'Plays', 'Unique users who opened the page', 'Page opens'],
+    header: ['Item', 'Unique listeners (pressed play)', 'Plays', 'Unique viewers (opened page)', 'Page opens'],
     rows: r.podcast.map((p) => [p.title, p.players, p.plays, p.openers, p.opens]),
   };
 

@@ -207,9 +207,9 @@ export default async function MonthlyReportPage({
       {r.podcast.length === 0 ? <Empty>No published podcast episodes.</Empty> : (
         <Table minWidth="560px" head={<>
           <th style={TH}>Episode</th>
-          <th style={{ ...TH, textAlign: 'right' }}>Pressed play</th>
+          <th style={{ ...TH, textAlign: 'right' }}>Unique listeners</th>
           <th style={{ ...TH, textAlign: 'right' }}>Plays</th>
-          <th style={{ ...TH, textAlign: 'right' }}>Opened page</th>
+          <th style={{ ...TH, textAlign: 'right' }}>Unique viewers</th>
           <th style={{ ...TH, textAlign: 'right' }}>Page opens</th>
         </>}>
           {r.podcast.map((p) => (
@@ -224,7 +224,8 @@ export default async function MonthlyReportPage({
         </Table>
       )}
       <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', margin: '6px 0 0', lineHeight: 1.5 }}>
-        &#34;Pressed play&#34; counts unique signed-in users who started the audio, including the Trailer button on episode pages.
+        Unique listeners are signed-in people who started the audio at least once (including the Trailer button on episode pages);
+        plays count every start. Unique viewers opened the episode page at least once; page opens count every visit.
         Play tracking began Oct 1, 2026; before that only page opens exist. Plays on Spotify, Apple, and other platforms are not visible here.
       </p>
 
