@@ -348,7 +348,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Certification Portals',
     name: 'Your Certification Portal',
     description:
-      'Partner certification portals are curated views for recovery-residence certification: the header carries the Pre-Certification (and, where offered, Post-Certification) buttons, and the library’s Certification Info filter separates the Required Videos and Certification Documents from everything else.',
+      'Partner certification portals are curated views for recovery-residence certification: the header carries the Pre-Certification (and, where offered, Post-Certification) buttons, and the library’s Certification Info filter separates the Pre-Cert. Required Course, the required Videos and the certification Documents from everything else.',
     quickStart: [
       'Use Home and Library in the portal header to move around.',
       'In the filter bar, expand Certification Info and tick Required Videos or Cert. Documents.',
@@ -367,7 +367,7 @@ export const HELP_TOPICS: HelpTopic[] = [
     description:
       'The pre-certification course is a seven-part video series taken in order: each video unlocks after you’ve watched the one before it (about 90% counts as watched). The certificate unlocks after all seven plus the evaluation.',
     quickStart: [
-      'Click the Pre-Certification button in the portal header, or the Pre-cert Requirements link under Certification Info in the library filter bar.',
+      'Click the Pre-Certification button in the portal header, or tick Pre-Cert. Required Course under Certification Info in the library filter bar.',
       'Start with Part 1 and let each video play through.',
       'Each next part unlocks as the previous one completes.',
       'Submit the evaluation, then download your certificate.',

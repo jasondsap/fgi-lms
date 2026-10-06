@@ -329,14 +329,19 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     // series and `handbook` is the certification paperwork.
     title: 'Certification Info',
     param: 'type',
-    // "Required Videos" is the tenant's seven-part series only — a curated
-    // collection (lib/tenants.ts), not every `video` row (Jennifer, 8-25:
-    // Clarifying Language is a video but not a requirement).
+    // "Videos" is the tenant's seven-part series only — a curated collection
+    // (lib/tenants.ts), not every `video` row (Jennifer, 8-25: Clarifying
+    // Language is a video but not a requirement). Jennifer 10-6-26: three
+    // look-alike checkboxes in this order — the pre-cert course is a one-slug
+    // collection per tenant (it replaced the 9-27 "Pre-cert Requirements"
+    // link), and "Cert. Documents" now reads "Documents" (still `handbook`
+    // only; the Resource Type group's "Documents" is the wider DOCUMENT_TYPES).
     items: [
-      { param: 'collection', value: 'required-videos', label: 'Required Videos' },
+      { param: 'collection', value: 'pre-cert-course', label: 'Pre-Cert. Required Course' },
+      { param: 'collection', value: 'required-videos', label: 'Videos' },
       'handbook',
     ],
-    labels: { handbook: 'Cert. Documents' },
+    labels: { handbook: 'Documents' },
     tenantOnly: true,
   },
   {

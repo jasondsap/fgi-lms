@@ -384,6 +384,12 @@ const TENANTS: Record<string, TenantConfig> = {
         // No Post-Certification button for Colorado (Jason, 8-23).
       },
       collections: {
+        // Jennifer 10-6-26: the Certification Info filter's first checkbox —
+        // the pre-cert course alone (same destination as the gold header button).
+        'pre-cert-course': {
+          label: 'Pre-Cert. Required Course',
+          slugs: ['co-pre-certification-requirements'],
+        },
         'required-videos': {
           label: 'Required Videos',
           slugs: [
@@ -588,6 +594,11 @@ const TENANTS: Record<string, TenantConfig> = {
       // no SCARR visibility row is silently absent from the page — keep this
       // list and resource_visibility in step.
       collections: {
+        // Jennifer 10-6-26: see the Colorado note — one-slug pre-cert collection.
+        'pre-cert-course': {
+          label: 'Pre-Cert. Required Course',
+          slugs: ['scarr-pre-certification-requirements'],
+        },
         'required-videos': {
           label: 'Required Videos',
           slugs: [

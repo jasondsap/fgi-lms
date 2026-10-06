@@ -97,7 +97,6 @@ export default async function TenantLibrarySection({
               total={data.total} targetPath={targetPath} isTenant
               fgiLibraryHref={`/library?from=${tenant.slug}`} fgiLibraryNewTab
               alwaysOpen={v3.filterBarStatic}
-              preCertHref={v3.certButtons.pre.href}
             />
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -119,7 +118,7 @@ export default async function TenantLibrarySection({
                   </strong>
                   {' — '}
                   {collection && !certDocs
-                    ? <>showing {data.total} of {collection.slugs.length} required items</>
+                    ? <>showing {data.total} of {collection.slugs.length} required item{collection.slugs.length === 1 ? '' : 's'}</>
                     : <>showing {data.total} item{data.total === 1 ? '' : 's'}</>}
                 </span>
                 <Link
