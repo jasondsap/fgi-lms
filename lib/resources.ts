@@ -638,13 +638,14 @@ export async function getLatestWebinar(): Promise<LatestItem | null> {
 
 /**
  * The third "Latest Highlights" tile. Jason (9-27-26): the Social Model of
- * Recovery video replaces the newest Learning Brief there. Pinned by slug and
+ * Recovery video replaces the newest Learning Brief there; (10-6-26): the
+ * How to Raise Funds guidebook replaces the video. Pinned by slug and
  * checked against the same FGI visibility rules as getLatestByType; if the
  * pinned resource is ever unpublished or hidden, the tile falls back to the
  * newest Learning Brief rather than disappearing. Shared by the FGI home and
  * both tenant landings, which only differ in the href they build.
  */
-export const FEATURED_HIGHLIGHT_SLUG = 'social-model-of-recovery';
+export const FEATURED_HIGHLIGHT_SLUG = 'how-to-raise-funds';
 
 export interface FeaturedHighlight extends LatestItem {
   label: string;
