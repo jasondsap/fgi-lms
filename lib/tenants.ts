@@ -413,21 +413,37 @@ const TENANTS: Record<string, TenantConfig> = {
       naadacPill: { bg: '#f2b134', fg: '#001970' },
       contactButton: { bg: '#ffd100', fg: '#001970' },
       certBoxFrame: '#e8112d',   // Mockup A red (8-31-26)
+      // Jennifer's 10-2-26 rewrite ("the ORH-CO narrative had a few errors"),
+      // verbatim incl. the "Where you will:" lead-in. Each entry is a block
+      // (lead-in + <ul>), rendered as a div by v3/Landing. The application
+      // link is ORH-CO's /application/ page, which hosts the New Operator
+      // Registration button and the certificate-upload note; the contact is
+      // now info@…org, retiring the .com flagged in the 8-22 note above.
       certBand: {
-        heading: 'Are you wanting to open a Recovery Residence?',
+        heading: 'Are you interested in opening a Recovery Residence?',
         paragraphsHtml: [
-          'Before starting your application, click the &ldquo;Pre-Certification ' +
-          'Requirements&rdquo; button at the top of the screen. Here you will watch ' +
-          'all seven videos in our &ldquo;So You Want to Be a Recovery Residence ' +
-          'Owner or Operator&rdquo; series, review all Certification documents, ' +
-          'complete two brief surveys, and download your completion certificate.',
-          'To proceed with certification, visit <a href="https://www.corecoveryhousing.org" ' +
-          'target="_blank" rel="noopener noreferrer">our website</a> to apply. ' +
-          'Your certificate of completion will be required.',
-          'Once you have completed the video series and reviewed the certification ' +
-          'documents, if you would like to schedule a meeting with our team, email ' +
-          '<a href="mailto:info@corecoveryhousing.com">info@corecoveryhousing.com</a> ' +
-          'with your completion certificate attached.',
+          '<p>Before starting your ORH-CO New Operator application, click the ' +
+          '&ldquo;Pre-Certification Requirements&rdquo; button at the top of the ' +
+          'screen. Where you will:</p>' +
+          '<ul>' +
+          '<li>Watch seven videos in the &ldquo;So You Want to Be a Recovery ' +
+          'Residence Owner or Operator&rdquo; series</li>' +
+          '<li>Review all certification documents</li>' +
+          '<li>Complete two brief surveys</li>' +
+          '<li>Download your Certificate of Completion for the Pre-Certification ' +
+          'Requirements course</li>' +
+          '</ul>',
+          '<p>Once you have downloaded your Certificate of Completion, proceed with ' +
+          'one of the following:</p>' +
+          '<ul>' +
+          '<li>Go to <a href="https://corecoveryhousing.org/application/" ' +
+          'target="_blank" rel="noopener noreferrer">ORH-CO&rsquo;s application ' +
+          'page</a>. Complete and submit the New Operator Registration form. You ' +
+          'will need to upload your Certificate of Completion in this process.</li>' +
+          '<li>If you would like to schedule a meeting with the ORH-CO team, email ' +
+          '<a href="mailto:info@corecoveryhousing.org">info@corecoveryhousing.org</a> ' +
+          'with your Certificate of Completion attached.</li>' +
+          '</ul>',
         ],
         photo: '/images/tenants/colorado/hero-photo.webp',
         photoAlt: 'A snowy Colorado mountain town main street',

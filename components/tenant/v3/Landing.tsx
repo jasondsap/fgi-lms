@@ -245,8 +245,12 @@ export default async function TenantLandingV3({ tenant, searchParams }: Props) {
             }}>
               {v3.certBand.heading}
             </h2>
+            {/* Each entry is a block of HTML, not a single paragraph — Jennifer's
+                10-2-26 ORH-CO rewrite is a lead-in sentence plus a bulleted
+                list, which can't sit inside a <p>. Lists are styled by
+                .tenant-prose ul/li in globals.css. */}
             {v3.certBand.paragraphsHtml.map((html, i) => (
-              <p
+              <div
                 key={i}
                 className="tenant-prose"
                 style={{

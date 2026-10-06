@@ -74,6 +74,11 @@ img { max-width: 100%; height: auto; display: block; }
 .tenant-prose p { margin: 0 0 0.9rem; }
 .tenant-prose p:last-child { margin-bottom: 0; }
 .tenant-prose a { color: inherit; text-decoration: underline; font-weight: 700; }
+/* Bulleted steps inside tenant copy (10-6-26, ORH-CO cert-box narrative). */
+.tenant-prose ul { margin: 0 0 0.9rem; padding-left: 1.4rem; }
+.tenant-prose ul:last-child { margin-bottom: 0; }
+.tenant-prose li { margin: 0 0 0.35rem; }
+.tenant-prose li:last-child { margin-bottom: 0; }
 
 /* PDF shell (8-11-26) — document column + action rail. Inline styles can't
    carry a media query, so the breakpoints for the page live here. */
