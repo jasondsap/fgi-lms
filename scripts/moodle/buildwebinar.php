@@ -131,7 +131,16 @@ if (!empty($spec['transcript'])) { add_pdf($course, 'Webinar Transcript', $spec[
 if (!empty($spec['slides'])) { add_pdf($course, 'Presentation Slides', $spec['slides'], 'slides.pdf'); }
 
 // ---- 5. question bank + import ---------------------------------------------
+// No "questions" in the spec (and no bank built earlier) → no bank, no quiz,
+// and the certificate is gated on the Watch page + evaluation only (10-6-26,
+// the Oct 2026 PAX Tools webinar shipped without a knowledge check). Re-run
+// with "questions" once a bank lands: the quiz is added and the cert re-gated.
 $qbname = $spec['fullname'] . ' — Question bank';
+$withquiz = !empty($spec['questions']) || has_mod($courseid, 'qbank', $qbname);
+$quizcm = 0;
+if (!$withquiz) {
+    mtrace('no questions in spec — bank + quiz skipped');
+} else {
 if ($qbcm = has_mod($courseid, 'qbank', $qbname)) {
     mtrace("skip qbank cmid $qbcm");
 } else {
@@ -208,6 +217,7 @@ if ($gi) {
     if ((float) $gi->gradepass !== $pass) { $gi->gradepass = $pass; $DB->update_record('grade_items', $gi); }
     mtrace("quiz grade {$quiz->grade}, sumgrades {$quiz->sumgrades}, gradepass $pass");
 }
+} // $withquiz
 
 // ---- 7. course evaluation (standard 9-item feedback) -----------------------
 $FB_INTRO = '<p>Thank you for visiting the Learning Center. Your feedback is greatly appreciated!</p>'
@@ -267,11 +277,14 @@ if ($certcm = has_mod($courseid, 'customcert', 'Download Your Certificate')) {
     foreach ($DB->get_records('customcert_pages', ['templateid' => $cert->templateid], 'id') as $p) {
         if (!$DB->record_exists('customcert_elements', ['pageid' => $p->id])) { $DB->delete_records('customcert_pages', ['id' => $p->id]); }
     }
-    $conds = []; $showc = [];
-    foreach ([$pagecm, $quizcm, $fbcm] as $g) { $conds[] = ['type' => 'completion', 'cm' => (int) $g, 'e' => 1]; $showc[] = true; }
-    $DB->set_field('course_modules', 'availability', json_encode(['op' => '&', 'c' => $conds, 'showc' => $showc]), ['id' => $certcm]);
-    mtrace("customcert cmid $certcm from '$certtemplate', gated on page $pagecm + quiz $quizcm + feedback $fbcm");
+    mtrace("customcert cmid $certcm from '$certtemplate'");
 }
+// The gate is (re)written on every run so a quiz added later is picked up.
+$gates = array_values(array_filter([$pagecm, $quizcm, $fbcm]));
+$conds = []; $showc = [];
+foreach ($gates as $g) { $conds[] = ['type' => 'completion', 'cm' => (int) $g, 'e' => 1]; $showc[] = true; }
+$DB->set_field('course_modules', 'availability', json_encode(['op' => '&', 'c' => $conds, 'showc' => $showc]), ['id' => $certcm]);
+mtrace("customcert $certcm gated on cmids " . implode(' + ', $gates) . ($quizcm ? '' : ' (no quiz)'));
 
 // ---- 9. section order: forum · page · resources · qbank · quiz · feedback · cert
 $s0 = $DB->get_record('course_sections', ['course' => $courseid, 'section' => 0], '*', MUST_EXIST);
