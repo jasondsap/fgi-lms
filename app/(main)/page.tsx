@@ -142,7 +142,7 @@ export default async function HomePage({ searchParams }: PageProps) {
               something here for you.
             </p>
 
-            {/* Explore • Learn • Grow */}
+            {/* Explore • Learn • Grow — gold dots (Jennifer, burn-down 9-28: "change blue dots to yellow") */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               borderLeft: '4px solid var(--fgi-gold)', paddingLeft: '16px',
@@ -151,12 +151,12 @@ export default async function HomePage({ searchParams }: PageProps) {
               <span>Explore</span>
               <span aria-hidden style={{
                 width: '9px', height: '9px', borderRadius: '50%',
-                background: 'var(--fgi-teal)', flexShrink: 0,
+                background: 'var(--fgi-gold)', flexShrink: 0,
               }} />
               <span>Learn</span>
               <span aria-hidden style={{
                 width: '9px', height: '9px', borderRadius: '50%',
-                background: 'var(--fgi-teal)', flexShrink: 0,
+                background: 'var(--fgi-gold)', flexShrink: 0,
               }} />
               <span>Grow</span>
             </div>

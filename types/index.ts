@@ -77,6 +77,9 @@ export interface ResourceMaterial {
   label: string;
   // Same invariant as Resource: the s3_key stays server-side.
   download_url: string;
+  /** Lower-case file extension (xlsx, docx, pdf…) so shells can say when a
+      file must be downloaded to open (Jennifer, burn-down 9-28 row 6). */
+  file_ext?: string;
 }
 
 export const MATERIAL_KIND_LABELS: Record<MaterialKind, string> = {
@@ -104,6 +107,10 @@ export interface Resource {
       In list responses this is per-surface: true when the row is internal
       everywhere OR flagged internal on the requested surface (9-10-26). */
   internal?: boolean;
+  /** HRSA "limited 1-on-1 direct client TA only" label (Jennifer, 10-12-26).
+      Label only — it does not change access. Stripped from every response
+      unless the viewer may see internal content; cards/detail show a pill. */
+  private?: boolean;
   audience_tags: AudienceTag[];
   topic_tags: TopicTag[];
   published_at: string | null;
@@ -320,6 +327,8 @@ export interface FilterGroupSpec {
   hideOnTenant?: boolean;
   /** Items to drop when rendering on a tenant portal. */
   excludeOnTenant?: string[];
+  /** Items hidden on every surface for now (still valid filter keys). */
+  hidden?: string[];
 }
 
 export const FILTER_GROUPS: FilterGroupSpec[] = [
@@ -368,6 +377,9 @@ export const FILTER_GROUPS: FilterGroupSpec[] = [
     // (Jennifer's SCARR page changes, 8-25): webinars, videos — plus the
     // umbrella "Documents" item above.
     excludeOnTenant: ['podcast', 'toolkit', 'guidebook', 'newsletter', 'paper', 'infographic', 'success_story', 'non_fgi'],
+    // Jennifer (burn-down 9-28): hide "External Resources" until we actually
+    // load some — there are no `non_fgi` rows yet. Delete this line to show it.
+    hidden: ['non_fgi'],
   },
   {
     title: 'I Am A…',

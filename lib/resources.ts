@@ -110,8 +110,12 @@ export async function getPublicResources(
   // holds only placeholders and constants (see the file-top rule).
   let searchRank = '';
   if (search) {
-    const words = search.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).slice(0, 6);
-    const HAY = "title || ' ' || array_to_string(search_keywords, ' ') || ' ' || description";
+    // Hyphens stay inside a word ("co-occurring") so the synonym table can
+    // see the whole token; everything else splits.
+    const words = search.toLowerCase().split(/[^a-z0-9-]+/).map((w) => w.replace(/^-+|-+$/g, ''))
+      .filter(Boolean).slice(0, 6);
+    // Authors searchable (Jennifer, 9-28): the citation carries the names.
+    const HAY = "title || ' ' || array_to_string(search_keywords, ' ') || ' ' || description || ' ' || coalesce(citation, '')";
 
     // ID lookup (9-2-26, Jason): every resource carries a six-character code
     // (two letters + four digits, e.g. ka7386) printed as "ID: …" on its page,
@@ -127,30 +131,37 @@ export async function getPublicResources(
     const idClause = idConds.length > 0 ? `(${idConds.join(' OR ')})` : '';
 
     if (words.length > 0) {
-      const wordConds = words.map((w) => {
-        const ph = bind(w);
-        return `(to_tsvector('english', ${HAY}) @@ plainto_tsquery('english', ${ph})
-          OR word_similarity(${ph}, title || ' ' || array_to_string(search_keywords, ' ')) > 0.45)`;
-        // 0.45 (was 0.42, tuned 8-31-26): "adiction" scored 0.44 against every
-        // "-ction/-tion" title (medication, certification, inspection…) and
-        // pulled in 14 junk rows; real typo matches all score ≥ 0.50.
-      });
+      // Each word matches if ANY of its spellings does (synonyms / number
+      // words / hyphen variants — see searchVariants). 0.45 (was 0.42, tuned
+      // 8-31-26): "adiction" scored 0.44 against every "-ction/-tion" title
+      // (medication, certification, inspection…) and pulled in 14 junk rows;
+      // real typo matches all score ≥ 0.50.
+      // Trigram tolerance only from four letters up: "DEI" at 0.45 matched
+      // De-escalation, Deflection and Delegation (10-12-26).
+      const wordConds = words.map((w) => `(${searchVariants(w).map((v) => {
+        const ph = bind(v);
+        const fuzzy = v.length >= 4
+          ? ` OR word_similarity(${ph}, title || ' ' || array_to_string(search_keywords, ' ')) > 0.45` : '';
+        return `to_tsvector('english', ${HAY}) @@ plainto_tsquery('english', ${ph})${fuzzy}`;
+      }).join(' OR ')})`);
       const wordClause = `(${wordConds.join(' AND ')})`;
       conditions.push(idClause ? `(${idClause} OR ${wordClause})` : wordClause);
-      // Ordering (Jennifer's hierarchy, 8-31-26): importance level first — but
-      // any searched word appearing in the title itself elevates the result one
-      // level (floor 1). Within a level, relevance blends the types: weighted
-      // full-text rank (title > keywords > description), with trigram title
-      // similarity breaking ties for typo-only matches.
-      const titleHit = words.map((w) => {
-        const ph = bind(w);
-        return `to_tsvector('english', coalesce(title, '')) @@ plainto_tsquery('english', ${ph})
-          OR word_similarity(${ph}, title) > 0.45`;
+      // Ordering (Jennifer, burn-down 9-28 row 20, replacing the 8-31 "elevate
+      // one level" rule): everything with the word IN THE TITLE comes first,
+      // in hierarchy order; then everything that matched elsewhere (keywords,
+      // description, citation), again in hierarchy order. Within a band and
+      // level, relevance blends the types: weighted full-text rank (title >
+      // keywords > description), with trigram title similarity breaking ties
+      // for typo-only matches.
+      const titleHit = words.flatMap((w) => searchVariants(w)).map((v) => {
+        const ph = bind(v);
+        const fuzzy = v.length >= 4 ? ` OR word_similarity(${ph}, title) > 0.45` : '';
+        return `to_tsvector('english', coalesce(title, '')) @@ plainto_tsquery('english', ${ph})${fuzzy}`;
       }).join(' OR ');
       const qph = bind(search);
       // An exact ID hit outranks everything, including the tier.
       const idRank = idClause ? `CASE WHEN ${idClause} THEN 0 ELSE 1 END ASC, ` : '';
-      searchRank = `${idRank}GREATEST(${TIER_SQL} - CASE WHEN (${titleHit}) THEN 1 ELSE 0 END, 1) ASC,
+      searchRank = `${idRank}CASE WHEN (${titleHit}) THEN 0 ELSE 1 END ASC, ${TIER_SQL} ASC,
         (ts_rank_cd(
           setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
           setweight(to_tsvector('english', array_to_string(search_keywords, ' ')), 'B') ||
@@ -251,15 +262,18 @@ export async function getPublicResources(
   const COLUMNS = `
       id, title, slug, type, description, duration_minutes,
       thumbnail_url, vimeo_id, vimeo_hash, external_url,
-      is_naadac_ce, internal, audience_tags, topic_tags, published_at`;
+      is_naadac_ce, internal, private, audience_tags, topic_tags, published_at`;
   // What the card's INTERNAL pill reflects: internal everywhere, or internal
   // on this surface. Only for the SELECT against `resources` itself — the
   // outer select of the stratified view reads the plain column back.
+  // PRIVATE (10-12-26) is read through to_jsonb so the query also works before
+  // the column exists (scripts/sql/2026-10-12-private-feedback.sql) — swap
+  // for the plain column once that has run everywhere.
   const SELECT_COLUMNS = COLUMNS.replace(' internal,', ` (internal OR EXISTS (
         SELECT 1 FROM resource_visibility rv
         JOIN tenants t ON t.id = rv.tenant_id
         WHERE rv.resource_id = resources.id AND t.slug = ${surfacePh} AND rv.internal
-      )) AS internal,`);
+      )) AS internal,`).replace(' private,', ` ${PRIVATE_SQL} AS private,`);
 
   // Default view: Jennifer's hierarchy levels in order, round-robin across
   // types within each level so a level reads as a blend rather than one type's
@@ -308,6 +322,10 @@ export async function getPublicResources(
   // Values bind to $1, $2, ... in the order they were pushed.
   const rows = await sql(query, values);
   const total = rows.length > 0 ? Number((rows[0] as any).total_count) : 0;
+
+  // The PRIVATE label is for staff eyes only: a learner who sees the card
+  // must not learn that a resource is restricted (Jennifer, 10-12-26).
+  if (!params.includeInternal) for (const r of rows as any[]) delete r.private;
 
   return {
     resources: rows as unknown as Resource[],
@@ -740,7 +758,8 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
   const rows = await sql`
     SELECT id, title, slug, type, description, duration_minutes,
            thumbnail_url, vimeo_id, vimeo_hash, external_url,
-           is_naadac_ce, internal, audience_tags, topic_tags, published_at, s3_key,
+           is_naadac_ce, internal, COALESCE((to_jsonb(resources) ->> 'private')::boolean, FALSE) AS private,
+           audience_tags, topic_tags, published_at, s3_key,
            event_date, ceu_credits, course_code, naadac_skill_groups,
            citation, abstract, sponsor_text, sponsor_logo_url, sponsor_url,
            -- The id itself stays server-side (see getCourseResource); the
@@ -802,8 +821,11 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
       console.error('Presigned URL error:', e);
     }
   }
-  // The key never reaches the client (same invariant as the resource itself).
-  const publicMaterials: ResourceMaterial[] = materials.map(({ s3_key: _k, ...rest }) => rest);
+  // The key never reaches the client (same invariant as the resource itself);
+  // only its extension survives, so the shell can flag spreadsheets.
+  const publicMaterials: ResourceMaterial[] = materials.map(({ s3_key, ...rest }) => ({
+    ...rest, file_ext: s3_key.split('.').pop()?.toLowerCase(),
+  }));
 
   return {
     ...resource, download_url, attachment_url, attachment_ext, presenters, materials: publicMaterials,
@@ -812,6 +834,9 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
 
 /** Office originals that a browser can't render inline but a visitor can edit. */
 const EDITABLE_EXT = /\.(docx|xlsx|pptx)$/i;
+
+/** `resources.private` whether or not the column exists yet — see SELECT_COLUMNS. */
+const PRIVATE_SQL = "COALESCE((to_jsonb(resources) ->> 'private')::boolean, FALSE)";
 
 /** Presenters attached to a resource, in the order Jennifer listed them. */
 async function getResourcePresenters(resourceId: string): Promise<Presenter[]> {
@@ -855,4 +880,43 @@ async function getResourceMaterials(
   );
 
   return materials.filter(Boolean) as (ResourceMaterial & { s3_key: string })[];
+}
+
+// -----------------------------------------------------------------------------
+// Search synonyms (Jennifer, burn-down 9-28 row 28: "KY" must find Kentucky,
+// "twelve" must find 12, "co-occuring"/"cooccurring" must find co-occurring).
+// Every variant is bound as its own parameter; nothing here reaches the SQL
+// text. Keep it small and literal — stemming and typo tolerance already come
+// from full-text search + trigrams.
+// -----------------------------------------------------------------------------
+const NUMBER_WORDS: Record<string, string> = {
+  one: '1', two: '2', three: '3', four: '4', five: '5', six: '6', seven: '7', eight: '8',
+  nine: '9', ten: '10', eleven: '11', twelve: '12', thirteen: '13', fourteen: '14',
+  fifteen: '15', sixteen: '16', seventeen: '17', eighteen: '18', nineteen: '19', twenty: '20',
+};
+const SYNONYMS: Record<string, string[]> = {
+  ky: ['kentucky'], kentucky: ['ky'],
+  co: ['colorado'], colorado: ['co'],
+  sc: ['south carolina'], scarr: ['south carolina'],
+  wv: ['west virginia'], tn: ['tennessee'], oh: ['ohio'],
+  rh: ['recovery housing', 'recovery residence'],
+  rco: ['recovery community organization'],
+  sud: ['substance use disorder'], oud: ['opioid use disorder'],
+  mat: ['medication assisted treatment', 'mar'], mar: ['medication assisted recovery', 'mat'],
+  moud: ['medications for opioid use disorder'],
+  naloxone: ['narcan'], narcan: ['naloxone'],
+  dei: ['diversity equity inclusion'],
+  cooccurring: ['co-occurring'], cooccuring: ['co-occurring'],
+  'co-occuring': ['co-occurring'],
+  reentry: ['re-entry'], 're-entry': ['reentry'],
+  peer: ['peer support'],
+};
+export function searchVariants(word: string): string[] {
+  const out = new Set<string>([word]);
+  if (word.includes('-')) { out.add(word.replace(/-/g, '')); out.add(word.replace(/-/g, ' ')); }
+  if (NUMBER_WORDS[word]) out.add(NUMBER_WORDS[word]);
+  const numeral = Object.entries(NUMBER_WORDS).find(([, n]) => n === word)?.[0];
+  if (numeral) out.add(numeral);
+  for (const alt of SYNONYMS[word] ?? []) out.add(alt);
+  return [...out].slice(0, 5);
 }

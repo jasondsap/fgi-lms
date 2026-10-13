@@ -1,5 +1,12 @@
 {
   "crons": [
-    { "path": "/api/cron/portal-reports", "schedule": "0 12 * * *" }
+    {
+      "path": "/api/cron/portal-reports",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/weekly-additions",
+      "schedule": "0 13 * * 1"
+    }
   ]
 }

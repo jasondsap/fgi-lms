@@ -88,10 +88,14 @@ export default function Footer() {
           margin: '0 auto',
           paddingTop: '2.5rem', paddingBottom: '2rem',
         }}>
+          {/* Jennifer (burn-down 9-28): location + email sit on the left with
+              the logo and web address; Follow Us, the podcast and Learning
+              Center Support stack on the far right. The "Kentucky Location:"
+              line is gone — the pin starts at the street address. */}
           <div className="footer-grid">
 
-            {/* Col 1 — logo + tagline + site URL */}
-            <div>
+            {/* Col 1 — logo, site URL, address, email */}
+            <div style={{ fontSize: '16px', lineHeight: 1.7 }}>
               <Image
                 src="/images/logos/fgi-logo-transparent.png"
                 alt="Fletcher Group"
@@ -106,21 +110,35 @@ export default function Footer() {
                 style={{
                   color: '#ffffff', fontSize: '16px', textDecoration: 'none',
                   display: 'inline-flex', alignItems: 'center', gap: '8px',
-                  marginTop: '1.25rem', marginBottom: '2rem',
+                  marginTop: '1.25rem', marginBottom: '1rem',
                 }}
               >
                 <InlineGlyph path={GLOBE} />
                 www.fletchergroup.org
               </Link>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '16px' }}>Learning Center Support</span>
-                <ContactButton fontSize="16px" />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <span style={{ display: 'inline-flex', paddingTop: '6px' }}><InlineGlyph path={MAP_PIN} /></span>
+                <div>
+                  <div>601 Meyers Baker Road, Suite 238</div>
+                  <div>London, Kentucky 40741</div>
+                </div>
               </div>
+              <a
+                href="mailto:info@fletchergroup.org"
+                style={{
+                  color: '#ffffff', textDecoration: 'none',
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  marginTop: '2px',
+                }}
+              >
+                <InlineGlyph path={MAIL} />
+                info@fletchergroup.org
+              </a>
             </div>
 
-            {/* Col 2 — Follow Us stacked over the podcast platforms; the
+            {/* Col 2 (far right) — Follow Us, the podcast, then support; the
                 outline hugs the content per Jennifer's 8-17-26 feedback. */}
-            <div className="footer-col--center" style={{
+            <div className="footer-col--end" style={{
               border: '1.5px solid #ffffff',
               borderRadius: 'var(--radius-lg)',
               padding: '1.25rem 1.75rem 1.35rem',
@@ -169,30 +187,11 @@ export default function Footer() {
                   </IconCircle>
                 </div>
               </div>
-            </div>
 
-            {/* Col 3 — office location (Florida removed per Jason, 8-20-26) */}
-            <div className="footer-col--end" style={{ fontSize: '16px', lineHeight: 1.7 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <InlineGlyph path={MAP_PIN} />
-                  <span>Kentucky Location:</span>
-                </div>
-                <div style={{ paddingLeft: '24px' }}>
-                  <div>601 Meyers Baker Road, Suite 238</div>
-                  <div>London, Kentucky 40741</div>
-                </div>
-                <a
-                  href="mailto:info@fletchergroup.org"
-                  style={{
-                    color: '#ffffff', textDecoration: 'none',
-                    display: 'inline-flex', alignItems: 'center', gap: '8px',
-                    marginTop: '2px',
-                  }}
-                >
-                  <InlineGlyph path={MAIL} />
-                  info@fletchergroup.org
-                </a>
+              {/* Learning Center Support */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <span style={{ fontSize: '16px' }}>Learning Center Support</span>
+                <ContactButton fontSize="16px" />
               </div>
             </div>
           </div>

@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import VisibilityPills from '@/components/library/VisibilityPill';
 import type { Resource } from '@/types';
 import { RESOURCE_TYPE_LABELS } from '@/types';
 
@@ -155,15 +156,12 @@ export default function ResourceCard({ resource, basePath = '', naadacPill, comp
           }}>
             {typeLabel}
           </span>
-          {resource.internal && (
-            <span title="Internal on this library — hidden from learners here" style={{
-              alignSelf: 'flex-start', marginTop: '-6px', marginBottom: '12px',
-              background: '#b13f08', color: '#ffffff', fontSize: '12px', fontWeight: 700,
-              lineHeight: 1.2, padding: '4px 11px', borderRadius: '999px', letterSpacing: '0.03em',
-            }}>
-              INTERNAL
-            </span>
-          )}
+          {/* Private / Internal pills with Jennifer's pop-ups (10-12-26) — the
+              server only sends these flags to staff and admins. */}
+          <VisibilityPills
+            internal={resource.internal} isPrivate={resource.private}
+            style={{ alignSelf: 'flex-start', marginTop: '-6px', marginBottom: '12px' }}
+          />
 
           {/* Title */}
           <h3 style={{

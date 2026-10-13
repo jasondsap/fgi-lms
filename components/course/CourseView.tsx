@@ -330,7 +330,9 @@ function CourseLoadError({ href }: { href: string }) {
         <a
           href={href}
           style={{
-            display: 'inline-block', background: 'var(--fgi-blue, #0e72a2)', color: '#ffffff',
+            // Jennifer (burn-down 9-28): public-facing messages use the dark
+            // navy (#163d5b), which reads correctly on every portal's chrome.
+            display: 'inline-block', background: 'var(--fgi-navy, #163d5b)', color: '#ffffff',
             borderRadius: '999px', padding: '10px 28px', fontSize: '15px',
             fontWeight: 600, textDecoration: 'none',
           }}

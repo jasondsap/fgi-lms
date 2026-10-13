@@ -53,11 +53,15 @@ export default function BackToTop() {
       tabIndex={visible ? 0 : -1}
       style={{
         position: 'fixed', zIndex: 150,
-        width: '44px', height: '44px', borderRadius: '50%',
+        // Jennifer (burn-down 9-28): the words "Back to Top" sit under the
+        // chevron, so the circle became a rounded tab.
+        width: '64px', height: 'auto', borderRadius: '14px',
+        flexDirection: 'column', gap: '1px', padding: '7px 4px 6px',
+        fontSize: '10px', fontWeight: 700, lineHeight: 1.1, letterSpacing: '0.01em',
         border: '1px solid var(--border-color)',
         boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 0, cursor: 'pointer',
+        cursor: 'pointer',
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(12px)',
         pointerEvents: visible ? 'auto' : 'none',
@@ -67,6 +71,7 @@ export default function BackToTop() {
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
         <path d="M4 12.5 10 6.5l6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
+      <span aria-hidden="true">Back to Top</span>
     </button>
   );
 }

@@ -4,6 +4,7 @@ import './globals.css';
 import RegistrationGate from '@/components/account/RegistrationGate';
 import WelcomeGate from '@/components/welcome/WelcomeGate';
 import BackToTop from '@/components/layout/BackToTop';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 
 // SEO (Jason, 8-31-26: Google was showing random page fragments): the title
 // matches how people actually search ("Fletcher Group … Resource Center"),
@@ -67,6 +68,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Vercel Web Analytics (Jason, 8-31-26) — data appears on the Vercel
             dashboard's Analytics tab once Web Analytics is ENABLED there. */}
         <Analytics />
+        {/* Google Analytics 4 (10-12-26) — only when NEXT_PUBLIC_GA_MEASUREMENT_ID is set */}
+        <GoogleAnalytics />
       </body>
     </html>
   );

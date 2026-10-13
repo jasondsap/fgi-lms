@@ -28,13 +28,25 @@ export async function createTicket(input: {
   pageUrl: string | null;
   browserInfo: string | null;
 }): Promise<string> {
-  const rows = await sql`
+  const insert = (category: string, title: string) => sql`
     INSERT INTO support_tickets (submitted_by, title, description, category, priority, page_url, browser_info)
-    VALUES (${input.userId}, ${input.title}, ${input.description}, ${input.category},
+    VALUES (${input.userId}, ${title}, ${input.description}, ${category},
             ${input.priority}, ${input.pageUrl}, ${input.browserInfo})
     RETURNING id
   `;
-  return rows[0].id as string;
+  try {
+    const rows = await insert(input.category, input.title);
+    return rows[0].id as string;
+  } catch (e) {
+    // 'feedback' (10-12-26) needs the CHECK constraint widened in Neon
+    // (scripts/sql/2026-10-12-private-feedback.sql). Until that runs, a
+    // feedback ticket must still land — file it as 'other', flagged in the title.
+    if (input.category === 'feedback' && /support_tickets_category_chk/.test(String((e as Error).message))) {
+      const rows = await insert('other', `[Feedback] ${input.title}`.slice(0, 200));
+      return rows[0].id as string;
+    }
+    throw e;
+  }
 }
 
 /** The submitter's own tickets, newest first. */

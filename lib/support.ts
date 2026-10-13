@@ -24,6 +24,10 @@ export const TICKET_CATEGORIES = [
   // not just problems. Requires 'question' in the support_tickets_category_chk
   // CHECK constraint (widened via direct SQL in Neon, like all schema).
   { value: 'question', label: 'Ask a question' },
+  // 'feedback' added 10-12-26 (Jennifer, burn-down 9-28: "Question, Problem,
+  // or Feedback"). Needs scripts/sql/2026-10-12-private-feedback.sql applied;
+  // until then createTicket falls back to 'other' (see lib/support-db.ts).
+  { value: 'feedback', label: 'Share feedback' },
   { value: 'bug', label: 'Something is broken' },
   { value: 'access', label: 'Sign-in / access problem' },
   { value: 'content', label: 'Content issue (wrong or missing material)' },

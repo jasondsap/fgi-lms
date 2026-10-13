@@ -205,6 +205,7 @@ export default function FilterSidebar({
             }
           : i))
         .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)))
+        .filter(i => !g.hidden?.includes(i.value))
         .filter(i => isTenant || !('tenantOnly' in i && i.tenantOnly));
       return { title: g.title, items };
     })

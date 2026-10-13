@@ -30,6 +30,13 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 export const STATUS_VALUES = ['completed', 'in_progress'] as const;
 export type StatusFilter = (typeof STATUS_VALUES)[number] | '';
 
+/** Which library the item lives in (Jennifer, burn-down 9-28 rows 43/44:
+    "FGI library items accessed should either not be shown to portal admin or
+    a separate filter"). Default stays "portal only" so the roster shows the
+    portal's own content; 'all' adds what members reached in the FGI library. */
+export const LIBRARY_VALUES = ['portal', 'fgi', 'all'] as const;
+export type LibraryFilter = (typeof LIBRARY_VALUES)[number];
+
 /** What the date range applies to (Jennifer's 6a "Date" and 6i "Date(s) item was accessed"). */
 export const DATE_FIELDS = [
   { value: 'accessed',  label: 'Item accessed' },
@@ -50,6 +57,7 @@ export interface PortalFilters {
   /** Resource ids; a row matches ANY of them. */
   items: string[];
   status: StatusFilter;
+  library: LibraryFilter;
   dateField: DateField;
   from: string | null;
   to: string | null;
@@ -62,6 +70,7 @@ const one = (v: ParamValue): string => (many(v)[0] ?? '').trim().slice(0, 100);
 /** Query string → filters. Everything is whitelisted or shape-checked here. */
 export function parseFilters(p: Record<string, ParamValue>): PortalFilters {
   const status = one(p.status);
+  const library = one(p.library);
   const dateField = one(p.datefield);
   const from = one(p.from);
   const to = one(p.to);
@@ -73,6 +82,7 @@ export function parseFilters(p: Record<string, ParamValue>): PortalFilters {
     roles: many(p.role).filter((r) => r in USER_ROLE_LABELS),
     items: many(p.item).filter((i) => UUID.test(i)).slice(0, 200),
     status: (STATUS_VALUES as readonly string[]).includes(status) ? (status as StatusFilter) : '',
+    library: (LIBRARY_VALUES as readonly string[]).includes(library) ? (library as LibraryFilter) : 'portal',
     dateField: DATE_FIELDS.some((d) => d.value === dateField) ? (dateField as DateField) : 'accessed',
     from: ISO_DATE.test(from) ? from : null,
     to: ISO_DATE.test(to) ? to : null,
@@ -89,6 +99,7 @@ export function filterQuery(f: PortalFilters, extra: Record<string, string> = {}
   f.roles.forEach((r) => qs.append('role', r));
   f.items.forEach((i) => qs.append('item', i));
   if (f.status) qs.set('status', f.status);
+  if (f.library !== 'portal') qs.set('library', f.library);
   // Kept without dates too: a saved report scheduled "this period only" needs
   // to know WHICH date the period applies to.
   if (f.from || f.to || f.dateField !== 'accessed') qs.set('datefield', f.dateField);
@@ -99,7 +110,7 @@ export function filterQuery(f: PortalFilters, extra: Record<string, string> = {}
 
 export function hasFilters(f: PortalFilters): boolean {
   return Boolean(f.q || f.org || f.county || f.zips.length || f.roles.length
-    || f.items.length || f.status || f.from || f.to);
+    || f.items.length || f.status || f.library !== 'portal' || f.from || f.to);
 }
 
 // -----------------------------------------------------------------------------
@@ -193,6 +204,11 @@ function build(
   }
 
   if (f.items.length) itemConds.push(`ui.resource_id = ANY(${bind(f.items)}::uuid[])`);
+  // Library (10-12-26): on_portal = the item is allow-listed for this portal.
+  const ON_PORTAL = `EXISTS (SELECT 1 FROM resource_visibility rv JOIN tenants t ON t.id = rv.tenant_id
+                     WHERE rv.resource_id = ui.resource_id AND t.slug = $1)`;
+  if (f.library === 'portal') itemConds.push(ON_PORTAL);
+  if (f.library === 'fgi') itemConds.push(`NOT ${ON_PORTAL}`);
   if (f.status === 'completed') itemConds.push('ui.completed_at IS NOT NULL');
   if (f.status === 'in_progress') itemConds.push('(ui.is_course AND ui.completed_at IS NULL)');
 
@@ -544,7 +560,7 @@ export async function listZipOptions(portal: string): Promise<Array<{ zip: strin
 
 export const EMPTY_FILTERS: PortalFilters = {
   q: '', org: '', county: '', zips: [], roles: [], items: [],
-  status: '', dateField: 'accessed', from: null, to: null,
+  status: '', library: 'portal', dateField: 'accessed', from: null, to: null,
 };
 
 export function roleLabels(roles: string[], roleOther: string | null): string {

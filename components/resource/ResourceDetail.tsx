@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import VisibilityPills from '@/components/library/VisibilityPill';
 import { authEnabled, getSession } from '@/auth';
 import CourseDetail from '@/components/resource/CourseDetail';
 import PdfDetail from '@/components/resource/PdfDetail';
@@ -58,6 +59,10 @@ export default async function ResourceDetail(
   const resource = await getResourceBySlug(slug);
   if (!resource) notFound();
   if (resource.internal && !seesInternal) notFound();
+  // PRIVATE is a staff-facing label (Jennifer, 10-12-26): strip it before the
+  // shell renders so a learner never learns a resource is restricted.
+  if (!seesInternal) delete resource.private;
+  const showPills = seesInternal && Boolean(resource.internal || resource.private);
 
   // My Learning (8-29-26): record the view and find out whether the learner
   // has saved this resource. Both are one cheap query; logging never throws.
@@ -91,6 +96,17 @@ export default async function ResourceDetail(
 
   return (
     <>
+      {showPills && (
+        <div className="gutter" style={{ background: '#fff8e6', borderBottom: '1px solid #f1dfae' }}>
+          <div style={{
+            maxWidth: 'var(--max-width)', margin: '0 auto', padding: '8px 0',
+            display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', fontSize: '13px',
+          }}>
+            <VisibilityPills internal={resource.internal} isPrivate={resource.private} size="md" />
+            <span style={{ color: '#6b5a2a' }}>Hover a label for the sharing rules. Learners never see this bar.</span>
+          </div>
+        </div>
+      )}
       {shell}
       {userId && (
         <BookmarkButton

@@ -36,6 +36,10 @@ const DOWNLOAD_LABEL: Record<string, string> = {
   xlsx: 'Download Excel Template',
   pptx: 'Download PowerPoint',
 };
+const SPREADSHEET_EXT = new Set(['xlsx', 'xlsm', 'xls', 'csv']);
+const SPREADSHEET_NOTE: React.CSSProperties = {
+  fontSize: '13px', lineHeight: 1.45, color: 'var(--text-secondary)', margin: '8px 0 0',
+};
 
 /*
  * Column geometry from the mockup, at the x1.4 artboard-to-site scale: 627pt of
@@ -181,6 +185,11 @@ export default async function PdfDetail(
                     {isPublication ? 'Download PDF' : DOWNLOAD_LABEL[resource.attachment_ext ?? ''] ?? 'Download'}
                   </TrackedLink>
                 )}
+                {/* Spreadsheets can't display in the browser (Jennifer, burn-down
+                    9-28 row 6): say so, right under the button. */}
+                {SPREADSHEET_EXT.has(resource.attachment_ext ?? '') && (
+                  <p style={SPREADSHEET_NOTE}>Spreadsheets open in Excel after you download them &mdash; they can&rsquo;t be viewed in the browser.</p>
+                )}
                 {resource.external_url && (
                   <a
                     href={resource.external_url} target="_blank" rel="noopener noreferrer"
@@ -207,6 +216,9 @@ export default async function PdfDetail(
                       {m.label}
                     </TrackedLink>
                   ))}
+                  {materials.some((m) => SPREADSHEET_EXT.has(m.file_ext ?? '')) && (
+                    <p style={SPREADSHEET_NOTE}>Spreadsheets open in Excel after you download them &mdash; they can&rsquo;t be viewed in the browser.</p>
+                  )}
                 </div>
               ) : null
             }

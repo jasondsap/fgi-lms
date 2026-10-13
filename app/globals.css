@@ -304,13 +304,15 @@ html, body { overflow-x: clip; }
 }
 
 /* ---- Footers ------------------------------------------------------------- */
-.footer-grid { display: grid; grid-template-columns: 0.8fr 1.7fr 1.1fr; gap: 2rem; align-items: start; }
+/* 10-12-26 (Jennifer): two columns — contact details left, the outlined
+   Follow / Podcast / Support box on the far right. */
+.footer-grid { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
 .footer-col--center { justify-self: center; }
 .footer-col--end { justify-self: end; }
 .tenant-footer-grid { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
 .tenant-footer-lobe { padding: 2.25rem 0 2rem 4.5rem; }
 @media (max-width: 1100px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr auto; }
   .footer-col--center { grid-column: 1 / -1; justify-self: start; }
 }
 @media (max-width: 900px) {

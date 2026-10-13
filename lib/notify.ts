@@ -10,12 +10,11 @@
 // user action it decorates (a lost email is recoverable in-app; a lost ticket
 // is not).
 
-/** Who hears about new support tickets. Code-as-config for now (Jason 8-31:
-    "email Jennifer and I for now") — move to an env list when the LC@ team
-    takes over the queue. */
+/** Who hears about new support tickets. Jennifer (burn-down 9-28): the
+    LC@ shared inbox, not her own address. Jason stays on copy for now. */
 import { STATE_PORTALS, type StatePortal } from '@/lib/state-portals';
 
-export const TICKET_NOTIFY_TO = ['jason@made180.com', 'jwhite@fletchergroup.org'];
+export const TICKET_NOTIFY_TO = ['jason@made180.com', 'LC@fletchergroup.org'];
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://fgilearn.org';
 

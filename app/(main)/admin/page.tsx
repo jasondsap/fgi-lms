@@ -142,6 +142,29 @@ export default async function AdminPage() {
             One month at a glance — traffic, new registrations and &#34;I am a…&#34;, podcast plays, evaluations, top resources. Excel / CSV export.
           </p>
         </Link>
+
+        {/* Catalog export (Jennifer, 10-12-26): every item with ID, filters,
+            tags, and portal visibility — a download, not a page. */}
+        <div
+          style={{
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid var(--fgi-blue)', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>
+            <Link href="/admin/catalog" style={{ color: 'inherit', textDecoration: 'none' }}>Catalog</Link>
+          </div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 10px' }}>
+            Every item in the library — ID, type, filters, tags, and which portals it&#39;s on. Word search across
+            titles, descriptions and keywords.
+          </p>
+          <div style={{ display: 'flex', gap: '14px', fontSize: '13.5px', fontWeight: 600 }}>
+            <Link href="/admin/catalog" style={{ color: 'var(--fgi-blue)' }}>Open</Link>
+            <a href="/api/admin/catalog/export" style={{ color: 'var(--fgi-blue)' }}>Download Excel</a>
+            <a href="/api/admin/catalog/export?format=csv" style={{ color: 'var(--fgi-blue)' }}>Download CSV</a>
+          </div>
+        </div>
       </div>
     </div>
   );

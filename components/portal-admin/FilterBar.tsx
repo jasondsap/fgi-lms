@@ -103,6 +103,19 @@ export default function FilterBar({
       </div>
 
       {evals ? (
+        <input type="hidden" name="library" value={filters.library} />
+      ) : (
+        <label style={LABEL}>
+          Library
+          <select name="library" defaultValue={filters.library} style={FIELD}>
+            <option value="portal">This portal only</option>
+            <option value="all">Portal + Fletcher Group Library</option>
+            <option value="fgi">Fletcher Group Library only</option>
+          </select>
+        </label>
+      )}
+
+      {evals ? (
         // An evaluation has no completion status; carry the value so it is
         // still there when the person switches back to Users / Progress.
         <input type="hidden" name="status" value={filters.status} />

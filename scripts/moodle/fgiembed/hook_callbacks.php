@@ -42,6 +42,31 @@ class hook_callbacks {
         }
         $hook->add_html('<style id="fgiembed">' . self::css() . '</style>');
         $hook->add_html('<script id="fgiembed-pdf">' . self::pdfjs() . '</script>');
+        $hook->add_html('<script id="fgiembed-extlinks">' . self::extlinks() . '</script>');
+    }
+
+    /**
+     * Off-site links open in a new tab (Jennifer, burn-down 9-28 row 9): a
+     * learner inside the player who follows an external link otherwise loses
+     * the course — the iframe navigates away and the LRC chrome stays put.
+     * Only links to another host are touched; Moodle's own navigation keeps
+     * working in the frame. Runs on embedded requests only.
+     */
+    private static function extlinks(): string {
+        return <<<'JS'
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        var links = document.querySelectorAll('#region-main a[href^="http"], #page-content a[href^="http"]');
+        for (var i = 0; i < links.length; i++) {
+            var a = links[i];
+            if (a.host && a.host !== window.location.host && !a.target) {
+                a.target = '_blank';
+                a.rel = (a.rel ? a.rel + ' ' : '') + 'noopener';
+            }
+        }
+    });
+})();
+JS;
     }
 
     /**

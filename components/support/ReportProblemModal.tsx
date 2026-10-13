@@ -93,7 +93,7 @@ export default function ReportProblemModal({
       />
       <div
         role="dialog"
-        aria-label="Ask a question or report a problem"
+        aria-label="Ask a question, report a problem, or share feedback"
         style={{
           position: 'relative', width: 'min(520px, 100%)',
           background: '#fff', borderRadius: 'var(--radius-lg)',
@@ -164,7 +164,7 @@ export default function ReportProblemModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={300}
-                placeholder="Short summary of your question or problem"
+                placeholder="Short summary of your question, problem, or feedback"
                 style={FIELD}
               />
             </div>
