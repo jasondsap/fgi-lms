@@ -4,7 +4,7 @@ import { useId, useState } from 'react';
 
 /**
  * Private / Internal pills with an explanatory pop-up (Jennifer, burn-down
- * 9-28-26 row 19, copy supplied 10-12-26). Rendered ONLY for viewers who may
+ * 9-28-26 row 19; copy supplied 10-12-26, corrected 10-13-26). Rendered ONLY for viewers who may
  * see internal content (admins, FGI staff, a portal's own admins) — the
  * server strips both flags for everyone else, so a learner who follows a
  * shared link never sees a pill or the pop-up.
@@ -14,18 +14,19 @@ import { useId, useState } from 'react';
  * screen readers announce it too.
  */
 export const VISIBILITY_COPY = {
+  // Jennifer 10-13-26 correction: the 10-12 copy had the two swapped.
   private: {
-    label: 'PRIVATE',
+    label: 'FGI PRIVATE',
     color: '#29abe2',
-    text: 'This resource has been approved by HRSA for limited 1-on-1 direct client TA only. '
-      + 'It CANNOT be shared publicly or distributed outside of direct TA consultations '
-      + 'without prior approval from leadership.',
+    text: 'This resource is for FGI STAFF USE ONLY. It CANNOT be shared outside the '
+      + 'organization without prior approval from leadership.',
   },
   internal: {
     label: 'INTERNAL',
     color: '#a20e3e',
-    text: 'This resource is for FGI staff use only. It CANNOT be shared outside the '
-      + 'organization without prior approval from leadership.',
+    text: 'This resource can be used for limited 1-on-1 DIRECT TA/CONSULTATION. '
+      + 'It CANNOT be shared publicly or distributed outside of direct TA consultations '
+      + 'without prior approval from leadership.',
   },
 } as const;
 
@@ -73,7 +74,7 @@ export function VisibilityPill({ kind, size = 'sm' }: { kind: VisibilityKind; si
         }}
       >
         <strong style={{ display: 'block', color: c.color, marginBottom: '4px' }}>
-          {c.label.charAt(0) + c.label.slice(1).toLowerCase()}
+          {c.label.split(' ').map((w, i) => (i === 0 && w === 'FGI' ? w : w.charAt(0) + w.slice(1).toLowerCase())).join(' ')}
         </strong>
         {c.text}
       </span>
