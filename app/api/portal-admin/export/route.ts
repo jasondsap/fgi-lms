@@ -11,7 +11,7 @@ import { NextRequest } from 'next/server';
 import { parseFilters } from '@/lib/portal-admin';
 import { tableToCsv, tableToXlsx } from '@/lib/portal-admin-export';
 import { buildReportTable, isReportKind } from '@/lib/portal-reports';
-import { getTenantConfig } from '@/lib/tenants';
+import { getPortalSurface } from '@/lib/portal-surfaces';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 
 export async function GET(request: NextRequest) {
   const p = request.nextUrl.searchParams;
-  const tenant = getTenantConfig(p.get('portal') ?? '');
+  const tenant = getPortalSurface(p.get('portal') ?? '');
   const viewer = await getViewer();
   if (!tenant || !canAdminPortal(viewer, tenant.slug)) return new Response('Not found', { status: 404 });
 

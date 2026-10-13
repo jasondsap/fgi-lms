@@ -25,7 +25,7 @@ import {
 import {
   evaluationsTable, progressTable, tableToCsv, tableToXlsx, usersTable, type ReportTable,
 } from '@/lib/portal-admin-export';
-import { getTenantConfig } from '@/lib/tenants';
+import { getPortalSurface } from '@/lib/portal-surfaces';
 import { USER_ROLE_LABELS, type UserRole } from '@/types';
 
 export const REPORT_KINDS = [
@@ -208,7 +208,7 @@ export type SendResult = 'sent' | 'not-allowed' | 'no-portal' | 'email-failed';
  * and another week of other people's data.
  */
 export async function sendSavedReport(r: SavedReport, runAt: Date): Promise<SendResult> {
-  const tenant = getTenantConfig(r.portal);
+  const tenant = getPortalSurface(r.portal);
   if (!tenant) return 'no-portal';
 
   const [owner] = await sql`
@@ -229,7 +229,7 @@ export async function sendSavedReport(r: SavedReport, runAt: Date): Promise<Send
 
   const kind = REPORT_KINDS.find((k) => k.value === r.report)?.label ?? r.report;
   const summary = describeFilters(filters, r.report);
-  const pageUrl = `${BASE_URL}/${r.portal}/admin?${filterQuery(savedFilters(r), { tab: r.report })}`;
+  const pageUrl = `${BASE_URL}${tenant.adminBase}?${filterQuery(savedFilters(r), { tab: r.report })}`;
   const html = `
     <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#1a1a1a;max-width:560px">
       <p>Hi ${esc((owner.given_name as string) || 'there')},</p>

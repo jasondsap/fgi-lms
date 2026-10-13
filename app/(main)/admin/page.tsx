@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { countUsers } from '@/lib/admin-users';
 import { countOpenTickets } from '@/lib/support-db';
-import { TENANT_SLUGS } from '@/lib/tenants';
 import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = { title: 'Admin — FGI Learning Resource Center' };
@@ -94,10 +93,10 @@ export default async function AdminPage() {
           </p>
         </Link>
 
-        {/* Portal Admin reports (9-19-26) live in each portal's chrome; the page
-            carries a portal switcher for FGI admins. */}
+        {/* Portal Admin reports (9-19-26) — the FGI library's own copy since
+            10-13-26; the page carries a switcher to Colorado and SCARR. */}
         <Link
-          href={`/${TENANT_SLUGS[0]}/admin`}
+          href="/admin/portal"
           style={{
             display: 'block', textDecoration: 'none', color: 'inherit',
             background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
@@ -107,7 +106,7 @@ export default async function AdminPage() {
         >
           <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Portal Reports</div>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-            What each portal&#39;s Portal Admin sees — that portal&#39;s users, registration data, and progress, with filters and CSV / Excel export.
+            Users, registration data, progress and evaluations for the Fletcher Group library — and, via the switcher, what each portal&#39;s Portal Admin sees. Filters, saved reports, CSV / Excel export.
           </p>
         </Link>
 

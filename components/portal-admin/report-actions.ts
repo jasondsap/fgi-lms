@@ -13,7 +13,7 @@ import {
   FORMATS, createSavedReport, deleteSavedReport, getSavedReport, isFrequency, isReportKind,
   sendSavedReport, setSchedule, type ReportFormat,
 } from '@/lib/portal-reports';
-import { getTenantConfig } from '@/lib/tenants';
+import { getPortalSurface } from '@/lib/portal-surfaces';
 import { canAdminPortal, getViewer } from '@/lib/viewer';
 
 const UUID = /^[0-9a-f-]{36}$/i;
@@ -21,7 +21,7 @@ const text = (form: FormData, key: string) => String(form.get(key) ?? '').trim()
 
 /** Who is asking, for which portal — or null when they may not administer it. */
 async function authorize(form: FormData): Promise<{ portal: string; userId: string } | null> {
-  const tenant = getTenantConfig(text(form, 'portal'));
+  const tenant = getPortalSurface(text(form, 'portal'));
   const viewer = await getViewer();
   if (!tenant || !viewer.userId || !canAdminPortal(viewer, tenant.slug)) return null;
   return { portal: tenant.slug, userId: viewer.userId };
@@ -29,7 +29,8 @@ async function authorize(form: FormData): Promise<{ portal: string; userId: stri
 
 /** Every action ends on the Saved reports tab with a one-line note. */
 function back(portal: string, note: string): never {
-  redirect(`/${portal}/admin?tab=saved&note=${encodeURIComponent(note)}`);
+  const base = getPortalSurface(portal)?.adminBase ?? `/${portal}/admin`;
+  redirect(`${base}?tab=saved&note=${encodeURIComponent(note)}`);
 }
 
 export async function saveReportAction(form: FormData): Promise<void> {
