@@ -141,6 +141,35 @@ const GUESTS = {
     org_logo_url: '/images/presenters/org-pew-charitable-trusts.webp',
     org_url: 'https://www.pew.org/en/about/experts/brandee-izquierdo',
   },
+  celisa: {
+    name: 'Celisa Lehew',
+    credentials: null,
+    // Title per the Ep 5 Information.docx.
+    title: 'Chief of Police, Chapel Hill Police Department',
+    // The docx has no bio (same gap as Ernie/Brandee) and the Town of Chapel
+    // Hill site has no chief's page — composed 10-15-26 from the Nov 18 2022
+    // appointment coverage (Chapelboro + ABC11). Every fact below is sourced
+    // there; the docx's "Guest Link" is the department page.
+    bio: 'Chief Celisa Lehew leads the Chapel Hill Police Department in ' +
+      'Chapel Hill, North Carolina. She joined the department as a patrol ' +
+      'officer in 2004 and went on to serve in leadership roles across each ' +
+      'of its divisions, rising to Assistant Chief before being selected ' +
+      'through a nationwide search as the town\'s ninth Chief of Police. She ' +
+      'took office on January 1, 2023, the first woman to lead the ' +
+      'department.\n' +
+      'A native of Sault Ste. Marie, Canada, Chief Lehew holds a Bachelor of ' +
+      'Science in Criminal Justice from Lake Superior State University and a ' +
+      'Master\'s in Justice Administration from Methodist University. Her ' +
+      'approach is built on community policing: "We have a very strong ' +
+      'foundation of community policing, and our officers are at the heart ' +
+      'of that."',
+    photo_url: '/images/presenters/celisa-lehew.webp',
+    org_name: 'Chapel Hill Police Department',
+    org_logo_url: '/images/presenters/org-chapel-hill-police.webp',
+    org_url: 'https://www.chapelhillnc.gov/Town-Government/Departments-and-Offices/Police',
+    // Second link from the docx: https://www.facebook.com/ChapelHillPD
+    // (presenters.org2_url exists but this loader's upsert doesn't write it).
+  },
 };
 
 // duration is ceil(minutes) from each Information.docx (1m22s, 14m26s, 52m,
@@ -257,6 +286,30 @@ const EPISODES = [
       'This conversation reminds us that recovery is more than treatment or ' +
       'crisis response. It is about building a full life across Health, Home, ' +
       'Purpose, and Community.',
+  },
+  {
+    slug: 'recovery-ecosystem-radio-episode-5',
+    title: 'Episode 5: Community Policing, Deflection, and Pre-Arrest Diversion ' +
+           'as Recovery Ecosystem Strategies',
+    // Released 10-15-26 via docs/pod cast (Jennifer's own folder). Title,
+    // date, length and description verbatim from its Information.docx.
+    dir: path.join(__dirname, '..', 'docs', 'pod cast', 'OneDrive_2026-10-15',
+                   'Episode 5 Celisa Lehew'),
+    file: 'Celisa Lehew -00 Recovery Ecosystem Podcast - Ep5 1st EDIT_ Celisa Lehew.mp3',
+    duration: 44, released: '2026-10-15',
+    tags: ['recovery_ecosystems', 'reentry', 'recovery_support'],
+    guest: 'celisa',
+    description:
+      'Chief Celisa Lehew, Chief of Police for the Chapel Hill Police ' +
+      'Department, joins Recovery Ecosystem Radio to explore how law ' +
+      'enforcement can serve as a critical front door for recovery.\n' +
+      'The discussion focuses on community policing, deflection, pre-arrest ' +
+      'diversion, public safety, housing recovery, and how strong ' +
+      'partnerships can connect people to Health, Home, Purpose, and ' +
+      'Community rather than deeper involvement in the justice system.\n' +
+      'This episode reminds us that public safety and recovery are not ' +
+      'separate; they are connected through dignity, trust, accountability, ' +
+      'and real pathways to long-term recovery.',
   },
 ];
 
