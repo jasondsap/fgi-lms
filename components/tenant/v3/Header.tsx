@@ -153,10 +153,20 @@ export default function TenantHeaderV3({
     </>
   );
 
+  // Pinned to the viewport like the FGI header (Jennifer's burn-down, "static
+  // header when in library", 10-19-26): the portal chrome stays put while the
+  // library scrolls, so Home / Library / the cert pills are always reachable.
+  // Inline so it beats the `.site-header { position: relative }` base rule.
+  const chrome: React.CSSProperties = {
+    position: 'sticky', top: 0, zIndex: 100,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+    borderBottom: `5px solid ${tenant.accent}`,
+  };
+
   if (v3.lobe) {
     const edgePad = 'max(2rem, calc((100vw - var(--max-width)) / 2))';
     return (
-      <header className="site-header" style={{ background: v3.lobe.bg, borderBottom: `5px solid ${tenant.accent}` }}>
+      <header className="site-header" style={{ ...chrome, background: v3.lobe.bg }}>
         <div className="site-header-inner" style={{
           display: 'flex', alignItems: 'stretch',
           paddingLeft: edgePad,
@@ -193,7 +203,7 @@ export default function TenantHeaderV3({
   }
 
   return (
-    <header className="site-header gutter" style={{ background: tenant.primary, borderBottom: `5px solid ${tenant.accent}` }}>
+    <header className="site-header gutter" style={{ ...chrome, background: tenant.primary }}>
       <div className="site-header-inner" style={{
         maxWidth: 'var(--max-width)', margin: '0 auto',
         display: 'flex', alignItems: 'center', gap: '1.75rem',
