@@ -365,18 +365,24 @@ export const HELP_TOPICS: HelpTopic[] = [
     category: 'Certification Portals',
     name: 'Pre-Certification Videos',
     description:
-      'The pre-certification course is a seven-part video series taken in order: each video unlocks after you’ve watched the one before it (about 90% counts as watched). The certificate unlocks after all seven plus the evaluation.',
+      'The pre-certification course is a seven-part video series taken in order: each video unlocks after you’ve watched the one before it (about 90% counts as watched). The certificate unlocks after all seven, the acknowledgment where the course has one, and the evaluation.',
     quickStart: [
       'Click the Pre-Certification button in the portal header, or tick Pre-Cert. Required Course under Certification Info in the library filter bar.',
       'Start with Part 1 and let each video play through.',
       'Each next part unlocks as the previous one completes.',
+      'If the sidebar lists a Certification Prerequisite Acknowledgment, open it and choose I Agree on each statement — Continue unlocks once all are agreed.',
       'Submit the evaluation, then download your certificate.',
     ],
     tips: [
       'A locked video’s tooltip says exactly what to finish first.',
       'Your progress through the series also appears on My Resources as a program.',
     ],
-    faqs: [],
+    faqs: [
+      {
+        q: 'What is the Certification Prerequisite Acknowledgment?',
+        a: 'Four statements about what a certified recovery residence can and cannot do. It isn’t a test and there is no score — choose I Agree on each statement and click Continue. Nothing is recorded until all four are agreed, and your certificate needs it to unlock.',
+      },
+    ],
   },
   {
     id: 'cert-docs',

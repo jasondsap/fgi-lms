@@ -143,9 +143,15 @@ const UI_CTE = `
   cp AS (
     SELECT p.* FROM user_course_progress p JOIN pu ON pu.id = p.user_id
   ),
+  ca AS (
+    SELECT a.user_id, a.resource_id, MIN(a.created_at) AS acknowledged_at
+    FROM course_acknowledgments a JOIN pu ON pu.id = a.user_id
+    GROUP BY a.user_id, a.resource_id
+  ),
   ui AS (
     SELECT COALESCE(ev.user_id, cp.user_id)         AS user_id,
            COALESCE(ev.resource_id, cp.resource_id) AS resource_id,
+           ca.acknowledged_at,
            (cp.user_id IS NOT NULL)                 AS is_course,
            COALESCE(ev.views, 0)::int               AS views,
            COALESCE(ev.shares, 0)::int              AS shares,
@@ -158,6 +164,8 @@ const UI_CTE = `
            cp.cert_earned, cp.ce_hours
     FROM ev
     FULL JOIN cp ON cp.user_id = ev.user_id AND cp.resource_id = ev.resource_id
+    LEFT JOIN ca ON ca.user_id = COALESCE(ev.user_id, cp.user_id)
+                AND ca.resource_id = COALESCE(ev.resource_id, cp.resource_id)
   )`;
 
 interface Built { userConds: string[]; itemConds: string[]; values: unknown[] }
@@ -383,12 +391,14 @@ export interface PortalProgressRow {
   quiz_best: number | null;
   quiz_max: number | null;
   quiz_passed: boolean | null;
+  /** Course acknowledgment agreed on the site (10-18-26; Colorado pre-cert). */
+  acknowledged_at: string | null;
   eval_submitted: boolean | null;
   cert_earned: boolean | null;
   ce_hours: number | null;
 }
 
-const num = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
+const num =(v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
 
 export async function listPortalProgress(
   portal: string, f: PortalFilters, limit = 20000, onlyUserId?: string,
@@ -403,7 +413,7 @@ export async function listPortalProgress(
                     WHERE rv.resource_id = ui.resource_id AND t.slug = $1) AS on_portal,
             ui.is_course, ui.views, ui.shares, ui.downloads, ui.first_at, ui.last_at, ui.completed_at,
             ui.pct, ui.tracked_done, ui.tracked_total, ui.quiz_best, ui.quiz_max, ui.quiz_passed,
-            ui.eval_submitted, ui.cert_earned, ui.ce_hours
+            ui.acknowledged_at, ui.eval_submitted, ui.cert_earned, ui.ce_hours
      FROM ui
      JOIN users u ON u.id = ui.user_id
      LEFT JOIN resources r ON r.id = ui.resource_id

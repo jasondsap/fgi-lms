@@ -44,7 +44,7 @@ export function progressTable(rows: PortalProgressRow[], portalName: string): Re
       'Item', 'ID', 'Type', 'Library', 'Status', 'Progress %',
       'First accessed', 'Last accessed', 'Completed',
       'Views', 'Shares', 'Downloads',
-      'Quiz score', 'Quiz passed', 'Evaluation submitted', 'Certificate earned', 'CE hours'],
+      'Quiz score', 'Quiz passed', 'Acknowledged', 'Evaluation submitted', 'Certificate earned', 'CE hours'],
     rows: rows.map((r) => [
       name(r), r.email, r.organization ?? '', r.county ?? '', r.zip ?? '',
       r.title ?? '(item removed)', r.course_code ?? '', typeLabel(r.type),
@@ -53,7 +53,7 @@ export function progressTable(rows: PortalProgressRow[], portalName: string): Re
       date(r.first_at), date(r.last_at), date(r.completed_at),
       r.views, r.shares, r.downloads,
       r.quiz_best !== null && r.quiz_max ? `${Math.round(r.quiz_best)} / ${Math.round(r.quiz_max)}` : '',
-      yesNo(r.quiz_passed), r.is_course ? yesNo(r.eval_submitted) : '',
+      yesNo(r.quiz_passed), date(r.acknowledged_at), r.is_course ? yesNo(r.eval_submitted) : '',
       r.is_course ? yesNo(r.cert_earned) : '',
       r.completed_at && r.ce_hours ? r.ce_hours : null,
     ]),

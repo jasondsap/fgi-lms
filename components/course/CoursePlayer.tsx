@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import EvaluationForm from '@/components/resource/EvaluationForm';
+import AcknowledgmentForm from '@/components/course/AcknowledgmentForm';
 import { EVALUATION_INTRO, EVALUATION_THANKS } from '@/lib/evaluation-items';
+import type { CourseAcknowledgment } from '@/lib/acknowledgment-items';
 
 export interface PlayerModule {
   cmid: number;
@@ -47,6 +49,11 @@ interface Props {
   /** Site evaluation (8-30-26): clicking the evaluation activity renders the
       Learning Center survey in the pane instead of Moodle's feedback UI. */
   siteEvaluation?: boolean;
+  /** Site acknowledgment (10-18-26): clicking the configured activity renders
+      the agreement pane instead of Moodle's quiz. `acknowledgedAt` is the
+      Neon record — set with an incomplete Moodle state means the completion
+      mark is still owed, and the pane offers to finish it. */
+  acknowledgment?: { config: CourseAcknowledgment; acknowledgedAt: string | null };
   /** 'fgi' | tenant slug — stored with the evaluation response. */
   surfaceKey?: string;
   /** Surface accent for the survey controls. */
@@ -71,7 +78,7 @@ const groupModules = (g: PlayerGroup): PlayerModule[] =>
 
 export default function CoursePlayer({
   title, slug, basePath, sections, initialSrc, initialCmid,
-  siteEvaluation = false, surfaceKey = 'fgi', accent = 'var(--fgi-blue)',
+  siteEvaluation = false, acknowledgment, surfaceKey = 'fgi', accent = 'var(--fgi-blue)',
 }: Props) {
   const router = useRouter();
   // iframe src lives in state so server refreshes (which mint a new one-time
@@ -81,13 +88,26 @@ export default function CoursePlayer({
   // Collapsed groups only — everything starts expanded, so a group added by a
   // later course edit is visible rather than silently folded away.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  // Site evaluation pane state: showing it, and submitted-this-session.
-  const [showEval, setShowEval] = useState(false);
-  const [evalDone, setEvalDone] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const allGroups = sections.flatMap((s) => s.groups);
   const allModules = allGroups.flatMap(groupModules);
+
+  const isSiteEval = (m: PlayerModule) =>
+    siteEvaluation && (m.modname === 'feedback' || m.modname === 'questionnaire');
+  const isSiteAck = (m: PlayerModule) =>
+    !!acknowledgment && m.cmid === acknowledgment.config.cmid;
+
+  // Site evaluation / acknowledgment pane state: showing it, and
+  // submitted-this-session. When the player opens directly on one of them
+  // (`?cm=` from My Resources "Resume", or the acknowledgment being the next
+  // item) the pane must be up from the first paint — otherwise the iframe
+  // underneath shows Moodle's own quiz / feedback page.
+  const initialModule = allModules.find((m) => m.cmid === initialCmid);
+  const [showEval, setShowEval] = useState(() => !!initialModule && isSiteEval(initialModule));
+  const [evalDone, setEvalDone] = useState(false);
+  const [showAck, setShowAck] = useState(() => !!initialModule && isSiteAck(initialModule));
+  const [ackDone, setAckDone] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   // Only completion-tracked modules count toward progress — a certificate or
   // reference link with no tracking would otherwise hold the bar under 100%.
   const trackedModules = allModules.filter((m) => m.completion > 0);
@@ -108,18 +128,24 @@ export default function CoursePlayer({
     return () => clearInterval(t);
   }, [router]);
 
-  const isSiteEval = (m: PlayerModule) =>
-    siteEvaluation && (m.modname === 'feedback' || m.modname === 'questionnaire');
-
   const openModule = (m: PlayerModule) => {
     setActiveCmid(m.cmid);
     if (isSiteEval(m)) {
       // The Learning Center survey renders in the pane — Moodle's feedback
       // UI is never shown (Jennifer, 8-30).
+      setShowAck(false);
       setShowEval(true);
       return;
     }
+    if (isSiteAck(m)) {
+      // The agreement renders in the pane — Moodle's quiz UI is never shown
+      // (Jennifer, 10-15; Gino's ticket 10-18).
+      setShowEval(false);
+      setShowAck(true);
+      return;
+    }
     setShowEval(false);
+    setShowAck(false);
     // The Moodle session cookie was established by the initial SSO load —
     // plain activity URLs work from here on.
     setIframeSrc(m.url);
@@ -189,8 +215,8 @@ export default function CoursePlayer({
             display: 'block', fontSize: '11px', color: 'var(--text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '2px',
           }}>
-            {MODNAME_LABELS[m.modname] ?? m.modname}
-            {m.state === 3 ? ' · not yet passed' : ''}
+            {isSiteAck(m) ? 'Acknowledgment' : (MODNAME_LABELS[m.modname] ?? m.modname)}
+            {m.state === 3 && !isSiteAck(m) ? ' · not yet passed' : ''}
             {locked ? ` · ${(m.lockTitle ?? 'Complete all items to unlock').toLowerCase()}` : ''}
           </span>
         </span>
@@ -356,6 +382,59 @@ export default function CoursePlayer({
             </div>
           </div>
         )}
+        {showAck && acknowledgment && (() => {
+          const ack = acknowledgment.config;
+          const moodleDone = allModules.some((m) => m.cmid === ack.cmid && (m.state === 1 || m.state === 2));
+          const done = ackDone || moodleDone;
+          // Agreed in Neon but the Moodle mark is still owed (it failed, or
+          // the plugin wasn't ready): prefill and let Continue finish it.
+          const owed = !done && !!acknowledgment.acknowledgedAt;
+          return (
+            <div style={{
+              position: 'absolute', inset: 0, overflowY: 'auto',
+              background: '#ffffff', zIndex: 5,
+            }}>
+              <div style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1.5rem 3rem' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                  {done ? ack.done.heading : ack.title}
+                </h2>
+                {done ? (
+                  ack.done.lines.map((line, i) => (
+                    <p key={i} style={{ fontSize: '16px', fontWeight: i === 0 ? 600 : 400, margin: '1rem 0 0', lineHeight: 1.55 }}>
+                      {line}
+                    </p>
+                  ))
+                ) : (
+                  <>
+                    {ack.intro.map((line, i) => (
+                      <p key={i} style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                        {line}
+                      </p>
+                    ))}
+                    {owed && (
+                      <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: '10px 0 0', lineHeight: 1.5 }}>
+                        Your agreement was recorded on{' '}
+                        {new Date(acknowledgment.acknowledgedAt!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.
+                        Click {ack.submitLabel} to finish applying it to the course.
+                      </p>
+                    )}
+                    <div style={{ marginTop: '1.25rem' }}>
+                      <AcknowledgmentForm
+                        key={owed ? 'owed' : 'fresh'}
+                        ack={ack}
+                        slug={slug}
+                        surface={surfaceKey}
+                        accent={accent}
+                        initialAgreed={owed}
+                        onDone={() => { setAckDone(true); router.refresh(); }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })()}
         <iframe
           ref={iframeRef}
           src={iframeSrc}

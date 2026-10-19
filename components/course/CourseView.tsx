@@ -19,6 +19,7 @@ import CoursePlayer, {
 } from '@/components/course/CoursePlayer';
 import type { Surface } from '@/lib/surface';
 import { syncCourseProgress } from '@/lib/progress';
+import { getAcknowledgedAt, getCourseAcknowledgment } from '@/lib/acknowledgment';
 
 /**
  * Moodle's web services return activity and section names HTML-escaped
@@ -59,15 +60,26 @@ const CERTIFICATE_MODNAMES = new Set(['customcert']);
  * come from module order and type. `build-course2.js` emits each lesson
  * followed by its own handouts, which is exactly the shape this relies on.
  */
-function groupModules(modules: PlayerModule[]): PlayerGroup[] {
+function groupModules(
+  modules: PlayerModule[],
+  acknowledgment?: { cmid: number; label: string },
+): PlayerGroup[] {
   const groups: PlayerGroup[] = [];
   const evaluation: PlayerModule[] = [];
+  const acknowledgments: PlayerModule[] = [];
   const certificates: PlayerModule[] = [];
   let current: PlayerGroup | null = null;
 
   for (const m of modules) {
     if (CERTIFICATE_MODNAMES.has(m.modname)) {
       certificates.push(m);
+      continue;
+    }
+    // The site acknowledgment (10-18-26) gets its own block ahead of the
+    // evaluation — Jennifer: the heading must read ACKNOWLEDGMENT, not
+    // EVALUATION, and it is not a quiz even though Moodle still holds a quiz.
+    if (acknowledgment && m.cmid === acknowledgment.cmid) {
+      acknowledgments.push(m);
       continue;
     }
     if (EVALUATION_MODNAMES.has(m.modname)) {
@@ -88,6 +100,12 @@ function groupModules(modules: PlayerModule[]): PlayerGroup[] {
     current.items.push(m);
   }
 
+  if (acknowledgments.length) {
+    groups.push({
+      key: 'acknowledgment', kind: 'evaluation', lead: null,
+      label: acknowledgment!.label, items: acknowledgments,
+    });
+  }
   if (evaluation.length) {
     groups.push({ key: 'evaluation', kind: 'evaluation', lead: null, label: 'Evaluation', items: evaluation });
   }
@@ -205,6 +223,14 @@ export default async function CourseView(
 
   const completionByCmid = new Map(completion.map((c) => [c.cmid, c.state]));
 
+  // Site acknowledgment (10-18-26): the configured activity renders as the
+  // agreement pane instead of Moodle's quiz. The Neon date tells the pane the
+  // learner already agreed even if the Moodle completion mark is still owed.
+  const ackConfig = getCourseAcknowledgment(courseId);
+  const acknowledgedAt = ackConfig
+    ? await getAcknowledgedAt(user.id, ackConfig.cmid).catch(() => null)
+    : null;
+
   const playerSections: PlayerSection[] = sections
     .filter((s) => s.visible)
     .map((s) => {
@@ -218,7 +244,9 @@ export default async function CourseView(
         .map(
           (m): PlayerModule => ({
             cmid: m.id,
-            name: decodeEntities(m.name),
+            // The acknowledgment's name comes from the site config so the
+            // sidebar is right before and after the Moodle rename lands.
+            name: ackConfig && m.id === ackConfig.cmid ? ackConfig.title : decodeEntities(m.name),
             modname: m.modname,
             url: getActivityEmbedUrl(m) ?? m.url!,
             // 0 incomplete, 1 complete, 2 complete-pass, 3 complete-fail
@@ -231,7 +259,10 @@ export default async function CourseView(
       return {
         id: s.id,
         name: /^\d*$/.test(name) ? '' : name,
-        groups: groupModules(modules),
+        groups: groupModules(
+          modules,
+          ackConfig ? { cmid: ackConfig.cmid, label: ackConfig.groupLabel } : undefined,
+        ),
       };
     })
     .filter((s) => s.groups.length > 0);
@@ -297,6 +328,10 @@ export default async function CourseView(
       initialSrc={initialSrc}
       initialCmid={firstModule.cmid}
       siteEvaluation={usesSiteEvaluation(courseId)}
+      acknowledgment={ackConfig ? {
+        config: ackConfig,
+        acknowledgedAt: acknowledgedAt ? acknowledgedAt.toISOString() : null,
+      } : undefined}
       surfaceKey={surface.key}
       accent={surface.primary}
     />

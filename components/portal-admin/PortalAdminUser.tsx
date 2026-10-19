@@ -113,6 +113,7 @@ export default async function PortalAdminUser({ surface: tenant, id }: { surface
                   <th style={TH}>Completed</th>
                   <th style={{ ...TH, textAlign: 'right' }}>Views</th>
                   <th style={TH}>Quiz</th>
+                  <th style={TH}>Acknowledged</th>
                   <th style={TH}>Evaluation</th>
                   <th style={TH}>Certificate</th>
                 </tr>
@@ -143,6 +144,7 @@ export default async function PortalAdminUser({ surface: tenant, id }: { surface
                       {r.quiz_passed === null ? '—' : r.quiz_passed ? 'Passed' : 'Not passed'}
                       {r.quiz_best !== null && r.quiz_max ? ` (${Math.round(r.quiz_best)}/${Math.round(r.quiz_max)})` : ''}
                     </td>
+                    <td style={{ ...TD, whiteSpace: 'nowrap' }}>{r.acknowledged_at ? fmtDate(r.acknowledged_at) : '—'}</td>
                     <td style={TD}>{r.is_course ? (r.eval_submitted ? 'Submitted' : 'Not yet') : '—'}</td>
                     <td style={TD}>{r.is_course ? (r.cert_earned ? 'Earned' : 'Not yet') : '—'}</td>
                   </tr>

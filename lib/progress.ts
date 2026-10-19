@@ -218,8 +218,10 @@ export async function syncCourseProgress(input: SyncInput): Promise<DerivedProgr
       console.warn('Grade lookup skipped:', (e as Error).message);
     }
     // Completion state carries pass/fail when the quiz completes on a passing
-    // grade (2 = complete-pass, 3 = complete-fail).
-    if (d.quiz_state === 2) quizPassed = true;
+    // grade (2 = complete-pass, 3 = complete-fail). Plain complete (1) only
+    // happens on a quiz that is no longer graded for completion — the site
+    // acknowledgment's override (10-18-26) — and that is a pass.
+    if (d.quiz_state === 2 || d.quiz_state === 1) quizPassed = true;
     else if (d.quiz_state === 3) quizPassed = false;
     else if (quizBest !== null && quizMax) quizPassed = quizBest / quizMax >= 0.7;
   }
