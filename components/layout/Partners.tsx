@@ -6,13 +6,15 @@ import Link from 'next/link';
 // Each logo links out to the partner's site in a new tab (Jennifer's
 // burn-down row "link to all partners when click logo"; URLs sent 10-19-26).
 // HRSA is on her list but has no logo on the strip — the footer disclaimer
-// covers it.
+// covers it. MISMATCH flagged 10-19: the partner-marr.png artwork reads
+// "Michigan Association of Recovery Resources" but Jennifer's URL is the
+// Maine association — one of the two is wrong; alt text follows the artwork.
 const PARTNERS = [
   { file: 'partner-naadac',     alt: 'NAADAC Approved Education Provider', width: 76,  height: 76,  href: 'https://www.naadac.org/' },
   { file: 'partner-elevenlabs', alt: 'IIElevenLabs',                       width: 115, height: 42,  href: 'https://elevenlabs.io/' },
   { file: 'partner-par',        alt: 'PAR — People Advocating Recovery',   width: 100, height: 51,  href: 'https://peopleadvocatingrecovery.org/' },
-  { file: 'partner-marr',       alt: 'MARR — Maine Association of Recovery Residences', width: 100, height: 51, href: 'https://www.mainerecoveryresidences.com/' },
-  { file: 'partner-ohio-rh',    alt: 'ORH-CO — Recovery Housing Colorado', width: 92,  height: 66,  href: 'https://corecoveryhousing.org/' },
+  { file: 'partner-marr',       alt: 'MARR — Michigan Association of Recovery Resources', width: 100, height: 51, href: 'https://www.mainerecoveryresidences.com/' },
+  { file: 'partner-ohio-rh',    alt: 'Ohio Recovery Housing Colorado'    , width: 92,  height: 66,  href: 'https://corecoveryhousing.org/' },
   { file: 'partner-scarr',      alt: 'SCARR — South Carolina Alliance for Recovery Residences', width: 92, height: 66, href: 'https://scarronline.org/' },
   { file: 'partner-marshall',   alt: 'Marshall Health',                    width: 75,  height: 50,  href: 'https://www.marshallhealth.org/' },
   { file: 'partner-webberized', alt: 'Webberized',                         width: 56,  height: 60,  href: 'https://webberized.com/' },
@@ -49,6 +51,7 @@ export default function Partners() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={alt}
+                className="partner-logo"
                 style={{ flexShrink: 0, display: 'flex', alignItems: 'center', lineHeight: 0 }}
               >
                 <Image

@@ -207,6 +207,31 @@ html, body { overflow-x: clip; }
   .tenant-logo img { max-width: 150px; }
 }
 
+/* ---- Partner logos (10-19-26): lift + grow on hover/focus so the logos
+   read as links; the gold brand underline fades in beneath. ---------------- */
+.partner-logo {
+  position: relative; border-radius: 6px;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+.partner-logo::after {
+  content: ''; position: absolute; left: 10%; right: 10%; bottom: -8px;
+  height: 3px; border-radius: 2px; background: var(--fgi-gold, #f5c518);
+  opacity: 0; transform: scaleX(0.4);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.partner-logo:hover, .partner-logo:focus-visible {
+  transform: translateY(-4px) scale(1.06);
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+  outline: none;
+}
+.partner-logo:hover::after, .partner-logo:focus-visible::after {
+  opacity: 1; transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .partner-logo, .partner-logo::after { transition: none; }
+  .partner-logo:hover, .partner-logo:focus-visible { transform: none; }
+}
+
 /* ---- Library: sidebar + grid ------------------------------------------- */
 .library-layout { display: flex; gap: 2rem; align-items: flex-start; }
 .resource-grid {
