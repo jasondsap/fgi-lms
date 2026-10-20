@@ -124,7 +124,7 @@ export async function updateTicketAction(
   listPath: string,
   ticketId: string,
   input: { status: string; priority: string; assignedTo: string | null; resolutionNote: string },
-): Promise<{ ok: true } | { error: string }> {
+): Promise<{ ok: true; notified: boolean } | { error: string }> {
   const viewer = await getViewer();
   if (viewer.role !== 'admin' || !viewer.userId || !UUID.test(ticketId)) return { error: 'Not allowed.' };
   if (!TICKET_STATUS_VALUES.has(input.status)) return { error: 'Unknown status.' };
@@ -147,12 +147,13 @@ export async function updateTicketAction(
   // Entering resolved/closed emails the submitter (8-31-26). Only on the
   // transition — re-saving an already-resolved ticket stays quiet. Best-effort.
   const DONE = new Set(['resolved', 'closed']);
+  let notified = false;
   if (
     DONE.has(input.status) && !DONE.has(before.status)
     && before.submitted_by !== viewer.userId && before.submitted_by_email
   ) {
     try {
-      await notifyTicketResolved({
+      notified = await notifyTicketResolved({
         ticketId,
         title: before.title,
         status: input.status,
@@ -167,7 +168,7 @@ export async function updateTicketAction(
 
   revalidatePath(`${safePath(listPath)}/${ticketId}`);
   revalidatePath('/admin/support');
-  return { ok: true };
+  return { ok: true, notified };
 }
 
 /**

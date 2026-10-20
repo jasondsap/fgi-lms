@@ -237,9 +237,9 @@ export async function notifyTicketResolved(input: {
   resolutionNote: string | null;
   toEmail: string;
   surface: string | null | undefined;
-}): Promise<void> {
+}): Promise<boolean> {
   const closed = input.status === 'closed';
-  await sendEmail({
+  return sendEmail({
     to: [input.toEmail],
     subject: `[LRC Support] Your ticket was ${closed ? 'closed' : 'resolved'}: ${input.title}`,
     html: ticketEmailHtml({

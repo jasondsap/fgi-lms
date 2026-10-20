@@ -7,7 +7,7 @@
  * `isAdmin` and `listPath` ('/support' or '/<tenant>/support').
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   CATEGORY_LABEL, STATUS_LABEL, PRIORITY_LABEL, TICKET_PRIORITIES, TICKET_STATUSES,
@@ -53,6 +53,22 @@ export default function TicketDetailView({
   const [note, setNote] = useState(ticket.resolution_note ?? '');
   const [saving, setSaving] = useState(false);
   const [adminError, setAdminError] = useState('');
+  const [savedMsg, setSavedMsg] = useState('');
+
+  // After a save, router.refresh() hands us the stored record; mirror it so
+  // the triage card reflects what's actually saved (and "dirty" goes false).
+  // Keyed on the individual fields, so a comment-only refresh leaves an
+  // in-progress edit alone.
+  useEffect(() => { setStatus(ticket.status); }, [ticket.status]);
+  useEffect(() => { setPriority(ticket.priority); }, [ticket.priority]);
+  useEffect(() => { setAssignee(ticket.assigned_to ?? ''); }, [ticket.assigned_to]);
+  useEffect(() => { setNote(ticket.resolution_note ?? ''); }, [ticket.resolution_note]);
+
+  const dirty =
+    status !== ticket.status
+    || priority !== ticket.priority
+    || assignee !== (ticket.assigned_to ?? '')
+    || note.trim() !== (ticket.resolution_note ?? '');
 
   // Delete flow: click once to arm, again to confirm
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -71,14 +87,17 @@ export default function TicketDetailView({
   };
 
   const saveAdmin = async () => {
-    if (saving) return;
+    if (saving || !dirty) return;
     setSaving(true);
     setAdminError('');
+    setSavedMsg('');
     const result = await updateTicketAction(listPath, ticket.id, {
       status, priority, assignedTo: assignee || null, resolutionNote: note,
     });
     setSaving(false);
     if ('error' in result) { setAdminError(result.error); return; }
+    const who = ticket.submitted_by_name?.split(' ')[0] || 'The submitter';
+    setSavedMsg(result.notified ? `Saved. ${who} was emailed the resolution.` : 'Saved.');
     router.refresh();
   };
 
@@ -301,17 +320,25 @@ export default function TicketDetailView({
                 Delete ticket
               </button>
             )}
-            <button
-              onClick={saveAdmin}
-              disabled={saving}
-              style={{
-                background: 'var(--fgi-navy)', color: '#fff', padding: '8px 20px', border: 'none',
-                borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600,
-                fontFamily: 'inherit', cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.55 : 1,
-              }}
-            >
-              {saving ? 'Saving…' : 'Save changes'}
-            </button>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: 'auto' }}>
+              {savedMsg && !dirty && (
+                <span role="status" style={{ fontSize: '13px', color: '#1e7a3a', fontWeight: 600 }}>
+                  ✓ {savedMsg}
+                </span>
+              )}
+              <button
+                onClick={saveAdmin}
+                disabled={saving || !dirty}
+                style={{
+                  background: 'var(--fgi-navy)', color: '#fff', padding: '8px 20px', border: 'none',
+                  borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 600,
+                  fontFamily: 'inherit', cursor: saving || !dirty ? 'default' : 'pointer',
+                  opacity: saving || !dirty ? 0.45 : 1,
+                }}
+              >
+                {saving ? 'Saving…' : dirty ? 'Save changes' : 'No unsaved changes'}
+              </button>
+            </span>
           </div>
         </div>
       )}
