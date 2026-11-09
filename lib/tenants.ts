@@ -160,6 +160,13 @@ export interface TenantV3 {
    * the accordion the FGI library and Colorado use.
    */
   filterBarStatic?: boolean;
+  /**
+   * Resource Type options this portal shows on top of the shared portal set
+   * (Jennifer, 11-9-26: Colorado gets "R.H. Guide/Handbook & Templates" for
+   * the Level 2/3 handbook templates). Values re-admitted past the filter
+   * group's `excludeOnTenant`.
+   */
+  filterExtraTypes?: string[];
   heroBg: string;
   /**
    * Optional smaller-print paragraph between the hero copy and the
@@ -366,6 +373,7 @@ const TENANTS: Record<string, TenantConfig> = {
     // info@corecoveryhousing.com while every other CO contact uses .org —
     // kept verbatim; flagged for Jennifer.
     v3: {
+      filterExtraTypes: ['guidebook'],
       orgSiteLabel: 'ORH-CO Web',
       orgSiteUrl: 'https://www.corecoveryhousing.org',
       headerLogo: {

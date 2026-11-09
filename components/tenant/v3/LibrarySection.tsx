@@ -96,7 +96,7 @@ export default async function TenantLibrarySection({
             <FilterSidebar
               total={data.total} targetPath={targetPath} isTenant
               fgiLibraryHref={`/library?from=${tenant.slug}`} fgiLibraryNewTab
-              alwaysOpen={v3.filterBarStatic}
+              alwaysOpen={v3.filterBarStatic} extraTypes={v3.filterExtraTypes}
             />
           </Suspense>
           <div style={{ flex: 1, minWidth: 0 }}>

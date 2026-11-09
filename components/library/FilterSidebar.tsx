@@ -26,6 +26,9 @@ interface Props {
    * `TenantV3.filterBarStatic`.
    */
   alwaysOpen?: boolean;
+  /** Portal-only: Resource Type values shown despite `excludeOnTenant`
+      (TenantV3.filterExtraTypes — Colorado's guidebook option, 11-9-26). */
+  extraTypes?: string[];
 }
 
 /**
@@ -113,7 +116,7 @@ function CheckItem({ label, checked, onChange }: { label: string; checked: boole
 
 export default function FilterSidebar({
   total, targetPath, isTenant = false, fgiLibraryHref, fgiLibraryLabel, fgiLibraryNewTab = false,
-  alwaysOpen = false,
+  alwaysOpen = false, extraTypes,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -204,7 +207,8 @@ export default function FilterSidebar({
               label: (isTenant && g.tenantLabels?.[i]) || g.labels?.[i] || labels[i] || i,
             }
           : i))
-        .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)))
+        .filter(i => !(isTenant && g.excludeOnTenant?.includes(i.value)
+          && !(g.param === 'type' && extraTypes?.includes(i.value))))
         .filter(i => !g.hidden?.includes(i.value))
         .filter(i => isTenant || !('tenantOnly' in i && i.tenantOnly));
       return { title: g.title, items };
