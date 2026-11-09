@@ -14,7 +14,8 @@
 // Usage:  sudo -u daemon /opt/bitnami/php/bin/php buildwebinar.php <spec.json> [--dry]
 // Spec:   {"shortname","fullname","summary","vimeo_id","padding":"56.25%",
 //          "transcript":"/tmp/x/transcript.pdf","slides":"/tmp/x/slides.pdf",
-//          "questions":"/tmp/x/questions.xml","cert_template":"NAADAC Certificate"}
+//          "questions":"/tmp/x/questions.xml","cert_template":"NAADAC Certificate",
+//          "handouts":[{"name","file","filename"}]}   (questions + handouts optional)
 // Idempotent: the course is reused by shortname, every module is skipped by
 // name, the bank is only imported when empty, slots only added when none.
 define('CLI_SCRIPT', true);
@@ -129,6 +130,12 @@ function add_pdf(stdClass $course, string $name, string $src, string $filename):
 }
 if (!empty($spec['transcript'])) { add_pdf($course, 'Webinar Transcript', $spec['transcript'], 'transcript.pdf'); }
 if (!empty($spec['slides'])) { add_pdf($course, 'Presentation Slides', $spec['slides'], 'slides.pdf'); }
+// Optional extra PDFs (11-9-26, the Nov 2026 suicide-prevention resource sheet):
+// "handouts":[{"name":"…","file":"/tmp/x/y.pdf","filename":"y.pdf"}]
+foreach ($spec['handouts'] ?? [] as $h) {
+    if (empty($h['name']) || empty($h['file']) || !file_exists($h['file'])) { cli_error('bad handout: ' . json_encode($h)); }
+    add_pdf($course, $h['name'], $h['file'], $h['filename'] ?? basename($h['file']));
+}
 
 // ---- 5. question bank + import ---------------------------------------------
 // No "questions" in the spec (and no bank built earlier) → no bank, no quiz,
