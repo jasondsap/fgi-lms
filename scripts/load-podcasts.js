@@ -170,6 +170,37 @@ const GUESTS = {
     // Second link from the docx: https://www.facebook.com/ChapelHillPD
     // (presenters.org2_url exists but this loader's upsert doesn't write it).
   },
+  phil: {
+    name: 'Phil Rutherford',
+    credentials: null,
+    // Title per the Ep 6 Information.docx (his National Council page writes
+    // "Philip" and words the role slightly differently).
+    title: 'Vice President of Growth & Substance Use Strategy, ' +
+           'National Council for Mental Wellbeing',
+    // Bio verbatim from his National Council page (the docx's Guest Link) —
+    // the docx has no bio text, same gap as Ernie/Brandee/Celisa.
+    bio: 'Philip Rutherford is the vice president for substance use ' +
+      'continuum in the Strategy and Growth Office at the National Council ' +
+      'for Mental Wellbeing. In this role, he expands the organization’s ' +
+      'impact in addressing the quality, effectiveness, accessibility and ' +
+      'affordability of substance use programs and services for National ' +
+      'Council members. He is also tasked with charting a course for ' +
+      'progress, transformation and equity.\n' +
+      'Rutherford has managed strategy and operations for several ' +
+      'recovery-focused organizations. He is a member of committees at the ' +
+      'National Institutes of Health, the Food and Drug Administration and ' +
+      'other federal agencies. He serves on several nonprofit boards, ' +
+      'including Serve Minnesota, the National Association of Addiction ' +
+      'Treatment Providers and the Police Treatment and Community ' +
+      'Collaborative. Prior to the nonprofit world, he spent most of his ' +
+      'career at Microsoft, Micron Electronics and the Taylor Corporation. ' +
+      'Rutherford is an active member of the recovery community and has ' +
+      'considerable experience in the areas of reentry and equity.',
+    photo_url: '/images/presenters/phil-rutherford.webp',
+    org_name: 'National Council for Mental Wellbeing',
+    org_logo_url: '/images/presenters/org-national-council-mental-wellbeing.webp',
+    org_url: 'https://www.thenationalcouncil.org/people/philip-rutherford/',
+  },
 };
 
 // duration is ceil(minutes) from each Information.docx (1m22s, 14m26s, 52m,
@@ -310,6 +341,37 @@ const EPISODES = [
       'This episode reminds us that public safety and recovery are not ' +
       'separate; they are connected through dignity, trust, accountability, ' +
       'and real pathways to long-term recovery.',
+  },
+  {
+    slug: 'recovery-ecosystem-radio-episode-6',
+    title: 'Episode 6: From Lived Experience to Lasting Impact: Recovery ' +
+           'Advocacy, Equity, and Leadership',
+    // Released 11-15-26 via docs/pod cast. Title, date, length and
+    // description verbatim from its Information.docx. The MP3's filename
+    // says "Ep7" — the docx and folder both say Episode 6.
+    dir: path.join(__dirname, '..', 'docs', 'pod cast', 'OneDrive_2026-11-16',
+                   'Episode 6 Phil Rutherford'),
+    file: '00 Recovery Ecosystem Podcast - Ep7 Phil Rutherford 1st EDIT (2).mp3',
+    duration: 46, released: '2026-11-15',
+    tags: ['recovery_ecosystems', 'recovery_support'],
+    guest: 'phil',
+    description:
+      'In this conversation, host Tony White sits down with Phil ' +
+      'Rutherford, Vice President of Growth and Substance Use Strategy at ' +
+      'the National Council for Mental Wellbeing, to explore how lived ' +
+      'experience can shape the future of recovery. Drawing on his own ' +
+      'recovery journey and years of national advocacy and leadership, Phil ' +
+      'discusses why people with lived experience must be recognized as ' +
+      'experts and included in the rooms where policies and programs are ' +
+      'developed, not simply invited to share their stories after decisions ' +
+      'have been made.\n' +
+      'The conversation also examines the importance of community-led ' +
+      'solutions, the role national organizations can play in supporting ' +
+      'local efforts, and the growing influence of peer recovery ' +
+      'professionals.\n' +
+      'Along the way, Phil offers a reminder that recovery doesn’t have to ' +
+      'be extraordinary to be meaningful. As he puts it, “boring is ' +
+      'beautiful.”',
   },
 ];
 
