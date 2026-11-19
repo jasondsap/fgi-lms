@@ -4,6 +4,13 @@ import type { Presenter } from '@/types';
 import { linkLabel } from '@/lib/link-label';
 
 /**
+ * Images uploaded from /admin/content are served by app/media/[...key] from
+ * S3, already sized (400px square / 480px logo) and cached immutably — the
+ * Next optimizer has nothing to add and would only re-fetch them.
+ */
+const isUpload = (url: string) => url.startsWith('/media/');
+
+/**
  * Headshot + bio band, shared by the webinar layout (4-21-26 mockup) and the
  * PDF shell (8-11-26), which places the same card under the document.
  */
@@ -19,6 +26,7 @@ export default function PresenterCard(
         {p.photo_url ? (
           <Image
             src={p.photo_url} alt={p.name} width={140} height={140}
+            unoptimized={isUpload(p.photo_url)}
             style={{ width: '140px', height: '140px', objectFit: 'cover', borderRadius: '4px' }}
           />
         ) : (
@@ -52,6 +60,7 @@ export default function PresenterCard(
           <div style={{ width: '180px', height: '80px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Image
               src={p.org_logo_url} alt={p.org_name ?? ''} width={180} height={80}
+              unoptimized={isUpload(p.org_logo_url)}
               style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain' }}
             />
           </div>

@@ -140,6 +140,8 @@ export interface Resource {
   attachment_ext?: string;
   presenters?: Presenter[];
   materials?: ResourceMaterial[];
+  /** Set only on an admin's preview of an unpublished row (11-19-26). */
+  is_draft?: boolean;
 }
 
 // Resource as stored in DB (admin view — includes all fields)

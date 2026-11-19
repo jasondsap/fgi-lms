@@ -753,7 +753,15 @@ export async function isVisibleOnSurface(
   return Boolean(rows[0]);
 }
 
-export async function getResourceBySlug(slug: string): Promise<Resource | null> {
+/**
+ * `includeUnpublished` is the admin draft preview (11-19-26): /admin/content
+ * links a draft to its real page before it goes live. Only ResourceDetail
+ * passes it, and only for users.role = 'admin'; the public API route never does.
+ */
+export async function getResourceBySlug(
+  slug: string, opts: { includeUnpublished?: boolean } = {},
+): Promise<Resource | null> {
+  const draftsToo = opts.includeUnpublished === true;
   // Tagged-template form — slug is bound as a parameter, not interpolated.
   const rows = await sql`
     SELECT id, title, slug, type, description, duration_minutes,
@@ -765,15 +773,18 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
            -- The id itself stays server-side (see getCourseResource); the
            -- shells only need to know whether the course exists, and this
            -- shape is returned verbatim by /api/resources/[slug].
-           moodle_course_id IS NOT NULL AS has_moodle_course
+           moodle_course_id IS NOT NULL AS has_moodle_course,
+           published
     FROM resources
-    WHERE slug = ${slug} AND published = TRUE
+    WHERE slug = ${slug} AND (published = TRUE OR ${draftsToo})
     LIMIT 1
   `;
 
   if (!rows[0]) return null;
 
   const resource = { ...rows[0] } as any;
+  const isDraft = resource.published === false;
+  delete resource.published;
   let download_url: string | undefined;
   let attachment_url: string | undefined;
 
@@ -829,6 +840,7 @@ export async function getResourceBySlug(slug: string): Promise<Resource | null> 
 
   return {
     ...resource, download_url, attachment_url, attachment_ext, presenters, materials: publicMaterials,
+    ...(isDraft ? { is_draft: true } : {}),
   } as Resource;
 }
 

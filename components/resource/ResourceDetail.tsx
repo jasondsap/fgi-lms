@@ -56,7 +56,8 @@ export default async function ResourceDetail(
 
   // Query the DB directly — a server component must never fetch its own API
   // route at runtime (see docs/CLAUDE.md architecture notes).
-  const resource = await getResourceBySlug(slug);
+  // Admins also get unpublished rows — the draft preview from /admin/content.
+  const resource = await getResourceBySlug(slug, { includeUnpublished: viewer.role === 'admin' });
   if (!resource) notFound();
   if (resource.internal && !seesInternal) notFound();
   // PRIVATE is a staff-facing label (Jennifer, 10-12-26): strip it before the
@@ -68,7 +69,8 @@ export default async function ResourceDetail(
   // has saved this resource. Both are one cheap query; logging never throws.
   const userId = session?.user?.id;
   let saved = false;
-  if (userId) {
+  // A draft preview is not a learner view — keep it out of the activity log.
+  if (userId && !resource.is_draft) {
     [saved] = await Promise.all([
       isBookmarked(userId, resource.id),
       logResourceEvent(userId, resource.id, 'view', surface.key),
@@ -107,8 +109,15 @@ export default async function ResourceDetail(
           </div>
         </div>
       )}
+      {resource.is_draft && (
+        <div className="gutter" style={{ background: '#fdf3dd', borderBottom: '1px solid #f1dfae' }}>
+          <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto', padding: '9px 0', fontSize: '13.5px', color: '#6b5a2a' }}>
+            <strong>Draft preview.</strong> This page is not published — only admins can open it.
+          </div>
+        </div>
+      )}
       {shell}
-      {userId && (
+      {userId && !resource.is_draft && (
         <BookmarkButton
           resourceId={resource.id}
           initialSaved={saved}

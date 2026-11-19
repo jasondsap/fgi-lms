@@ -142,6 +142,23 @@ export default async function AdminPage() {
           </p>
         </Link>
 
+        {/* Self-serve loading (Jason, 11-19-26): newsletters and podcast
+            episodes, without a hand-off. */}
+        <Link
+          href="/admin/content"
+          style={{
+            display: 'block', textDecoration: 'none', color: 'inherit',
+            background: 'var(--card-bg, #fff)', border: '1px solid var(--border-color)',
+            borderLeft: '4px solid #8b6f00', borderRadius: 'var(--radius-md)',
+            padding: '18px 20px',
+          }}
+        >
+          <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '6px' }}>Add Content</div>
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            Load a newsletter or podcast episode — upload the file, add the description and tags, preview, publish.
+          </p>
+        </Link>
+
         {/* Catalog export (Jennifer, 10-12-26): every item with ID, filters,
             tags, and portal visibility — a download, not a page. */}
         <div
